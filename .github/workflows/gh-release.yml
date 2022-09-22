@@ -22,7 +22,7 @@ jobs:
       #Create github releases
       - uses: ./.github/actions/create-release
         with:
-          package-path: packages/common-avalanche
+          package-path: packages/common-ethereum
           repo-token: ${{ secrets.REPO_TOKEN }}
 
       - uses: ./.github/actions/create-release
@@ -32,5 +32,5 @@ jobs:
 
       - uses: ./.github/actions/create-release
         with:
-          package-path: packages/types-avalanche
+          package-path: packages/types-ethereum
           repo-token: ${{ secrets.REPO_TOKEN }}

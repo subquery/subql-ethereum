@@ -15,7 +15,7 @@ import {
   SubqlEthereumDataSource,
   FileType,
   ProjectManifestV1_0_0Impl,
-} from '@subql/common-avalanche';
+} from '@subql/common-ethereum';
 import { buildSchemaFromString } from '@subql/utils';
 import { GraphQLSchema } from 'graphql';
 import {

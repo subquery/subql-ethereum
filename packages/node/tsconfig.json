@@ -8,8 +8,8 @@
     "outDir": "./dist"
   },
   "references": [
-    { "path": "../common-avalanche" },
-    { "path": "../types-avalanche" }
+    { "path": "../common-ethereum" },
+    { "path": "../types-ethereum" }
   ],
   "include": ["src/**/*"]
 }

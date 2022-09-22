@@ -17,7 +17,7 @@ import {
   getYargsOption,
   profilerWrap,
 } from '@subql/node-core';
-import { EthereumBlockWrapper } from '@subql/types-avalanche';
+import { EthereumBlockWrapper } from '@subql/types-ethereum';
 import chalk from 'chalk';
 import { last } from 'lodash';
 import { AutoQueue, Queue } from '../../utils/autoQueue';

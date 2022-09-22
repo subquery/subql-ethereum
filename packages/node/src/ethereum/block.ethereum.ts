@@ -10,7 +10,7 @@ import {
   EthereumBlockFilter,
   EthereumBlockWrapper,
   EthereumTransaction,
-} from '@subql/types-avalanche';
+} from '@subql/types-ethereum';
 import { ethers } from 'ethers';
 import { flatten } from 'lodash';
 import {

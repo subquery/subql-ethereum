@@ -21,7 +21,7 @@ module.exports = {
 
   // An array of glob patterns indicating a set of files for which coverage information should be collected
   collectCoverageFrom: [
-    'packages/common-avalanche/src/**/*.ts',
+    'packages/common-ethereum/src/**/*.ts',
     'packages/node/src/**/*.ts',
   ],
 
@@ -85,7 +85,7 @@ module.exports = {
   // A map from regular expressions to module names or to arrays of module names that allow to stub out resources with a single module
   // moduleNameMapper: {},
   moduleNameMapper: {
-    '^@subql/common-avalanche/(.*)$': '<rootDir>/packages/common-avalanche/src/$1',
+    '^@subql/common-ethereum/(.*)$': '<rootDir>/packages/common-ethereum/src/$1',
   },
 
   // An array of regexp pattern strings, matched against all module paths before considered 'visible' to the module loader

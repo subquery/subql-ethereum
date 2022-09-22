@@ -3,4 +3,3 @@
 
 export * from './api.ethereum';
 export * from './api.service.ethereum';
-export * from './provider';

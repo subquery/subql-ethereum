@@ -8,7 +8,7 @@ import {
   isCustomDs,
   EthereumHandlerKind,
   SubqlHandlerFilter,
-} from '@subql/common-avalanche';
+} from '@subql/common-ethereum';
 import {
   ApiService,
   delay,
@@ -23,10 +23,10 @@ import {
   ApiWrapper,
   EthereumLogFilter,
   EthereumTransactionFilter,
-} from '@subql/types-avalanche';
+} from '@subql/types-ethereum';
 import { range, sortBy, uniqBy } from 'lodash';
-import { calcInterval } from '../avalanche/utils.avalanche';
 import { SubqlProjectDs, SubqueryProject } from '../configure/SubqueryProject';
+import { calcInterval } from '../ethereum/utils.ethereum';
 import { eventToTopic, functionToSighash } from '../utils/string';
 import { Dictionary, DictionaryService } from './dictionary.service';
 import { DsProcessorService } from './ds-processor.service';

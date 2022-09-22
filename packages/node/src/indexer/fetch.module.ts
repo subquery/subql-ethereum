@@ -12,8 +12,8 @@ import {
   DbModule,
   ApiService,
 } from '@subql/node-core';
-import { EthereumApiService } from '../avalanche/api.service.ethereum';
 import { SubqueryProject } from '../configure/SubqueryProject';
+import { EthereumApiService } from '../ethereum/api.service.ethereum';
 import { DictionaryService } from './dictionary.service';
 import { DsProcessorService } from './ds-processor.service';
 import { DynamicDsService } from './dynamic-ds.service';

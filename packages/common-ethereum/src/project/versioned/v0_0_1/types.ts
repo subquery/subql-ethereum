@@ -8,7 +8,7 @@ import {
   SubqlHandlerFilter,
   SubqlRuntimeDatasource,
   SubqlRuntimeHandler,
-} from '@subql/types-avalanche';
+} from '@subql/types-ethereum';
 
 export type ManifestV0_0_1Mapping = Omit<BaseMapping<SubqlHandlerFilter, SubqlRuntimeHandler>, 'file'>;
 

@@ -9,8 +9,8 @@ import {
   PoiService,
   MmrService,
 } from '@subql/node-core';
-import { EthereumApiService } from '../avalanche';
 import { SubqueryProject } from '../configure/SubqueryProject';
+import { EthereumApiService } from '../ethereum';
 import { DictionaryService } from './dictionary.service';
 import { DsProcessorService } from './ds-processor.service';
 import { DynamicDsService } from './dynamic-ds.service';

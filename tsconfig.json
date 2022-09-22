@@ -18,17 +18,17 @@
     "inlineSources": true,
     "composite": true,
     "paths": {
-      "@subql/common-avalanche": ["packages/common-avalanche/src"],
-      "@subql/common-avalanche/*": ["packages/common-avalanche/src/*"],
-      "@subql/types-avalanche": ["packages/types-avalanche/src"],
-      "@subql/types-avalanche/*": ["packages/types-avalanche/src/*"],
+      "@subql/common-ethereum": ["packages/common-ethereum/src"],
+      "@subql/common-ethereum/*": ["packages/common-ethereum/src/*"],
+      "@subql/types-ethereum": ["packages/types-ethereum/src"],
+      "@subql/types-ethereum/*": ["packages/types-ethereum/src/*"],
     },
     "skipLibCheck": true
   },
   "references": [
-    {"path": "packages/common-avalanche"},
+    {"path": "packages/common-ethereum"},
     {"path": "packages/node"},
-    {"path": "packages/types-avalanche"},
+    {"path": "packages/types-ethereum"},
   ],
   "include": ["packages/**/*"],
   "exclude": ["**/node_modules/**"],

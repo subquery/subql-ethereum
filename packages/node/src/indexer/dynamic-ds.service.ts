@@ -3,7 +3,7 @@
 
 import assert from 'assert';
 import { Injectable } from '@nestjs/common';
-import { isCustomDs, isRuntimeDs } from '@subql/common-avalanche';
+import { isCustomDs, isRuntimeDs } from '@subql/common-ethereum';
 import { getLogger, MetadataRepo } from '@subql/node-core';
 import { Transaction } from 'sequelize/types';
 import { SubqlProjectDs, SubqueryProject } from '../configure/SubqueryProject';

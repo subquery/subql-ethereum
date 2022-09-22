@@ -22,7 +22,7 @@ jobs:
   Build-Publish:
     name: Build-Publish
     needs: pre-ci
-    if: "!startsWith(github.event.head_commit.message, '[SKIP CI]') && startsWith(github.event.head_commit.message, '[release]') && github.repository == 'subquery/subql-avalanche'"
+    if: "!startsWith(github.event.head_commit.message, '[SKIP CI]') && startsWith(github.event.head_commit.message, '[release]') && github.repository == 'subquery/subql-ethereum'"
     runs-on: ubuntu-latest
     steps:
       #Check out
@@ -37,14 +37,14 @@ jobs:
 
     #Identify changes
       - uses: marceloprado/has-changed-path@v1
-        id: changed-types-avalanche
+        id: changed-types-ethereum
         with:
-          paths: packages/types-avalanche
+          paths: packages/types-ethereum
 
       - uses: marceloprado/has-changed-path@v1
-        id: changed-common-avalanche
+        id: changed-common-ethereum
         with:
-          paths: packages/common-avalanche
+          paths: packages/common-ethereum
 
       - uses: marceloprado/has-changed-path@v1
         id: changed-node
@@ -57,19 +57,19 @@ jobs:
         run: yarn workspaces foreach run build
 
       #Publish to npm and github releases
-      - name: Publish Types Avalanche
-        if: steps.changed-types-avalanche.outputs.changed == 'true'
+      - name: Publish Types ethereum
+        if: steps.changed-types-ethereum.outputs.changed == 'true'
         uses: ./.github/actions/create-release
         with:
-          package-path: packages/types-avalanche
+          package-path: packages/types-ethereum
           repo-token: ${{ secrets.REPO_TOKEN }}
           npm-token: ${{ secrets.NPM_TOKEN }}
 
-      - name: Publish Common avalanche
-        if: steps.changed-common-avalanche.outputs.changed == 'true'
+      - name: Publish Common ethereum
+        if: steps.changed-common-ethereum.outputs.changed == 'true'
         uses: ./.github/actions/create-release
         with:
-          package-path: packages/common-avalanche
+          package-path: packages/common-ethereum
           repo-token: ${{ secrets.REPO_TOKEN }}
           npm-token: ${{ secrets.NPM_TOKEN }}
 

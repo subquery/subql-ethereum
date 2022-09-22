@@ -18,7 +18,7 @@ import {
   SubqlHandler,
   EthereumHandlerKind,
   RuntimeDataSourceV0_0_1,
-} from '@subql/common-avalanche';
+} from '@subql/common-ethereum';
 import yaml from 'js-yaml';
 import tar from 'tar';
 import { SubqlProjectDs } from '../configure/SubqueryProject';

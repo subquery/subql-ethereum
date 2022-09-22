@@ -22,7 +22,7 @@ jobs:
   Bump-Prerelease-Publish:
     name: Bump-Prerelease-Publish
     needs: pre-ci
-    if: "!startsWith(github.event.head_commit.message, '[SKIP CI]') && !startsWith(github.event.head_commit.message, '[release]') && github.repository == 'subquery/subql-avalanche'"
+    if: "!startsWith(github.event.head_commit.message, '[SKIP CI]') && !startsWith(github.event.head_commit.message, '[release]') && github.repository == 'subquery/subql-ethereum'"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -36,14 +36,14 @@ jobs:
           node-version: 16
 
       - uses: marceloprado/has-changed-path@v1
-        id: changed-types-avalanche
+        id: changed-types-ethereum
         with:
-          paths: packages/types-avalanche
+          paths: packages/types-ethereum
 
       - uses: marceloprado/has-changed-path@v1
-        id: changed-common-avalanche
+        id: changed-common-ethereum
         with:
-          paths: packages/common-avalanche
+          paths: packages/common-ethereum
 
       - uses: marceloprado/has-changed-path@v1
         id: changed-node
@@ -63,18 +63,18 @@ jobs:
           package-path: packages/utils
           npm-token: ${{ secrets.NPM_TOKEN }}
 
-      - name: Bump types Avalanche & deploy
-        if: steps.changed-types-avalanche.outputs.changed == 'true'
+      - name: Bump types ethereum & deploy
+        if: steps.changed-types-ethereum.outputs.changed == 'true'
         uses: ./.github/actions/create-prerelease
         with:
-          package-path: packages/types-avalanche
+          package-path: packages/types-ethereum
           npm-token: ${{ secrets.NPM_TOKEN }}
 
-      - name: Bump common avalanche & deploy
-        if: steps.changed-common-avalanche.outputs.changed == 'true'
+      - name: Bump common ethereum & deploy
+        if: steps.changed-common-ethereum.outputs.changed == 'true'
         uses: ./.github/actions/create-prerelease
         with:
-          package-path: packages/common-avalanche
+          package-path: packages/common-ethereum
           npm-token: ${{ secrets.NPM_TOKEN }}
 
       - name: Bump node & deploy

@@ -10,7 +10,7 @@ import {
   SubqlMapping,
   SubqlRuntimeDatasource,
   SubqlRuntimeHandler,
-} from '@subql/types-avalanche';
+} from '@subql/types-ethereum';
 import {IEthereumProjectManifest} from '../../types';
 import {RuntimeDataSourceV0_2_0, CustomDatasourceV0_2_0} from '../v0_2_0/types';
 

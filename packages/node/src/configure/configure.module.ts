@@ -5,7 +5,7 @@ import assert from 'assert';
 import path from 'path';
 import { DynamicModule, Global, Module } from '@nestjs/common';
 import { getProjectRootAndManifest, IPFS_REGEX } from '@subql/common';
-import { EthereumProjectNetworkConfig } from '@subql/common-avalanche';
+import { EthereumProjectNetworkConfig } from '@subql/common-ethereum';
 import {
   IConfig,
   MinConfig,

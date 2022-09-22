@@ -6,7 +6,7 @@ import { Injectable } from '@nestjs/common';
 import {
   isDatasourceV0_2_0,
   SubqlEthereumDataSource,
-} from '@subql/common-avalanche';
+} from '@subql/common-ethereum';
 import {
   timeout,
   NodeConfig,
@@ -14,11 +14,7 @@ import {
   getYargsOption,
   getLogger,
 } from '@subql/node-core';
-import {
-  ApiWrapper,
-  EthereumBlockWrapper,
-  Store,
-} from '@subql/types-avalanche';
+import { ApiWrapper, EthereumBlockWrapper, Store } from '@subql/types-ethereum';
 import { levelFilter } from '@subql/utils';
 import { merge } from 'lodash';
 import { NodeVM, NodeVMOptions, VMScript } from 'vm2';

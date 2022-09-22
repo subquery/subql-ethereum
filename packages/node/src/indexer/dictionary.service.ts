@@ -13,7 +13,7 @@ import { getYargsOption, getLogger, profiler } from '@subql/node-core';
 import {
   DictionaryQueryCondition,
   DictionaryQueryEntry,
-} from '@subql/types-avalanche';
+} from '@subql/types-ethereum';
 import { buildQuery, GqlNode, GqlQuery, GqlVar, MetaData } from '@subql/utils';
 import fetch from 'node-fetch';
 import { SubqueryProject } from '../configure/SubqueryProject';

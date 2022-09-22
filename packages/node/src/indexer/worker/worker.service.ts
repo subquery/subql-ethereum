@@ -4,7 +4,7 @@
 import { threadId } from 'node:worker_threads';
 import { Injectable } from '@nestjs/common';
 import { ApiService, NodeConfig, getLogger } from '@subql/node-core';
-import { EthereumBlockWrapper, BlockWrapper } from '@subql/types-avalanche';
+import { EthereumBlockWrapper, BlockWrapper } from '@subql/types-ethereum';
 import { AutoQueue } from '../../utils/autoQueue';
 import { IndexerManager } from '../indexer.manager';
 

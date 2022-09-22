@@ -13,7 +13,7 @@ import {
   SubqlCustomHandler,
   EthereumHandlerKind,
   EthereumRuntimeHandlerInputMap,
-} from '@subql/common-avalanche';
+} from '@subql/common-ethereum';
 import {
   ApiService,
   PoiBlock,
@@ -33,10 +33,10 @@ import {
   SubqlRuntimeHandler,
   EthereumBlockWrapper,
   EthereumBlock,
-} from '@subql/types-avalanche';
+} from '@subql/types-ethereum';
 import { Sequelize } from 'sequelize';
-import { EthereumBlockWrapped } from '../avalanche/block.ethereum';
 import { SubqlProjectDs, SubqueryProject } from '../configure/SubqueryProject';
+import { EthereumBlockWrapped } from '../ethereum/block.ethereum';
 import {
   asSecondLayerHandlerProcessor_1_0_0,
   DsProcessorService,

@@ -8,7 +8,7 @@ import https from 'https';
 import url from 'url';
 import { Interface } from '@ethersproject/abi';
 import { hexDataSlice } from '@ethersproject/bytes';
-import { RuntimeDataSourceV0_2_0 } from '@subql/common-avalanche';
+import { RuntimeDataSourceV0_2_0 } from '@subql/common-ethereum';
 import { getLogger } from '@subql/node-core';
 import {
   ApiWrapper,
@@ -17,7 +17,7 @@ import {
   EthereumTransaction,
   EthereumResult,
   EthereumLog,
-} from '@subql/types-avalanche';
+} from '@subql/types-ethereum';
 import { ethers } from 'ethers';
 import { EthereumBlockWrapped } from './block.ethereum';
 
@@ -27,7 +27,7 @@ const Web3WsProvider = require('web3-providers-ws');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { version: packageVersion } = require('../../package.json');
 
-const logger = getLogger('api.avalanche');
+const logger = getLogger('api.ethereum');
 
 async function loadAssets(
   ds: RuntimeDataSourceV0_2_0,
