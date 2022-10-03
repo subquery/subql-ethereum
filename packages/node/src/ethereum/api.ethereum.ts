@@ -8,6 +8,7 @@ import https from 'https';
 import url from 'url';
 import { Interface } from '@ethersproject/abi';
 import { hexDataSlice } from '@ethersproject/bytes';
+import { parse as parseTx } from '@ethersproject/transactions';
 import { RuntimeDataSourceV0_2_0 } from '@subql/common-ethereum';
 import { getLogger } from '@subql/node-core';
 import {
@@ -20,7 +21,11 @@ import {
 } from '@subql/types-ethereum';
 import { ethers } from 'ethers';
 import { EthereumBlockWrapped } from './block.ethereum';
-
+import {
+  formatBlock,
+  formatReceipt,
+  formatTransaction,
+} from './utils.ethereum';
 const Web3HttpProvider = require('web3-providers-http');
 const Web3WsProvider = require('web3-providers-ws');
 
@@ -55,7 +60,9 @@ export class EthereumApi implements ApiWrapper<EthereumBlockWrapper> {
   private chainId: number;
 
   constructor(private endpoint: string) {
-    const { hostname, pathname, port, protocol } = new URL(endpoint);
+    const { hostname, pathname, port, protocol, searchParams } = new URL(
+      endpoint,
+    );
     const httpAgent = new http.Agent({ keepAlive: true, maxSockets: 10 });
     const httpsAgent = new https.Agent({ keepAlive: true, maxSockets: 10 });
 
@@ -79,6 +86,9 @@ export class EthereumApi implements ApiWrapper<EthereumBlockWrapper> {
           https: httpsAgent,
         },
       };
+      if (searchParams.apiKey) {
+        options.headers.apiKey = searchParams.get('apiKey');
+      }
       provider = new Web3HttpProvider(this.endpoint, options);
     } else if (protocolStr === 'ws' || protocolStr === 'wss') {
       const options = {
@@ -89,6 +99,9 @@ export class EthereumApi implements ApiWrapper<EthereumBlockWrapper> {
           keepAlive: true,
         },
       };
+      if (searchParams.apiKey) {
+        options.headers.apiKey = searchParams.get('apiKey');
+      }
       provider = new Web3WsProvider(endpoint, options);
     } else {
       throw new Error(`Unsupported protocol: ${protocol}`);
@@ -99,7 +112,7 @@ export class EthereumApi implements ApiWrapper<EthereumBlockWrapper> {
 
   async init(): Promise<void> {
     this.genesisBlock = await this.client.getBlock(0);
-    this.chainId = (await this.client.getNetwork()).chainId;
+    this.chainId = await this.client.send('net_version', []);
   }
 
   async getLastHeight(): Promise<number> {
@@ -132,16 +145,26 @@ export class EthereumApi implements ApiWrapper<EthereumBlockWrapper> {
       bufferBlocks.map(async (num) => {
         try {
           // Fetch Block
-          const block = await this.client.getBlock(num);
+          const block_promise = await this.client.send('eth_getBlockByNumber', [
+            ethers.utils.hexValue(num),
+            true,
+          ]);
 
+          const block = formatBlock(block_promise);
+          //const block = this.client.formatter.blockWithTransactions(rawBlock);
+          block.stateRoot = this.client.formatter.hash(block.stateRoot);
           // Get transaction receipts
           const transactions = await Promise.all(
             block.transactions.map(async (tx) => {
-              const transaction = await this.client.getTransaction(tx);
-              const receipt = await this.client.getTransactionReceipt(tx);
+              //logger.info(JSON.stringify(tx))
+              const transaction = formatTransaction(tx);
+              const receipt = await this.client.send(
+                'eth_getTransactionReceipt',
+                [tx.hash],
+              );
 
-              (transaction as EthereumTransaction).receipt = receipt;
-              return transaction as EthereumTransaction;
+              transaction.receipt = formatReceipt(receipt, block);
+              return transaction;
             }),
           );
           return new EthereumBlockWrapped(block, transactions);
@@ -192,9 +215,9 @@ export class EthereumApi implements ApiWrapper<EthereumBlockWrapper> {
   }
 
   async parseLog<T extends EthereumResult = EthereumResult>(
-    log: ethers.providers.Log,
+    log: EthereumLog,
     ds: RuntimeDataSourceV0_2_0,
-  ): Promise<EthereumLog> {
+  ): Promise<EthereumLog<T> | EthereumLog> {
     try {
       if (!ds?.options?.abi) {
         return log;

@@ -19,6 +19,7 @@ import {
   hexStringEq,
   stringNormalizedEq,
 } from '../utils/string';
+import { formatLog } from './utils.ethereum';
 
 export class EthereumBlockWrapped implements EthereumBlockWrapper {
   private _logs: EthereumLog[];
@@ -26,9 +27,9 @@ export class EthereumBlockWrapped implements EthereumBlockWrapper {
     private _block: EthereumBlock,
     private _txs: EthereumTransaction[],
   ) {
-    this._logs = flatten(
-      _txs.map((tx) => tx.receipt.logs),
-    ) as unknown as EthereumLog[];
+    this._logs = flatten(_txs.map((tx) => tx.receipt.logs)).map((log) =>
+      formatLog(log, _block),
+    ) as EthereumLog[];
     this._logs.map((log) => {
       log.block = this.block;
       return log;
@@ -61,7 +62,7 @@ export class EthereumBlockWrapped implements EthereumBlockWrapper {
   }
 
   static filterBlocksProcessor(
-    block: ethers.providers.Block,
+    block: EthereumBlock,
     filter: EthereumBlockFilter,
   ): boolean {
     if (filter?.modulo && block.number % filter.modulo !== 0) {
@@ -87,7 +88,7 @@ export class EthereumBlockWrapped implements EthereumBlockWrapper {
     }
     if (
       filter.function &&
-      transaction.data.indexOf(functionToSighash(filter.function)) !== 0
+      transaction.input.indexOf(functionToSighash(filter.function)) !== 0
     ) {
       return false;
     }
