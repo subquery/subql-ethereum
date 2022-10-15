@@ -86,8 +86,8 @@ export class EthereumApi implements ApiWrapper<EthereumBlockWrapper> {
           https: httpsAgent,
         },
       };
-      if (searchParams.apiKey) {
-        options.headers.apiKey = searchParams.get('apiKey');
+      if ((searchParams as any).apiKey) {
+        (options.headers as any).apiKey = searchParams.get('apiKey');
       }
       provider = new Web3HttpProvider(this.endpoint, options);
     } else if (protocolStr === 'ws' || protocolStr === 'wss') {
@@ -99,9 +99,10 @@ export class EthereumApi implements ApiWrapper<EthereumBlockWrapper> {
           keepAlive: true,
         },
       };
-      if (searchParams.apiKey) {
-        options.headers.apiKey = searchParams.get('apiKey');
+      if ((searchParams as any).apiKey) {
+        (options.headers as any).apiKey = searchParams.get('apiKey');
       }
+
       provider = new Web3WsProvider(endpoint, options);
     } else {
       throw new Error(`Unsupported protocol: ${protocol}`);
@@ -111,7 +112,12 @@ export class EthereumApi implements ApiWrapper<EthereumBlockWrapper> {
   }
 
   async init(): Promise<void> {
-    this.genesisBlock = await this.client.getBlock(0);
+    this.genesisBlock = await this.client.send('eth_getBlockByNumber', [
+      ethers.utils.hexValue(0),
+      true,
+    ]);
+    logger.info(this.endpoint);
+
     this.chainId = await this.client.send('net_version', []);
   }
 
