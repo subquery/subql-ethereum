@@ -7,9 +7,6 @@
     "rootDir": "src",
     "outDir": "./dist"
   },
-  "references": [
-    { "path": "../common-ethereum" },
-    { "path": "../types-ethereum" }
-  ],
+  "references": [{ "path": "../common-ethereum" }, { "path": "../types" }],
   "include": ["src/**/*"]
 }

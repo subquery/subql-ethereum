@@ -8,19 +8,3 @@ All logs must start with the format: [x.y.z] - yyyy-mm-dd
 
 ## [Unreleased]
 
-## [0.2.0] - 2022-09-07
-
-### Updated
-- Sync with Substrate SDK.
-
-## [0.1.3] - 2022-06-29
-### Fixed
-- Fix deployment missing assets and options (#1156)
-
-## [0.1.2] - 2022-06-29
-### Fixed
-- Fix deployment missing filter issue (#1138)
-
-## [0.1.1] - 2022-06-27
-### Added
-- init commit

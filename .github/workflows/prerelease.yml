@@ -38,7 +38,7 @@ jobs:
       - uses: marceloprado/has-changed-path@v1
         id: changed-types-ethereum
         with:
-          paths: packages/types-ethereum
+          paths: packages/types
 
       - uses: marceloprado/has-changed-path@v1
         id: changed-common-ethereum
@@ -67,7 +67,7 @@ jobs:
         if: steps.changed-types-ethereum.outputs.changed == 'true'
         uses: ./.github/actions/create-prerelease
         with:
-          package-path: packages/types-ethereum
+          package-path: packages/types
           npm-token: ${{ secrets.NPM_TOKEN }}
 
       - name: Bump common ethereum & deploy

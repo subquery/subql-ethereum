@@ -17,7 +17,6 @@ import {
   SubqlCustomHandler,
   SubqlHandler,
   EthereumHandlerKind,
-  RuntimeDataSourceV0_0_1,
 } from '@subql/common-ethereum';
 import yaml from 'js-yaml';
 import tar from 'tar';
@@ -70,20 +69,6 @@ export function isCustomHandler(
   handler: SubqlHandler,
 ): handler is SubqlCustomHandler {
   return !isBaseHandler(handler);
-}
-
-export async function updateDataSourcesV0_0_1(
-  _dataSources: RuntimeDataSourceV0_0_1[],
-  reader: Reader,
-): Promise<SubqlProjectDs[]> {
-  // force convert to updated ds
-  const dataSources = _dataSources as SubqlProjectDs[];
-  await Promise.all(
-    dataSources.map(async (ds) => {
-      ds.mapping.entryScript = await loadDataSourceScript(reader);
-    }),
-  );
-  return dataSources;
 }
 
 export async function updateDataSourcesV0_2_0(

@@ -1,7 +1,6 @@
 // Copyright 2020-2022 OnFinality Limited authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import {ethers} from 'ethers';
 import {BlockWrapper} from '../interfaces';
 
 export interface EthereumBlockFilter {
