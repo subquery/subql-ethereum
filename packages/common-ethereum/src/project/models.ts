@@ -87,7 +87,7 @@ export class BlockHandler implements SubqlBlockHandler {
   @IsOptional()
   @Type(() => BlockFilter)
   filter?: BlockFilter;
-  @IsEnum(FlareHandlerKind, {groups: [FlareHandlerKind.Block]})
+  @IsEnum(FlareHandlerKind, {groups: [FlareHandlerKind.FlareBlock, FlareHandlerKind.EthBlock]})
   kind: EthereumHandlerKind.Block;
   @IsString()
   handler: string;
@@ -98,7 +98,7 @@ export class CallHandler implements SubqlCallHandler {
   @IsOptional()
   @Type(() => TransactionFilter)
   filter?: TransactionFilter;
-  @IsEnum(FlareHandlerKind, {groups: [FlareHandlerKind.Call]})
+  @IsEnum(FlareHandlerKind, {groups: [FlareHandlerKind.FlareCall, FlareHandlerKind.EthCall]})
   kind: EthereumHandlerKind.Call;
   @IsString()
   handler: string;
@@ -109,7 +109,7 @@ export class EventHandler implements SubqlEventHandler {
   @IsOptional()
   @Type(() => LogFilter)
   filter?: LogFilter;
-  @IsEnum(FlareHandlerKind, {groups: [FlareHandlerKind.Event]})
+  @IsEnum(FlareHandlerKind, {groups: [FlareHandlerKind.FlareEvent, FlareHandlerKind.EthEvent]})
   kind: EthereumHandlerKind.Event;
   @IsString()
   handler: string;
@@ -130,11 +130,17 @@ export class EthereumMapping implements SubqlMapping {
     const handlers: SubqlHandler[] = params.value;
     return handlers.map((handler) => {
       switch (handler.kind) {
-        case FlareHandlerKind.Event:
+        case FlareHandlerKind.FlareEvent:
           return plainToClass(EventHandler, handler);
-        case FlareHandlerKind.Call:
+        case FlareHandlerKind.FlareCall:
           return plainToClass(CallHandler, handler);
-        case FlareHandlerKind.Block:
+        case FlareHandlerKind.FlareBlock:
+          return plainToClass(BlockHandler, handler);
+        case FlareHandlerKind.EthEvent:
+          return plainToClass(EventHandler, handler);
+        case FlareHandlerKind.EthCall:
+          return plainToClass(CallHandler, handler);
+        case FlareHandlerKind.EthBlock:
           return plainToClass(BlockHandler, handler);
         default:
           throw new Error(`handler ${(handler as any).kind} not supported`);
@@ -158,7 +164,7 @@ export class CustomMapping implements SubqlMapping<SubqlCustomHandler> {
 }
 
 export class RuntimeDataSourceBase<M extends SubqlMapping<SubqlRuntimeHandler>> implements SubqlRuntimeDatasource<M> {
-  @IsEnum(FlareDatasourceKind, {groups: [FlareDatasourceKind.Runtime]})
+  @IsEnum(FlareDatasourceKind, {groups: [FlareDatasourceKind.FlareRuntime, FlareDatasourceKind.EthRuntime]})
   kind: EthereumDatasourceKind.Runtime;
   @Type(() => EthereumMapping)
   @ValidateNested()

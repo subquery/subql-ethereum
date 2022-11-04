@@ -30,11 +30,15 @@ export interface EthereumProjectNetworkConfig extends ProjectNetworkConfig {
 }
 
 export enum FlareHandlerKind {
-  Block = 'flare/BlockHandler',
-  Call = 'flare/TransactionHandler',
-  Event = 'flare/LogHandler',
+  FlareBlock = 'flare/BlockHandler',
+  FlareCall = 'flare/TransactionHandler',
+  FlareEvent = 'flare/LogHandler',
+  EthBlock = 'ethereum/BlockHandler',
+  EthCall = 'ethereum/TransactionHandler',
+  EthEvent = 'ethereum/LogHandler',
 }
 
 export enum FlareDatasourceKind {
-  Runtime = 'flare/Runtime',
+  FlareRuntime = 'flare/Runtime',
+  EthRuntime = 'ethereum/Runtime',
 }
