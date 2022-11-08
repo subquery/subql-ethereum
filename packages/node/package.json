@@ -15,7 +15,7 @@
   "homepage": "https://github.com/subquery/subql",
   "repository": "github:subquery/subql",
   "bin": {
-    "subql-node-ethereum": "./bin/run"
+    "subql-node-flare": "./bin/run"
   },
   "dependencies": {
     "@apollo/client": "3.5.8",
@@ -33,6 +33,7 @@
     "@willsoto/nestjs-prometheus": "^4.4.0",
     "algosdk": "^1.13.1",
     "app-module-path": "^2.2.0",
+    "cron-converter": "^1.0.2",
     "dayjs": "^1.10.7",
     "ethers": "^5.6.1",
     "eventemitter2": "^6.4.5",
@@ -72,6 +73,5 @@
   "files": [
     "/dist",
     "/bin"
-  ],
-  "stableVersion": "1.10.1-0"
+  ]
 }
