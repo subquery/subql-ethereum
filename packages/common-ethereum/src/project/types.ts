@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import {IProjectManifest, ProjectNetworkConfig} from '@subql/common';
-import {SubqlDatasource} from '@subql/types-ethereum';
+import {SubqlDatasource} from '@subql/types-flare';
 
 // All of these used to be redefined in this file, re-exporting for simplicity
 export {
@@ -19,7 +19,7 @@ export {
   SubqlHandlerFilter,
   EthereumDatasourceKind,
   EthereumRuntimeHandlerInputMap as EthereumRuntimeHandlerInputMap,
-} from '@subql/types-ethereum';
+} from '@subql/types-flare';
 
 export type IEthereumProjectManifest = IProjectManifest<SubqlDatasource>;
 

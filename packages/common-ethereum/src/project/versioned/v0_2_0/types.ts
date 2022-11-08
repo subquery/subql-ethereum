@@ -7,7 +7,7 @@ import {
   SubqlCustomDatasource,
   EthereumDatasourceKind,
   SubqlRuntimeDatasource,
-} from '@subql/types-ethereum';
+} from '@subql/types-flare';
 
 // export interface SubstrateMappingV0_2_0<F, T extends SubstrateRuntimeHandler> extends BaseMapping<T> {
 //   file: string;

@@ -18,7 +18,7 @@ import {
   delay,
   profilerWrap,
 } from '@subql/node-core';
-import { EthereumBlockWrapper } from '@subql/types-ethereum';
+import { EthereumBlockWrapper } from '@subql/types-flare';
 import chalk from 'chalk';
 import { last } from 'lodash';
 import { IndexerManager } from '../indexer.manager';

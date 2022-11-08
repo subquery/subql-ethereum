@@ -19,7 +19,7 @@ import {
   ProjectManifestV1_0_0Impl,
   isRuntimeDs,
   EthereumHandlerKind,
-} from '@subql/common-ethereum';
+} from '@subql/common-flare';
 import { buildSchemaFromString } from '@subql/utils';
 import Cron from 'cron-converter';
 import { GraphQLSchema } from 'graphql';

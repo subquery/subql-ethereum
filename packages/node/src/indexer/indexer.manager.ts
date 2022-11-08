@@ -13,7 +13,7 @@ import {
   SubqlCustomHandler,
   EthereumHandlerKind,
   EthereumRuntimeHandlerInputMap,
-} from '@subql/common-ethereum';
+} from '@subql/common-flare';
 import {
   ApiService,
   PoiBlock,
@@ -31,7 +31,7 @@ import {
   SubqlRuntimeHandler,
   EthereumBlockWrapper,
   EthereumBlock,
-} from '@subql/types-ethereum';
+} from '@subql/types-flare';
 import { Sequelize } from 'sequelize';
 import { SubqlProjectDs, SubqueryProject } from '../configure/SubqueryProject';
 import { EthereumApi } from '../ethereum';

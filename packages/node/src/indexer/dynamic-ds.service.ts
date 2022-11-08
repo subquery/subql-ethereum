@@ -3,7 +3,7 @@
 
 import assert from 'assert';
 import { Injectable } from '@nestjs/common';
-import { isCustomDs, isRuntimeDs } from '@subql/common-ethereum';
+import { isCustomDs, isRuntimeDs } from '@subql/common-flare';
 import { getLogger, MetadataRepo } from '@subql/node-core';
 import { cloneDeep } from 'lodash';
 import { Transaction } from 'sequelize/types';

@@ -4,7 +4,7 @@
 import { threadId } from 'node:worker_threads';
 import { Injectable } from '@nestjs/common';
 import { ApiService, NodeConfig, getLogger, AutoQueue } from '@subql/node-core';
-import { EthereumBlockWrapper, BlockWrapper } from '@subql/types-ethereum';
+import { EthereumBlockWrapper, BlockWrapper } from '@subql/types-flare';
 import { IndexerManager } from '../indexer.manager';
 
 export type FetchBlockResponse = { parentHash: string } | undefined;

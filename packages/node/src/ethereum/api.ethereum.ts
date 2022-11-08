@@ -7,7 +7,7 @@ import https from 'https';
 import { Interface } from '@ethersproject/abi';
 import { Block } from '@ethersproject/abstract-provider';
 import { JsonRpcProvider, WebSocketProvider } from '@ethersproject/providers';
-import { RuntimeDataSourceV0_2_0 } from '@subql/common-ethereum';
+import { RuntimeDataSourceV0_2_0 } from '@subql/common-flare';
 import { getLogger } from '@subql/node-core';
 import {
   ApiWrapper,
@@ -16,7 +16,7 @@ import {
   EthereumTransaction,
   EthereumResult,
   EthereumLog,
-} from '@subql/types-ethereum';
+} from '@subql/types-flare';
 import { ConnectionInfo, hexDataSlice, hexValue } from 'ethers/lib/utils';
 import { EthereumBlockWrapped } from './block.ethereum';
 import {

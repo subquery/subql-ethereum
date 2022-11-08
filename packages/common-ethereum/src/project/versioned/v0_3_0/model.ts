@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import {ProjectManifestBaseImpl} from '@subql/common';
-import {SubqlCustomDatasource, SubqlCustomHandler, SubqlMapping, SubqlRuntimeHandler} from '@subql/types-ethereum';
+import {SubqlCustomDatasource, SubqlCustomHandler, SubqlMapping, SubqlRuntimeHandler} from '@subql/types-flare';
 import {plainToClass, Transform, TransformFnParams, Type} from 'class-transformer';
 import {
   Equals,

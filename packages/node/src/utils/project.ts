@@ -18,7 +18,7 @@ import {
   SubqlHandler,
   EthereumHandlerKind,
   EthereumDatasourceKind,
-} from '@subql/common-ethereum';
+} from '@subql/common-flare';
 import { StoreService } from '@subql/node-core';
 import { getAllEntitiesRelations } from '@subql/utils';
 import yaml from 'js-yaml';
