@@ -37,12 +37,12 @@ jobs:
 
     #Identify changes
       - uses: marceloprado/has-changed-path@v1
-        id: changed-types-ethereum
+        id: changed-types-flare
         with:
           paths: packages/types
 
       - uses: marceloprado/has-changed-path@v1
-        id: changed-common-ethereum
+        id: changed-common-flare
         with:
           paths: packages/common-ethereum
 
@@ -57,16 +57,16 @@ jobs:
         run: yarn workspaces foreach run build
 
       #Publish to npm and github releases
-      - name: Publish Types ethereum
-        if: steps.changed-types-ethereum.outputs.changed == 'true'
+      - name: Publish Types flare
+        if: steps.changed-types-flare.outputs.changed == 'true'
         uses: ./.github/actions/create-release
         with:
           package-path: packages/types
           repo-token: ${{ secrets.REPO_TOKEN }}
           npm-token: ${{ secrets.NPM_TOKEN }}
 
-      - name: Publish Common ethereum
-        if: steps.changed-common-ethereum.outputs.changed == 'true'
+      - name: Publish Common flare
+        if: steps.changed-common-flare.outputs.changed == 'true'
         uses: ./.github/actions/create-release
         with:
           package-path: packages/common-ethereum

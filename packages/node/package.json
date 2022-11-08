@@ -1,5 +1,5 @@
 {
-  "name": "@subql/node-ethereum",
+  "name": "@subql/node-flare",
   "version": "1.10.1-1",
   "description": "",
   "author": "Ian He",
@@ -25,9 +25,9 @@
     "@nestjs/platform-express": "^8.2.6",
     "@nestjs/schedule": "^1.0.2",
     "@subql/common": "latest",
-    "@subql/common-ethereum": "workspace:*",
+    "@subql/common-flare": "workspace:*",
     "@subql/node-core": "latest",
-    "@subql/types-ethereum": "workspace:*",
+    "@subql/types-flare": "workspace:*",
     "@subql/utils": "latest",
     "@subql/x-merkle-mountain-range": "2.0.0-0.1.2",
     "@willsoto/nestjs-prometheus": "^4.4.0",
