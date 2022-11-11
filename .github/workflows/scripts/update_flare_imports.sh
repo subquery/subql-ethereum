@@ -12,3 +12,10 @@ do
         replace_paths $file
     fi
 done
+
+for file in packages/**/package.json;
+do
+    if [ -f "${file}" ]; then
+        replace_paths $file
+    fi
+done
