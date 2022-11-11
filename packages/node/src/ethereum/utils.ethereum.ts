@@ -11,7 +11,7 @@ import {
   EthereumReceipt,
   EthereumResult,
   EthereumTransaction,
-} from '@subql/types-flare';
+} from '@subql/types-ethereum';
 
 export function calcInterval(api: ApiWrapper): number {
   // TODO find a way to get this from the blockchain

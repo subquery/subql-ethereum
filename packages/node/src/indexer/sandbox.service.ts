@@ -5,9 +5,9 @@ import { Injectable } from '@nestjs/common';
 import {
   isDatasourceV0_2_0,
   SubqlEthereumDataSource,
-} from '@subql/common-flare';
+} from '@subql/common-ethereum';
 import { NodeConfig, StoreService, IndexerSandbox } from '@subql/node-core';
-import { ApiWrapper, EthereumBlockWrapper } from '@subql/types-flare';
+import { ApiWrapper, EthereumBlockWrapper } from '@subql/types-ethereum';
 import { SubqlProjectDs, SubqueryProject } from '../configure/SubqueryProject';
 import { getProjectEntry } from '../utils/project';
 

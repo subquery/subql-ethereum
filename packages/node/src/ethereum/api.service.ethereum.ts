@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Injectable } from '@nestjs/common';
-import { ProjectNetworkV1_0_0 } from '@subql/common-flare';
+import { ProjectNetworkV1_0_0 } from '@subql/common-ethereum';
 import { ApiService, getLogger } from '@subql/node-core';
 import { EthereumApi } from './api.ethereum';
 

@@ -8,7 +8,7 @@ import {
   EthereumDatasourceKind,
   EthereumHandlerKind,
   SubqlRuntimeDatasource,
-} from '@subql/types-flare';
+} from '@subql/types-ethereum';
 
 export function isBlockHandlerProcessor<E>(
   hp: SecondLayerHandlerProcessor<EthereumHandlerKind, unknown, unknown>

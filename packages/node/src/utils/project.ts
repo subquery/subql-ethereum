@@ -17,6 +17,7 @@ import {
   SubqlCustomHandler,
   SubqlHandler,
   EthereumHandlerKind,
+  EthereumDatasourceKind,
 } from '@subql/common-ethereum';
 import { retryOnFail, StoreService } from '@subql/node-core';
 import { getAllEntitiesRelations } from '@subql/utils';

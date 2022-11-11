@@ -1,7 +1,7 @@
 # production images
 FROM node:16 as builder
 ARG RELEASE_VERSION
-ENTRYPOINT ["subql-node-flare"]
+ENTRYPOINT ["subql-node-ethereum"]
 RUN npm i -g --unsafe-perm @subql/node-flare@${RELEASE_VERSION}
 
 FROM node:16-alpine

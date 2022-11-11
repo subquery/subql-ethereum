@@ -8,7 +8,7 @@ import {
   isCustomDs,
   EthereumHandlerKind,
   SubqlHandlerFilter,
-} from '@subql/common-flare';
+} from '@subql/common-ethereum';
 import {
   ApiService,
   Dictionary,
@@ -23,7 +23,7 @@ import {
   ApiWrapper,
   EthereumLogFilter,
   EthereumTransactionFilter,
-} from '@subql/types-flare';
+} from '@subql/types-ethereum';
 import { range, sortBy, uniqBy } from 'lodash';
 import { SubqlProjectDs, SubqueryProject } from '../configure/SubqueryProject';
 import { calcInterval } from '../ethereum/utils.ethereum';

@@ -10,7 +10,7 @@ import {
   EthereumBlockFilter,
   EthereumBlockWrapper,
   EthereumTransaction,
-} from '@subql/types-flare';
+} from '@subql/types-ethereum';
 import { flatten } from 'lodash';
 import {
   eventToTopic,

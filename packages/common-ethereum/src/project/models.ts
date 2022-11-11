@@ -22,7 +22,7 @@ import {
   SubqlCallHandler,
   EthereumTransactionFilter,
   SubqlDatasource,
-} from '@subql/types-flare';
+} from '@subql/types-ethereum';
 import {plainToClass, Transform, Type} from 'class-transformer';
 import {
   ArrayMaxSize,

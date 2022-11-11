@@ -10,13 +10,13 @@ import {
   SubqlEthereumCustomDataSource,
   SubqlEthereumDataSource,
   SubqlDatasourceProcessor,
-} from '@subql/common-flare';
+} from '@subql/common-ethereum';
 import { getLogger, NodeConfig, Sandbox } from '@subql/node-core';
 import {
   SecondLayerHandlerProcessor_0_0_0,
   SecondLayerHandlerProcessor_1_0_0,
   SubqlCustomDatasource,
-} from '@subql/types-flare';
+} from '@subql/types-ethereum';
 
 import { VMScript } from 'vm2';
 import { SubqueryProject } from '../configure/SubqueryProject';
