@@ -5,8 +5,6 @@ on:
       - main
     paths-ignore:
       - '.github/workflows/**'
-  workflow_dispatch:
-    
 jobs:
   pre-ci:
     runs-on: ubuntu-latest
@@ -22,7 +20,7 @@ jobs:
   Bump-Prerelease-Flare-Publish:
     name: Bump-Prerelease-Flare-Publish
     needs: pre-ci
-    if: "!startsWith(github.event.head_commit.message, '[SKIP CI]') && !startsWith(github.event.head_commit.message, '[release]') && github.repository == 'DeveloperInProgress/subql-ethereum'"
+    if: "!startsWith(github.event.head_commit.message, '[SKIP CI]') && !startsWith(github.event.head_commit.message, '[release]') && github.repository == 'subquery/subql-ethereum'"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -36,12 +34,12 @@ jobs:
           node-version: 16
 
       - uses: marceloprado/has-changed-path@v1
-        id: changed-types-ethereum
+        id: changed-types-flare
         with:
           paths: packages/types
 
       - uses: marceloprado/has-changed-path@v1
-        id: changed-common-ethereum
+        id: changed-common-flare
         with:
           paths: packages/common-ethereum
 
@@ -93,7 +91,7 @@ jobs:
         if: steps.changed-common-flare.outputs.changed == 'true'
         uses: ./.github/actions/create-prerelease
         with:
-          package-path: packages/common-flare
+          package-path: packages/common-ethereum
           npm-token: ${{ secrets.NPM_TOKEN }}
 
       - name: Bump node & deploy
