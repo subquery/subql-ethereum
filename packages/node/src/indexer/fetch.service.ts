@@ -374,6 +374,8 @@ export class FetchService implements OnApplicationShutdown {
               scaledBatchSize,
             );
 
+          const chainId = await this.dictionaryService.getEvmChainId();
+
           if (startBlockHeight !== getStartBlockHeight()) {
             logger.debug(
               `Queue was reset for new DS, discarding dictionary query result`,
@@ -383,7 +385,7 @@ export class FetchService implements OnApplicationShutdown {
 
           if (
             dictionary &&
-            this.dictionaryValidation(dictionary, startBlockHeight)
+            this.dictionaryValidation(dictionary, chainId, startBlockHeight)
           ) {
             let { batchBlocks } = dictionary;
 
@@ -450,9 +452,13 @@ export class FetchService implements OnApplicationShutdown {
 
   private dictionaryValidation(
     { _metadata: metaData }: Dictionary,
+    chainId: string,
     startBlockHeight: number,
   ): boolean {
-    if (metaData.genesisHash !== this.api.getGenesisHash()) {
+    if (
+      metaData.genesisHash !== this.api.getGenesisHash() &&
+      chainId !== this.api.getChainId().toString()
+    ) {
       logger.error(
         'The dictionary that you have specified does not match the chain you are indexing, it will be ignored. Please update your project manifest to reference the correct dictionary',
       );
