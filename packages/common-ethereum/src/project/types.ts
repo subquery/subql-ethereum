@@ -26,7 +26,6 @@ export type IEthereumProjectManifest = IProjectManifest<SubqlDatasource>;
 export interface EthereumProjectNetworkConfig extends ProjectNetworkConfig {
   genesisHash?: string;
   chainId?: string;
-  headers?: Record<string, string>;
 }
 
 export enum SubqlEthereumHandlerKind {

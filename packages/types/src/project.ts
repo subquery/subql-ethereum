@@ -43,7 +43,6 @@ export interface ProjectManifest {
 
   network: {
     endpoint: string;
-    headers: Record<string, string>;
     customTypes?: RegistryTypes;
   };
 
