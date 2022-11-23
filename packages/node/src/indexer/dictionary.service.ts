@@ -24,7 +24,7 @@ export class DictionaryService
   }
 
   async getEvmChainId(): Promise<string> {
-    const query = `query{chainAlias(id: "chainId"){value}}`;
+    const query = `query{evmChainAlias(id: "chainId"){value}}`;
 
     try {
       const resp = await timeout(
@@ -33,7 +33,7 @@ export class DictionaryService
         }),
         this.nodeConfig.dictionaryTimeout,
       );
-      return resp.data.chainAlias.value;
+      return resp.data.evmChainAlias.value;
     } catch (e) {
       logger.warn(e, `failed to fetch evm chainId from dictionary`);
       return undefined;

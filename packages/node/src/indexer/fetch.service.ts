@@ -102,6 +102,7 @@ export class FetchService implements OnApplicationShutdown {
   private batchSizeScale: number;
   private templateDynamicDatasouces: SubqlProjectDs[];
   private dictionaryGenesisMatches = true;
+  private evmChainId: string;
 
   constructor(
     private apiService: ApiService,
@@ -216,10 +217,16 @@ export class FetchService implements OnApplicationShutdown {
       );
     }
     await this.syncDynamicDatascourcesFromMeta();
+
     this.updateDictionary();
     this.eventEmitter.emit(IndexerEvent.UsingDictionary, {
       value: Number(this.useDictionary),
     });
+
+    if (this.project.network.dictionary) {
+      this.evmChainId = await this.dictionaryService.getEvmChainId();
+    }
+
     await this.getFinalizedBlockHead();
     await this.getBestBlockHead();
 
@@ -374,8 +381,6 @@ export class FetchService implements OnApplicationShutdown {
               scaledBatchSize,
             );
 
-          const chainId = await this.dictionaryService.getEvmChainId();
-
           if (startBlockHeight !== getStartBlockHeight()) {
             logger.debug(
               `Queue was reset for new DS, discarding dictionary query result`,
@@ -385,7 +390,7 @@ export class FetchService implements OnApplicationShutdown {
 
           if (
             dictionary &&
-            this.dictionaryValidation(dictionary, chainId, startBlockHeight)
+            this.dictionaryValidation(dictionary, startBlockHeight)
           ) {
             let { batchBlocks } = dictionary;
 
@@ -452,12 +457,11 @@ export class FetchService implements OnApplicationShutdown {
 
   private dictionaryValidation(
     { _metadata: metaData }: Dictionary,
-    chainId: string,
     startBlockHeight: number,
   ): boolean {
     if (
       metaData.genesisHash !== this.api.getGenesisHash() &&
-      chainId !== this.api.getChainId().toString()
+      this.evmChainId !== this.api.getChainId().toString()
     ) {
       logger.error(
         'The dictionary that you have specified does not match the chain you are indexing, it will be ignored. Please update your project manifest to reference the correct dictionary',
