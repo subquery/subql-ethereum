@@ -24,26 +24,16 @@ export class DictionaryService
   }
 
   async getEvmChainId(): Promise<string> {
-    const nodes: GqlNode[] = [
-      {
-        entity: 'chain_aliases',
-        project: ['value'],
-      },
-    ];
-    const vars: GqlVar[] = [];
-
-    const { query, variables } = buildQuery(vars, nodes);
+    const query = `query{chainAlias(id: "chainId"){value}}`;
 
     try {
       const resp = await timeout(
         this.client.query({
           query: gql(query),
-          variables,
         }),
         this.nodeConfig.dictionaryTimeout,
       );
-
-      return resp.data.chain_aliases.value;
+      return resp.data.chainAlias.value;
     } catch (e) {
       logger.warn(e, `failed to fetch evm chainId from dictionary`);
       return undefined;
