@@ -24,7 +24,7 @@ export class DictionaryService
   }
 
   async getEvmChainId(): Promise<string> {
-    const query = `query{evmChainAlias(id: "chainId"){value}}`;
+    const query = `query{chainAlias(id: "evmChainId"){value}}`;
 
     try {
       const resp = await timeout(
