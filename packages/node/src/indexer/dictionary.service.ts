@@ -9,7 +9,6 @@ import {
   timeout,
   getLogger,
 } from '@subql/node-core';
-import { buildQuery, GqlNode, GqlVar } from '@subql/utils';
 import { SubqueryProject } from '../configure/SubqueryProject';
 
 const logger = getLogger('dictionary');
@@ -33,7 +32,7 @@ export class DictionaryService
         }),
         this.nodeConfig.dictionaryTimeout,
       );
-      return resp.data.evmChainAlias.value;
+      return resp.data.chainAlias.value;
     } catch (e) {
       logger.warn(e, `failed to fetch evm chainId from dictionary`);
       return undefined;
