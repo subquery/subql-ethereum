@@ -31,7 +31,6 @@ import { eventToTopic, functionToSighash } from '../utils/string';
 import { IBlockDispatcher } from './blockDispatcher';
 import { DictionaryService } from './dictionary.service';
 import { DynamicDsService } from './dynamic-ds.service';
-import { ProjectService } from './project.service';
 import { UnfinalizedBlocksService } from './unfinalizedBlocks.service';
 
 const logger = getLogger('fetch');
@@ -116,7 +115,6 @@ export class FetchService implements OnApplicationShutdown {
     private unfinalizedBlocksService: UnfinalizedBlocksService,
     private eventEmitter: EventEmitter2,
     private schedulerRegistry: SchedulerRegistry,
-    private projectService: ProjectService,
   ) {
     this.batchSizeScale = 1;
   }
@@ -258,6 +256,7 @@ export class FetchService implements OnApplicationShutdown {
     }
     try {
       const currentFinalizedHeight = await this.api.getFinalizedBlockHeight();
+      logger.info(`finalized:${currentFinalizedHeight.toString()}`);
       const finalizedHeader = await this.api.getBlockByHeightOrHash(
         currentFinalizedHeight,
       );
@@ -285,6 +284,7 @@ export class FetchService implements OnApplicationShutdown {
     }
     try {
       const currentBestHeight = await this.api.getBestBlockHeight();
+      logger.info(`best:${currentBestHeight.toString()}`);
       if (this.latestBestHeight !== currentBestHeight) {
         this.latestBestHeight = currentBestHeight;
         this.eventEmitter.emit(IndexerEvent.BlockBest, {
@@ -456,6 +456,7 @@ export class FetchService implements OnApplicationShutdown {
     if (endBlockHeight > this.latestFinalizedHeight) {
       if (this.nodeConfig.unfinalizedBlocks) {
         if (endBlockHeight >= this.latestBestHeight) {
+          logger.info('here');
           endBlockHeight = this.latestBestHeight;
         }
       } else {
