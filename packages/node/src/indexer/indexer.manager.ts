@@ -173,7 +173,7 @@ export class IndexerManager {
     return {
       dynamicDsCreated,
       operationHash,
-      reindexBlockHeight: null,
+      reindexBlockHeight,
     };
   }
 

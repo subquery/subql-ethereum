@@ -256,7 +256,7 @@ export class FetchService implements OnApplicationShutdown {
     }
     try {
       const currentFinalizedHeight = await this.api.getFinalizedBlockHeight();
-      logger.info(`finalized:${currentFinalizedHeight.toString()}`);
+      logger.debug(`finalized:${currentFinalizedHeight.toString()}`);
       const finalizedHeader = await this.api.getBlockByHeightOrHash(
         currentFinalizedHeight,
       );
@@ -284,7 +284,7 @@ export class FetchService implements OnApplicationShutdown {
     }
     try {
       const currentBestHeight = await this.api.getBestBlockHeight();
-      logger.info(`best:${currentBestHeight.toString()}`);
+      logger.debug(`best:${currentBestHeight.toString()}`);
       if (this.latestBestHeight !== currentBestHeight) {
         this.latestBestHeight = currentBestHeight;
         this.eventEmitter.emit(IndexerEvent.BlockBest, {
@@ -456,7 +456,6 @@ export class FetchService implements OnApplicationShutdown {
     if (endBlockHeight > this.latestFinalizedHeight) {
       if (this.nodeConfig.unfinalizedBlocks) {
         if (endBlockHeight >= this.latestBestHeight) {
-          logger.info('here');
           endBlockHeight = this.latestBestHeight;
         }
       } else {

@@ -8,6 +8,7 @@ import {
   ApiService,
   getLogger,
   getMetaDataInfo,
+  Metadata,
   MetadataRepo,
   NodeConfig,
 } from '@subql/node-core';
@@ -254,8 +255,8 @@ export class UnfinalizedBlocksService {
   }
 
   private async setMetadata(
-    key: string,
-    value: string | number | boolean,
+    key: Metadata['key'],
+    value: Metadata['value'],
     tx: Transaction,
   ): Promise<void> {
     assert(this.metadataRepo, `Model _metadata does not exist`);
