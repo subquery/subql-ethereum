@@ -23,7 +23,7 @@ import {
   EthereumTransactionFilter,
   SubqlDatasource,
 } from '@subql/types-ethereum';
-import {plainToClass, Transform, Type} from 'class-transformer';
+import {Expose, plainToClass, Transform, Type} from 'class-transformer';
 import {
   ArrayMaxSize,
   IsArray,
@@ -50,9 +50,6 @@ export class LogFilter implements EthereumLogFilter {
   @IsOptional()
   @IsArray()
   topics?: string[];
-  @IsOptional()
-  @IsString()
-  address?: string;
 }
 
 export class ChainTypes implements RegisteredTypes {
@@ -97,8 +94,8 @@ export class BlockHandler implements SubqlBlockHandler {
 }
 
 export class CallHandler implements SubqlCallHandler {
-  @IsObject()
   @IsOptional()
+  @ValidateNested()
   @Type(() => TransactionFilter)
   filter?: TransactionFilter;
   @IsEnum(SubqlEthereumHandlerKind, {groups: [SubqlEthereumHandlerKind.FlareCall, SubqlEthereumHandlerKind.EthCall]})
@@ -108,10 +105,10 @@ export class CallHandler implements SubqlCallHandler {
 }
 
 export class EventHandler implements SubqlEventHandler {
-  @IsObject()
   @IsOptional()
+  @ValidateNested()
   @Type(() => LogFilter)
-  filter?: LogFilter;
+  filter?: EthereumLogFilter;
   @IsEnum(SubqlEthereumHandlerKind, {groups: [SubqlEthereumHandlerKind.FlareEvent, SubqlEthereumHandlerKind.EthEvent]})
   kind: EthereumHandlerKind.Event;
   @IsString()
@@ -152,7 +149,7 @@ export class EthereumMapping implements SubqlMapping {
   })
   @IsArray()
   @ValidateNested()
-  handlers: SubqlHandler[];
+  handlers: SubqlRuntimeHandler[];
   @IsString()
   file: string;
 }
@@ -205,4 +202,6 @@ export class CustomDataSourceBase<K extends string, M extends SubqlMapping = Sub
   @Type(() => FileReferenceImpl)
   @IsObject()
   processor: FileReference;
+  @IsOptional()
+  options?: any;
 }

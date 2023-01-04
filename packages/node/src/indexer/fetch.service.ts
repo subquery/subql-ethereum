@@ -42,12 +42,13 @@ const INTERVAL_PERCENT = 0.9;
 
 function eventFilterToQueryEntry(
   filter: EthereumLogFilter,
+  dsOptions: any,
 ): DictionaryQueryEntry {
   const conditions = [];
-  if (filter.address) {
+  if (dsOptions.address) {
     conditions.push({
       field: 'address',
-      value: filter.address.toLowerCase(),
+      value: dsOptions.address.toLowerCase(),
     });
   }
   if (filter.topics) {
@@ -167,8 +168,10 @@ export class FetchService implements OnApplicationShutdown {
           }
           case EthereumHandlerKind.Event: {
             for (const filter of filterList as EthereumLogFilter[]) {
-              if (filter.address || filter.topics) {
-                queryEntries.push(eventFilterToQueryEntry(filter));
+              if (ds.options.address || filter.topics) {
+                queryEntries.push(
+                  eventFilterToQueryEntry(filter, ds.options.address),
+                );
               } else {
                 return [];
               }

@@ -119,6 +119,7 @@ export interface SubqlCustomDatasource<
 > extends ISubqlDatasource<M> {
   kind: K;
   assets: Map<string, CustomDataSourceAsset>;
+  options?: any;
   processor: Processor<O>;
 }
 
