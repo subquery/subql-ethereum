@@ -210,6 +210,7 @@ export class ProjectService {
       'lastFinalizedVerifiedHeight',
       'schemaMigrationCount',
       'unfinalizedBlocks',
+      'bypassBlocks',
     ] as const;
 
     const entries = await metadataRepo.findAll({
