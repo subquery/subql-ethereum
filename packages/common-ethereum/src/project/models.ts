@@ -34,8 +34,9 @@ import {
   IsString,
   IsObject,
   ValidateNested,
+  IsEthereumAddress,
 } from 'class-validator';
-import {SubqlEthereumDatasourceKind, SubqlEthereumHandlerKind} from './types';
+import {SubqlEthereumDatasourceKind, SubqlEthereumHandlerKind, SubqlEthereumProcessorOptions} from './types';
 
 export class BlockFilter implements EthereumBlockFilter {
   @IsOptional()
@@ -149,7 +150,7 @@ export class EthereumMapping implements SubqlMapping {
   })
   @IsArray()
   @ValidateNested()
-  handlers: SubqlRuntimeHandler[];
+  handlers: SubqlHandler[];
   @IsString()
   file: string;
 }
@@ -185,6 +186,15 @@ export class FileReferenceImpl implements FileReference {
   file: string;
 }
 
+export class EthereumProcessorOptions implements SubqlEthereumProcessorOptions {
+  @IsOptional()
+  @IsString()
+  abi?: string;
+  @IsOptional()
+  @IsEthereumAddress()
+  address?: string;
+}
+
 export class CustomDataSourceBase<K extends string, M extends SubqlMapping = SubqlMapping<SubqlCustomHandler>>
   implements SubqlCustomDatasource<K, M>
 {
@@ -203,5 +213,6 @@ export class CustomDataSourceBase<K extends string, M extends SubqlMapping = Sub
   @IsObject()
   processor: FileReference;
   @IsOptional()
-  options?: any;
+  @ValidateNested()
+  options?: EthereumProcessorOptions;
 }

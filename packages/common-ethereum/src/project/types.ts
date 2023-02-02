@@ -41,3 +41,8 @@ export enum SubqlEthereumDatasourceKind {
   FlareRuntime = 'flare/Runtime',
   EthRuntime = 'ethereum/Runtime',
 }
+
+export interface SubqlEthereumProcessorOptions {
+  abi?: string;
+  address?: string;
+}
