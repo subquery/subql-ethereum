@@ -139,45 +139,47 @@ export class EthereumApi implements ApiWrapper<EthereumBlockWrapper> {
     const block = formatBlock(block_promise);
     block.stateRoot = this.client.formatter.hash(block.stateRoot);
 
-    if (this.endpointSupportsGetBlockReceipts) {
-      try {
-        const rawReceipts: any[] = await this.client.send(
-          'eth_getBlockReceipts',
-          [hexValue(block.number)],
-        );
+    // use old method first
 
-        const receipts = rawReceipts.map((receipt) =>
-          formatReceipt(receipt, block),
-        );
-
-        const txs = block.transactions.map((tx) => {
-          const transaction = formatTransaction(tx);
-          transaction.receipt =
-            receipts[BigNumber.from(transaction.transactionIndex).toNumber()];
-
-          assert(
-            transaction.hash === transaction.receipt.transactionHash,
-            'Failed to match receipt to transaction',
-          );
-
-          return transaction;
-        });
-
-        return new EthereumBlockWrapped(block, txs);
-      } catch (e) {
-        // Method not avaialble https://eips.ethereum.org/EIPS/eip-1474
-        if (e.error.code === -32601) {
-          logger.warn(
-            `The endpoint doesn't support 'eth_getBlockReceipts', individual receipts will be fetched instead, this will greatly impact performance.`,
-          );
-          this.endpointSupportsGetBlockReceipts = false;
-
-          // Should continue and use old method here
-        } else {
-          throw e;
-        }
-      }
-    }
+    // if (this.endpointSupportsGetBlockReceipts) {
+    //   try {
+    //     const rawReceipts: any[] = await this.client.send(
+    //       'eth_getBlockReceipts',
+    //       [hexValue(block.number)],
+    //     );
+    //
+    //     const receipts = rawReceipts.map((receipt) =>
+    //       formatReceipt(receipt, block),
+    //     );
+    //
+    //     const txs = block.transactions.map((tx) => {
+    //       const transaction = formatTransaction(tx);
+    //       transaction.receipt =
+    //         receipts[BigNumber.from(transaction.transactionIndex).toNumber()];
+    //
+    //       assert(
+    //         transaction.hash === transaction.receipt.transactionHash,
+    //         'Failed to match receipt to transaction',
+    //       );
+    //
+    //       return transaction;
+    //     });
+    //
+    //     return new EthereumBlockWrapped(block, txs);
+    //   } catch (e) {
+    //     // Method not avaialble https://eips.ethereum.org/EIPS/eip-1474
+    //     if (e.error.code === -32601) {
+    //       logger.warn(
+    //         `The endpoint doesn't support 'eth_getBlockReceipts', individual receipts will be fetched instead, this will greatly impact performance.`,
+    //       );
+    //       this.endpointSupportsGetBlockReceipts = false;
+    //
+    //       // Should continue and use old method here
+    //     } else {
+    //       throw e;
+    //     }
+    //   }
+    // }
 
     const transactions = await Promise.all(
       block.transactions.map(async (tx) => {
@@ -187,28 +189,6 @@ export class EthereumApi implements ApiWrapper<EthereumBlockWrapper> {
         return transaction;
       }),
     );
-
-    // const rawReceipts: any[] = await this.client.send(
-    //   'eth_getBlockReceipts',
-    //   [hexValue(block.number)],
-    // );
-    //
-    // const receipts = rawReceipts.map((receipt) =>
-    //   formatReceipt(receipt, block),
-    // );
-    //
-    // const transactions = block.transactions.map((tx) => {
-    //   const transaction = formatTransaction(tx);
-    //   transaction.receipt =
-    //     receipts[BigNumber.from(transaction.transactionIndex).toNumber()];
-    //
-    //   assert(
-    //     transaction.hash === transaction.receipt.transactionHash,
-    //     'Failed to match receipt to transaction',
-    //   );
-
-    //   return transaction;
-    // })
 
     return new EthereumBlockWrapped(block, transactions);
   }
