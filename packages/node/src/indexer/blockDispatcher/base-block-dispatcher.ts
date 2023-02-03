@@ -100,6 +100,7 @@ export abstract class BaseBlockDispatcher<Q extends IQueue>
   }
 
   flushQueue(height: number): void {
+    console.log(`flash queue for dynamic ds, block height ${height}`);
     this.latestBufferedHeight = height;
     this.queue.flush();
   }
@@ -142,6 +143,7 @@ export abstract class BaseBlockDispatcher<Q extends IQueue>
       );
       // In memory _processedBlockCount increase, db metadata increase BlockCount in indexer.manager
       this.setProcessedBlockCount(this._processedBlockCount + 1);
+      console.log(`~~~~~~   set this.latestProcessedHeight to ${height}`);
       this.latestProcessedHeight = height;
     }
   }

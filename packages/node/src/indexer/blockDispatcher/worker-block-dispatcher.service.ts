@@ -191,7 +191,6 @@ export class WorkerBlockDispatcherService
 
         const { dynamicDsCreated, operationHash, reindexBlockHeight } =
           await worker.processBlock(height);
-
         await this.postProcessBlock(height, {
           dynamicDsCreated,
           operationHash: Buffer.from(operationHash, 'base64'),

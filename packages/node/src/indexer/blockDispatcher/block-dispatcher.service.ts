@@ -106,7 +106,13 @@ export class BlockDispatcherService
 
   flushQueue(height: number): void {
     super.flushQueue(height);
-    this.processQueue.flush();
+    console.log(`super flushQueue, queue.size: ${this.queue.size}`);
+
+    this.processQueue = new AutoQueue(6);
+
+    console.log(
+      `this.processQueue.flush(), this.processQueue.size: ${this.processQueue.size}`,
+    );
   }
 
   private async fetchBlocksFromQueue(): Promise<void> {
@@ -141,6 +147,7 @@ export class BlockDispatcherService
         );
 
         const blocks = await this.fetchBlocksBatches(blockNums);
+        console.log(`blocks has been fetched, ${blocks.length} blocks`);
 
         if (bufferedHeight > this._latestBufferedHeight) {
           logger.debug(`Queue was reset for new DS, discarding fetched blocks`);
@@ -150,9 +157,14 @@ export class BlockDispatcherService
           const height = block.blockHeight;
           try {
             this.preProcessBlock(height);
+            console.log(`this.preProcessBlock(${height})`);
 
             const processBlockResponse = await this.indexerManager.indexBlock(
               block,
+            );
+
+            console.log(
+              `~~~~~ processBlock(${height}), dynamicDsCreated: ${processBlockResponse.dynamicDsCreated}`,
             );
 
             await this.postProcessBlock(height, processBlockResponse);
