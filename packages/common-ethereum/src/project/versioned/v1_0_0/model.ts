@@ -75,9 +75,6 @@ export class EthereumRunnerSpecsImpl implements RunnerSpecs {
 }
 
 export class ProjectNetworkDeploymentV1_0_0 {
-  @IsString()
-  @IsOptional()
-  endpoint?: string;
   @IsNotEmpty()
   @Transform(({value}: TransformFnParams) => value.trim())
   @IsString()
@@ -98,14 +95,6 @@ export class ProjectNetworkV1_0_0 extends ProjectNetworkDeploymentV1_0_0 {
 }
 
 export class DeploymentV1_0_0 {
-  @IsString()
-  name: string;
-  @IsString()
-  version: string;
-  @IsString()
-  description: string;
-  @IsString()
-  repository: string;
   @Transform((params) => {
     if (params.value.genesisHash && !params.value.chainId) {
       params.value.chainId = params.value.genesisHash;
@@ -203,9 +192,9 @@ export class ProjectManifestV1_0_0Impl<D extends object = DeploymentV1_0_0>
   get deployment(): D {
     if (!this._deployment) {
       this._deployment = plainToClass(DeploymentV1_0_0, this) as unknown as D;
-      validateSync(this._deployment, {whitelist: true, forbidNonWhitelisted: true, forbidUnknownValues: true});
+      //validateSync(this._deployment.)
+      validateSync(this._deployment, {whitelist: true});
     }
-
     return this._deployment;
   }
 }

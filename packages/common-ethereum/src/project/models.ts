@@ -23,11 +23,9 @@ import {
   EthereumTransactionFilter,
   SubqlDatasource,
 } from '@subql/types-ethereum';
-import {Expose, plainToClass, Transform, Type} from 'class-transformer';
+import {plainToClass, Transform, Type} from 'class-transformer';
 import {
-  ArrayMaxSize,
   IsArray,
-  IsBoolean,
   IsEnum,
   IsInt,
   IsOptional,
@@ -35,6 +33,9 @@ import {
   IsObject,
   ValidateNested,
   IsEthereumAddress,
+  registerDecorator,
+  ValidationOptions,
+  ValidationArguments,
 } from 'class-validator';
 import {SubqlEthereumDatasourceKind, SubqlEthereumHandlerKind, SubqlEthereumProcessorOptions} from './types';
 
@@ -83,6 +84,31 @@ export class TransactionFilter implements EthereumTransactionFilter {
   function?: string;
 }
 
+export function forbidNonWhitelisted(keys: any, validationOptions?: ValidationOptions) {
+  return function (object: object, propertyName: string) {
+    registerDecorator({
+      name: 'forbidNonWhitelisted',
+      target: object.constructor,
+      propertyName: propertyName,
+      constraints: [],
+      options: validationOptions,
+      validator: {
+        validate(value: any, args: ValidationArguments) {
+          const isValid = !Object.keys(value).some((key) => !(key in keys));
+          if (!isValid) {
+            throw new Error(
+              `Invalid keys present in value: ${JSON.stringify(value)}. Whitelisted keys: ${JSON.stringify(
+                Object.keys(keys)
+              )}`
+            );
+          }
+          return isValid;
+        },
+      },
+    });
+  };
+}
+
 export class BlockHandler implements SubqlBlockHandler {
   @IsObject()
   @IsOptional()
@@ -95,10 +121,11 @@ export class BlockHandler implements SubqlBlockHandler {
 }
 
 export class CallHandler implements SubqlCallHandler {
+  @forbidNonWhitelisted({from: '', to: '', function: ''})
   @IsOptional()
   @ValidateNested()
   @Type(() => TransactionFilter)
-  filter?: TransactionFilter;
+  filter?: EthereumTransactionFilter;
   @IsEnum(SubqlEthereumHandlerKind, {groups: [SubqlEthereumHandlerKind.FlareCall, SubqlEthereumHandlerKind.EthCall]})
   kind: EthereumHandlerKind.Call;
   @IsString()
@@ -106,6 +133,7 @@ export class CallHandler implements SubqlCallHandler {
 }
 
 export class EventHandler implements SubqlEventHandler {
+  @forbidNonWhitelisted({topics: ''})
   @IsOptional()
   @ValidateNested()
   @Type(() => LogFilter)
@@ -164,6 +192,15 @@ export class CustomMapping implements SubqlMapping<SubqlCustomHandler> {
   file: string;
 }
 
+export class EthereumProcessorOptions implements SubqlEthereumProcessorOptions {
+  @IsOptional()
+  @IsString()
+  abi?: string;
+  @IsOptional()
+  @IsEthereumAddress()
+  address?: string;
+}
+
 export class RuntimeDataSourceBase<M extends SubqlMapping<SubqlRuntimeHandler>> implements SubqlRuntimeDatasource<M> {
   @IsEnum(SubqlEthereumDatasourceKind, {
     groups: [SubqlEthereumDatasourceKind.FlareRuntime, SubqlEthereumDatasourceKind.EthRuntime],
@@ -178,21 +215,13 @@ export class RuntimeDataSourceBase<M extends SubqlMapping<SubqlRuntimeHandler>> 
   @IsOptional()
   assets?: Map<string, FileReference>;
   @IsOptional()
-  options?: any;
+  @ValidateNested()
+  options?: EthereumProcessorOptions;
 }
 
 export class FileReferenceImpl implements FileReference {
   @IsString()
   file: string;
-}
-
-export class EthereumProcessorOptions implements SubqlEthereumProcessorOptions {
-  @IsOptional()
-  @IsString()
-  abi?: string;
-  @IsOptional()
-  @IsEthereumAddress()
-  address?: string;
 }
 
 export class CustomDataSourceBase<K extends string, M extends SubqlMapping = SubqlMapping<SubqlCustomHandler>>

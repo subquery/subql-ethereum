@@ -6,6 +6,7 @@ import {SubqlDatasource} from '@subql/types-ethereum';
 
 // All of these used to be redefined in this file, re-exporting for simplicity
 export {
+  SubqlEthereumProcessorOptions,
   SubqlRuntimeHandler,
   SubqlCustomHandler,
   SubqlHandler,
@@ -40,9 +41,4 @@ export enum SubqlEthereumHandlerKind {
 export enum SubqlEthereumDatasourceKind {
   FlareRuntime = 'flare/Runtime',
   EthRuntime = 'ethereum/Runtime',
-}
-
-export interface SubqlEthereumProcessorOptions {
-  abi?: string;
-  address?: string;
 }
