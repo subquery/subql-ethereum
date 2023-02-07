@@ -18,8 +18,8 @@ export function calcInterval(api: ApiWrapper): number {
   return 6000;
 }
 
-function handleAddress(value: string): string {
-  if (value === '0x') {
+function handleAddress(value: string): string | null {
+  if (!value || value === '0x') {
     return null;
   }
   return getAddress(value);
