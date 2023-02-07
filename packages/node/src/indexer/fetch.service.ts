@@ -404,7 +404,8 @@ export class FetchService implements OnApplicationShutdown {
 
       if (
         this.blockDispatcher.freeSize < scaledBatchSize ||
-        startBlockHeight > latestHeight
+        startBlockHeight > latestHeight ||
+        this.blockDispatcher.isFlushing
       ) {
         await delay(1);
         continue;
@@ -583,12 +584,12 @@ export class FetchService implements OnApplicationShutdown {
     await this.syncDynamicDatascourcesFromMeta();
     this.dynamicDsService.deleteTempDsRecords(blockHeight);
     this.updateDictionary();
-    this.blockDispatcher.flushQueue(blockHeight);
+    await this.blockDispatcher.flushQueue(blockHeight);
   }
 
   async resetForIncorrectBestBlock(blockHeight: number): Promise<void> {
     await this.syncDynamicDatascourcesFromMeta();
     this.updateDictionary();
-    this.blockDispatcher.flushQueue(blockHeight);
+    await this.blockDispatcher.flushQueue(blockHeight);
   }
 }

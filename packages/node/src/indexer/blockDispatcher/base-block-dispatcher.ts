@@ -25,8 +25,9 @@ export interface IBlockDispatcher {
   latestBufferedHeight: number | undefined;
 
   // Remove all enqueued blocks, used when a dynamic ds is created
-  flushQueue(height: number): void;
+  flushQueue(height: number): void | Promise<void>;
   rewind(height: number): Promise<void>;
+  isFlushing: boolean;
 }
 
 const NULL_MERKEL_ROOT = hexToU8a('0x00');
@@ -43,7 +44,7 @@ export abstract class BaseBlockDispatcher<Q extends IQueue>
   protected latestProcessedHeight: number;
   protected currentProcessingHeight: number;
   protected onDynamicDsCreated: (height: number) => Promise<void>;
-  private handlingDynamicDs: boolean;
+  isFlushing: boolean;
 
   constructor(
     protected nodeConfig: NodeConfig,
@@ -101,7 +102,6 @@ export abstract class BaseBlockDispatcher<Q extends IQueue>
   }
 
   flushQueue(height: number): void {
-    console.log(`flash queue for dynamic ds, block height ${height}`);
     this.latestBufferedHeight = height;
     this.queue.flush();
   }
@@ -136,7 +136,6 @@ export abstract class BaseBlockDispatcher<Q extends IQueue>
         void this.projectService.setBlockOffset(height - 1);
       }
       if (dynamicDsCreated) {
-        this.handlingDynamicDs = true;
         await this.onDynamicDsCreated(height);
       }
       assert(
@@ -145,7 +144,6 @@ export abstract class BaseBlockDispatcher<Q extends IQueue>
       );
       // In memory _processedBlockCount increase, db metadata increase BlockCount in indexer.manager
       this.setProcessedBlockCount(this._processedBlockCount + 1);
-      console.log(`~~~~~~   set this.latestProcessedHeight to ${height}`);
       this.latestProcessedHeight = height;
     }
   }

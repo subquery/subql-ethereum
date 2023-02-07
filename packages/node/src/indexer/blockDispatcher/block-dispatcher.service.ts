@@ -34,6 +34,8 @@ export class BlockDispatcherService
   private fetching = false;
   private isShutdown = false;
   private fetchBlocksBatches: EthereumApiService['api']['fetchBlocks'];
+  private isFetchingBlock: boolean;
+  isFlushing = false;
 
   constructor(
     private apiService: ApiService,
@@ -82,6 +84,7 @@ export class BlockDispatcherService
     // // In the case where factors of batchSize is equal to bypassBlock or when cleanedBatchBlocks is []
     // // to ensure block is bypassed, latestBufferHeight needs to be manually set
     // If cleanedBlocks = []
+
     if (!!latestBufferHeight && !cleanedBlocks.length) {
       this.latestBufferedHeight = latestBufferHeight;
       return;
@@ -104,22 +107,27 @@ export class BlockDispatcherService
     });
   }
 
-  flushQueue(height: number): void {
+  async flushQueue(height: number): Promise<void> {
+    this.isFlushing = true;
     super.flushQueue(height);
-    console.log(`super flushQueue, queue.size: ${this.queue.size}`);
-
-    // this.processQueue = new AutoQueue(6);
+    await this.waitStopFetching();
     this.processQueue.flush();
-    console.log(
-      `this.processQueue.flush(), this.processQueue.size: ${this.processQueue.size}`,
-    );
+    this.isFlushing = false;
+  }
+
+  async waitStopFetching(): Promise<void> {
+    // keep ask api if still fetching block
+    logger.debug(`waiting api stop fetching blocks ...`);
+    if (this.isFetchingBlock) {
+      await delay(0.5);
+      await this.waitStopFetching();
+    }
   }
 
   private async fetchBlocksFromQueue(): Promise<void> {
     if (this.fetching || this.isShutdown) return;
     // Process queue is full, no point in fetching more blocks
     // if (this.processQueue.freeSpace < this.nodeConfig.batchSize) return;
-
     this.fetching = true;
 
     try {
@@ -145,55 +153,50 @@ export class BlockDispatcherService
             blockNums[blockNums.length - 1]
           }], total ${blockNums.length} blocks`,
         );
-
-        const blocks = await this.fetchBlocksBatches(blockNums);
-        console.log(
-          `blocks has been fetched, ${blocks[0].blockHeight} - ${
-            blocks[blocks.length - 1].blockHeight
-          }`,
-        );
-
-        if (bufferedHeight > this._latestBufferedHeight) {
-          logger.debug(`Queue was reset for new DS, discarding fetched blocks`);
-          continue;
-        }
-        const blockTasks = blocks.map((block) => async () => {
-          const height = block.blockHeight;
-          try {
-            this.preProcessBlock(height);
-            console.log(`this.preProcessBlock(${height})`);
-
-            const processBlockResponse = await this.indexerManager.indexBlock(
-              block,
+        let blocks;
+        if (!this.isFlushing) {
+          this.isFetchingBlock = true;
+          blocks = await this.fetchBlocksBatches(blockNums);
+          this.isFetchingBlock = false;
+          if (bufferedHeight > this._latestBufferedHeight) {
+            logger.debug(
+              `Queue was reset for new DS, discarding fetched blocks`,
             );
-
-            console.log(
-              `~~~~~ processBlock(${height}), dynamicDsCreated: ${processBlockResponse.dynamicDsCreated}`,
-            );
-
-            await this.postProcessBlock(height, processBlockResponse);
-          } catch (e) {
-            if (this.isShutdown) {
-              return;
-            }
-            logger.error(
-              e,
-              `failed to index block at height ${height} ${
-                e.handler ? `${e.handler}(${e.stack ?? ''})` : ''
-              }`,
-            );
-            throw e;
+            continue;
           }
-        });
+          const blockTasks = blocks.map((block) => async () => {
+            const height = block.blockHeight;
+            try {
+              this.preProcessBlock(height);
 
-        // There can be enough of a delay after fetching blocks that shutdown could now be true
-        if (this.isShutdown) break;
+              const processBlockResponse = await this.indexerManager.indexBlock(
+                block,
+              );
 
-        this.processQueue.putMany(blockTasks);
+              await this.postProcessBlock(height, processBlockResponse);
+            } catch (e) {
+              if (this.isShutdown) {
+                return;
+              }
+              logger.error(
+                e,
+                `failed to index block at height ${height} ${
+                  e.handler ? `${e.handler}(${e.stack ?? ''})` : ''
+                }`,
+              );
+              throw e;
+            }
+          });
 
-        this.eventEmitter.emit(IndexerEvent.BlockQueueSize, {
-          value: this.processQueue.size,
-        });
+          // There can be enough of a delay after fetching blocks that shutdown could now be true
+          if (this.isShutdown) break;
+
+          this.processQueue.putMany(blockTasks);
+
+          this.eventEmitter.emit(IndexerEvent.BlockQueueSize, {
+            value: this.processQueue.size,
+          });
+        }
       }
     } finally {
       this.fetching = false;
