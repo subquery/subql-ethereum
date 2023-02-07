@@ -109,17 +109,19 @@ export class BlockDispatcherService
 
   async flushQueue(height: number): Promise<void> {
     this.isFlushing = true;
+    logger.debug(`flush queue starting ...`);
     super.flushQueue(height);
     await this.waitStopFetching();
     this.processQueue.flush();
     this.isFlushing = false;
+    logger.debug(`queue flushed!`);
   }
 
   async waitStopFetching(): Promise<void> {
     // keep ask api if still fetching block
     logger.debug(`waiting api stop fetching blocks ...`);
     if (this.isFetchingBlock) {
-      await delay(0.5);
+      await delay(1);
       await this.waitStopFetching();
     }
   }
@@ -147,16 +149,17 @@ export class BlockDispatcherService
           }
           break;
         }
-
-        logger.info(
-          `fetch block [${blockNums[0]},${
-            blockNums[blockNums.length - 1]
-          }], total ${blockNums.length} blocks`,
-        );
-        let blocks;
+        // If it is not flushing, continue
+        // otherwise, flush queue will reset both queue, add number to this.queue again from top
         if (!this.isFlushing) {
+          //TODO, improve this
           this.isFetchingBlock = true;
-          blocks = await this.fetchBlocksBatches(blockNums);
+          logger.info(
+            `fetch block [${blockNums[0]},${
+              blockNums[blockNums.length - 1]
+            }], total ${blockNums.length} blocks`,
+          );
+          const blocks = await this.fetchBlocksBatches(blockNums);
           this.isFetchingBlock = false;
           if (bufferedHeight > this._latestBufferedHeight) {
             logger.debug(
