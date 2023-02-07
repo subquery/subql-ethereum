@@ -108,8 +108,8 @@ export class BlockDispatcherService
     super.flushQueue(height);
     console.log(`super flushQueue, queue.size: ${this.queue.size}`);
 
-    this.processQueue = new AutoQueue(6);
-
+    // this.processQueue = new AutoQueue(6);
+    this.processQueue.flush();
     console.log(
       `this.processQueue.flush(), this.processQueue.size: ${this.processQueue.size}`,
     );
@@ -147,7 +147,11 @@ export class BlockDispatcherService
         );
 
         const blocks = await this.fetchBlocksBatches(blockNums);
-        console.log(`blocks has been fetched, ${blocks.length} blocks`);
+        console.log(
+          `blocks has been fetched, ${blocks[0].blockHeight} - ${
+            blocks[blocks.length - 1].blockHeight
+          }`,
+        );
 
         if (bufferedHeight > this._latestBufferedHeight) {
           logger.debug(`Queue was reset for new DS, discarding fetched blocks`);

@@ -43,6 +43,7 @@ export abstract class BaseBlockDispatcher<Q extends IQueue>
   protected latestProcessedHeight: number;
   protected currentProcessingHeight: number;
   protected onDynamicDsCreated: (height: number) => Promise<void>;
+  private handlingDynamicDs: boolean;
 
   constructor(
     protected nodeConfig: NodeConfig,
@@ -135,6 +136,7 @@ export abstract class BaseBlockDispatcher<Q extends IQueue>
         void this.projectService.setBlockOffset(height - 1);
       }
       if (dynamicDsCreated) {
+        this.handlingDynamicDs = true;
         await this.onDynamicDsCreated(height);
       }
       assert(
