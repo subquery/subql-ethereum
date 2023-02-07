@@ -168,10 +168,8 @@ export class FetchService implements OnApplicationShutdown {
           }
           case EthereumHandlerKind.Event: {
             for (const filter of filterList as EthereumLogFilter[]) {
-              if (ds.options.address || filter.topics) {
-                queryEntries.push(
-                  eventFilterToQueryEntry(filter, ds.options.address),
-                );
+              if ((ds.options && ds.options.address) || filter.topics) {
+                queryEntries.push(eventFilterToQueryEntry(filter, ds.options));
               } else {
                 return [];
               }
