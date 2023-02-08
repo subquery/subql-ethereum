@@ -148,7 +148,7 @@ export class BlockDispatcherService
           bufferedHeight > this._latestBufferedHeight ||
           this.queue.peek() < Math.min(...blockNums)
         ) {
-          logger.warn(`Queue was reset for new DS, discarding fetched blocks`);
+          logger.info(`Queue was reset for new DS, discarding fetched blocks`);
           continue;
         }
 
