@@ -219,8 +219,6 @@ export class FetchService implements OnApplicationShutdown {
       }
     }
 
-    // console.log("QUERY ENTRIES", JSON.stringify(queryEntries))
-
     return uniqBy(
       queryEntries,
       (item) =>
