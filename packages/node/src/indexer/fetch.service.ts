@@ -25,9 +25,11 @@ import {
   ApiWrapper,
   EthereumLogFilter,
   EthereumTransactionFilter,
+  SubqlEthereumProcessorOptions,
+  DictionaryQueryCondition,
 } from '@subql/types-ethereum';
 import { MetaData } from '@subql/utils';
-import { range, sortBy, uniqBy, without } from 'lodash';
+import { range, sortBy, uniqBy, without, groupBy } from 'lodash';
 import { SubqlProjectDs, SubqueryProject } from '../configure/SubqueryProject';
 import { calcInterval } from '../ethereum/utils.ethereum';
 import { eventToTopic, functionToSighash } from '../utils/string';
@@ -45,7 +47,7 @@ const INTERVAL_PERCENT = 0.9;
 
 function eventFilterToQueryEntry(
   filter: EthereumLogFilter,
-  dsOptions: any,
+  dsOptions: SubqlEthereumProcessorOptions,
 ): DictionaryQueryEntry {
   const conditions = [];
   if (dsOptions.address) {
@@ -54,6 +56,43 @@ function eventFilterToQueryEntry(
       value: dsOptions.address.toLowerCase(),
     });
   }
+  if (filter.topics) {
+    for (let i = 0; i < Math.min(filter.topics.length, 4); i++) {
+      const topic = filter.topics[i];
+      if (!topic) {
+        continue;
+      }
+      const field = `topics${i}`;
+      conditions.push({ field, value: eventToTopic(topic) });
+    }
+  }
+  return {
+    entity: 'evmLogs',
+    conditions,
+  };
+}
+
+function eventFilterToQueryEntryGroup(
+  filter: EthereumLogFilter,
+  dsOptions: SubqlEthereumProcessorOptions[],
+): DictionaryQueryEntry {
+  const conditions: DictionaryQueryCondition[] = [];
+
+  const addresses = dsOptions.map((option) => option.address).filter(Boolean);
+
+  if (addresses.length) {
+    conditions.push({
+      field: 'address',
+      value: addresses,
+      matcher: 'in',
+    });
+  }
+  // if (dsOptions.address) {
+  //   conditions.push({
+  //     field: 'address',
+  //     value: dsOptions.address.toLowerCase(),
+  //   });
+  // }
   if (filter.topics) {
     for (let i = 0; i < Math.min(filter.topics.length, 4); i++) {
       const topic = filter.topics[i];
@@ -139,10 +178,26 @@ export class FetchService implements OnApplicationShutdown {
   buildDictionaryQueryEntries(startBlock: number): DictionaryQueryEntry[] {
     const queryEntries: DictionaryQueryEntry[] = [];
 
+    type GroupedSubqlProjectDs = SubqlProjectDs & {
+      groupedOptions?: SubqlEthereumProcessorOptions[];
+    };
+
+    const groupdDynamicDs: GroupedSubqlProjectDs[] = Object.values(
+      groupBy(this.templateDynamicDatasouces, (ds) => ds.name),
+    ).map((grouped: SubqlProjectDs[]) => {
+      const options = grouped.map((ds) => ds.options);
+      const ref = grouped[0];
+
+      return {
+        ...ref,
+        groupedOptions: options,
+      };
+    });
+
     // Only run the ds that is equal or less than startBlock
     // sort array from lowest ds.startBlock to highest
-    const filteredDs = this.project.dataSources
-      .concat(this.templateDynamicDatasouces)
+    const filteredDs: GroupedSubqlProjectDs[] = this.project.dataSources
+      .concat(groupdDynamicDs)
       .filter((ds) => ds.startBlock <= startBlock)
       .sort((a, b) => a.startBlock - b.startBlock);
 
@@ -171,7 +226,11 @@ export class FetchService implements OnApplicationShutdown {
           }
           case EthereumHandlerKind.Event: {
             for (const filter of filterList as EthereumLogFilter[]) {
-              if ((ds.options && ds.options.address) || filter.topics) {
+              if (ds.groupedOptions) {
+                queryEntries.push(
+                  eventFilterToQueryEntryGroup(filter, ds.groupedOptions),
+                );
+              } else if (ds.options?.address || filter.topics) {
                 queryEntries.push(eventFilterToQueryEntry(filter, ds.options));
               } else {
                 return [];
@@ -183,6 +242,8 @@ export class FetchService implements OnApplicationShutdown {
         }
       }
     }
+
+    // console.log("QUERY ENTRIES", JSON.stringify(queryEntries))
 
     return uniqBy(
       queryEntries,
