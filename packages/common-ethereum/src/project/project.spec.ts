@@ -106,8 +106,4 @@ describe.skip('project.yaml', () => {
   it('can fail validation if custom ds missing processor', () => {
     expect(() => loadEthereumProjectManifest(path.join(projectsDir, 'project_0.2.0_invalid_custom_ds.yaml'))).toThrow();
   });
-
-  it('deployment get options in template ', () => {
-    expect(() => loadEthereumProjectManifest(path.join(projectsDir, 'project_0.2.0_invalid_custom_ds.yaml'))).toThrow();
-  });
 });
