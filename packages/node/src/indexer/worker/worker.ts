@@ -21,6 +21,7 @@ import { threadId } from 'node:worker_threads';
 import { INestApplication } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { registerWorker, getLogger, NestLogger } from '@subql/node-core';
+import { DynamicDsService } from '../dynamic-ds.service';
 import { IndexerManager } from '../indexer.manager';
 import { WorkerModule } from './worker.module';
 import {
@@ -69,7 +70,15 @@ async function fetchBlock(height: number): Promise<FetchBlockResponse> {
 async function processBlock(height: number): Promise<ProcessBlockResponse> {
   assert(workerService, 'Not initialised');
 
-  return workerService.processBlock(height);
+  const res = await workerService.processBlock(height);
+
+  // Clean up the temp ds records for worker thread instance
+  if (res.dynamicDsCreated) {
+    const dynamicDsService = app.get(DynamicDsService);
+    dynamicDsService.deleteTempDsRecords(height);
+  }
+
+  return res;
 }
 
 // eslint-disable-next-line @typescript-eslint/require-await
