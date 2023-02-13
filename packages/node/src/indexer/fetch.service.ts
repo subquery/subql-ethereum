@@ -55,7 +55,7 @@ function eventFilterToQueryEntry(
   if (Array.isArray(dsOptions)) {
     const addresses = dsOptions.map((option) => option.address).filter(Boolean);
 
-    if (addresses.length <= QUERY_ADDRESS_LIMIT) {
+    if (addresses.length !== 0 && addresses.length <= QUERY_ADDRESS_LIMIT) {
       conditions.push({
         field: 'address',
         value: addresses,
