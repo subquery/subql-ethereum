@@ -33,6 +33,7 @@ import {
 
 let app: INestApplication;
 let workerService: WorkerService;
+let dynamicDsService: DynamicDsService;
 
 const logger = getLogger(`worker #${threadId}`);
 
@@ -54,6 +55,7 @@ async function initWorker(): Promise<void> {
     await indexerManager.start();
 
     workerService = app.get(WorkerService);
+    dynamicDsService = app.get(DynamicDsService);
   } catch (e) {
     console.log('Failed to start worker', e);
     logger.error(e, 'Failed to start worker');
@@ -101,6 +103,10 @@ async function getStatus(): Promise<WorkerStatusResponse> {
   };
 }
 
+async function reloadDynamicDs(): Promise<void> {
+  return dynamicDsService.reloadDynamicDatasources();
+}
+
 // Register these functions to be exposed to worker host
 registerWorker({
   initWorker,
@@ -109,6 +115,7 @@ registerWorker({
   numFetchedBlocks,
   numFetchingBlocks,
   getStatus,
+  reloadDynamicDs,
 });
 
 // Export types to be used on the parent
@@ -118,6 +125,7 @@ export type ProcessBlock = typeof processBlock;
 export type NumFetchedBlocks = typeof numFetchedBlocks;
 export type NumFetchingBlocks = typeof numFetchingBlocks;
 export type GetWorkerStatus = typeof getStatus;
+export type ReloadDynamicDs = typeof reloadDynamicDs;
 
 process.on('uncaughtException', (e) => {
   logger.error(e, 'Uncaught Exception');
