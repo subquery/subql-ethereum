@@ -59,6 +59,9 @@ export class EthereumApi implements ApiWrapper<EthereumBlockWrapper> {
 
   private endpointSupportsGetBlockReceipts = true;
 
+  // Ethereum POS
+  private supportsFinalization = true;
+
   constructor(private endpoint: string) {
     const { hostname, pathname, port, protocol, searchParams } = new URL(
       endpoint,
@@ -92,11 +95,23 @@ export class EthereumApi implements ApiWrapper<EthereumBlockWrapper> {
   }
 
   async getFinalizedBlockHeight(): Promise<number> {
-    return (await this.client.getBlock('finalized')).number;
+    try {
+      if (this.supportsFinalization) {
+        return (await this.client.getBlock('finalised')).number;
+      } else {
+        // TODO make number of blocks finalised configurable
+        return (await this.getBestBlockHeight()) - 15; // Consider 15 blocks finalized
+      }
+    } catch (e) {
+      // TODO handle specific error for this
+      this.supportsFinalization = false;
+      return this.getFinalizedBlockHeight();
+    }
   }
 
   async getBestBlockHeight(): Promise<number> {
-    return (await this.client.getBlock('safe')).number;
+    const tag = this.supportsFinalization ? 'safe' : 'latest';
+    return (await this.client.getBlock(tag)).number;
   }
 
   getRuntimeChain(): string {
@@ -116,6 +131,9 @@ export class EthereumApi implements ApiWrapper<EthereumBlockWrapper> {
   }
 
   async getBlockByHeightOrHash(heightOrHash: number | string): Promise<Block> {
+    if (typeof heightOrHash === 'number') {
+      heightOrHash = hexValue(heightOrHash);
+    }
     return this.client.getBlock(heightOrHash);
   }
 
