@@ -5,6 +5,7 @@ import fs from 'fs';
 import { Interface } from '@ethersproject/abi';
 import { Block, TransactionReceipt } from '@ethersproject/abstract-provider';
 import { JsonRpcProvider, WebSocketProvider } from '@ethersproject/providers';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { RuntimeDataSourceV0_2_0 } from '@subql/common-ethereum';
 import { getLogger } from '@subql/node-core';
 import {
@@ -59,7 +60,7 @@ export class EthereumApi implements ApiWrapper<EthereumBlockWrapper> {
   // Ethereum POS
   private supportsFinalization = true;
 
-  constructor(private endpoint: string) {
+  constructor(private endpoint: string, private eventEmitter: EventEmitter2) {
     const { hostname, pathname, port, protocol, searchParams } = new URL(
       endpoint,
     );
@@ -86,9 +87,20 @@ export class EthereumApi implements ApiWrapper<EthereumBlockWrapper> {
   }
 
   async init(): Promise<void> {
+    this.injectClient();
     this.genesisBlock = await this.client.getBlock(0);
 
     this.chainId = (await this.client.getNetwork()).chainId;
+  }
+
+  private injectClient(): void {
+    const orig = this.client.send.bind(this.client);
+    Object.defineProperty(this.client, 'send', {
+      value: (...args) => {
+        this.eventEmitter.emit('rpcCall');
+        return orig(...args);
+      },
+    });
   }
 
   async getFinalizedBlockHeight(): Promise<number> {
@@ -166,7 +178,7 @@ export class EthereumApi implements ApiWrapper<EthereumBlockWrapper> {
       }),
     ]);
 
-    return new EthereumBlockWrapped(
+    const ret = new EthereumBlockWrapped(
       block,
       includeTx
         ? block.transactions.map((tx) => ({
@@ -180,6 +192,8 @@ export class EthereumApi implements ApiWrapper<EthereumBlockWrapper> {
         : [],
       logs.map((l) => formatLog(l, block)),
     );
+    this.eventEmitter.emit('fetchBlock');
+    return ret;
   }
 
   async fetchBlocks(bufferBlocks: number[]): Promise<EthereumBlockWrapper[]> {
