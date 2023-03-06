@@ -2,9 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import fs from 'fs';
+import http from 'http';
+import https from 'https';
 import { Interface } from '@ethersproject/abi';
 import { Block, TransactionReceipt } from '@ethersproject/abstract-provider';
-import { JsonRpcProvider, WebSocketProvider } from '@ethersproject/providers';
+import { Provider, WebSocketProvider } from '@ethersproject/providers';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { RuntimeDataSourceV0_2_0 } from '@subql/common-ethereum';
 import { getLogger, profiler } from '@subql/node-core';
@@ -16,9 +18,12 @@ import {
   EthereumResult,
   EthereumLog,
 } from '@subql/types-ethereum';
-import { ConnectionInfo, hexDataSlice, hexValue } from 'ethers/lib/utils';
+import { hexDataSlice, hexValue } from 'ethers/lib/utils';
 import { retryOnFailEth } from '../utils/project';
 import { EthereumBlockWrapped } from './block.ethereum';
+import { JsonRpcBatchProvider } from './ethers/json-rpc-batch-provider';
+import { JsonRpcProvider } from './ethers/json-rpc-provider';
+import { ConnectionInfo } from './ethers/web';
 import SafeEthProvider from './safe-api';
 import {
   formatBlock,
@@ -77,6 +82,10 @@ export class EthereumApi implements ApiWrapper<EthereumBlockWrapper> {
         allowGzip: true,
         throttleLimit: 5,
         throttleSlotInterval: 1,
+        agents: {
+          http: new http.Agent({ keepAlive: true /*, maxSockets: 100*/ }),
+          https: new https.Agent({ keepAlive: true /*, maxSockets: 100*/ }),
+        },
       };
       searchParams.forEach((value, name, searchParams) => {
         (connection.headers as any)[name] = value;
@@ -205,7 +214,7 @@ export class EthereumApi implements ApiWrapper<EthereumBlockWrapper> {
       bufferBlocks.map(async (num) => {
         try {
           // Fetch Block
-          return await this.fetchBlock(num, false);
+          return await this.fetchBlock(num, true);
         } catch (e) {
           // Wrap error from an axios error to fix issue with error being undefined
           const error = new Error(e.message);
