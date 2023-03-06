@@ -7,7 +7,7 @@ import { Block, TransactionReceipt } from '@ethersproject/abstract-provider';
 import { JsonRpcProvider, WebSocketProvider } from '@ethersproject/providers';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { RuntimeDataSourceV0_2_0 } from '@subql/common-ethereum';
-import { getLogger } from '@subql/node-core';
+import { getLogger, profiler } from '@subql/node-core';
 import {
   ApiWrapper,
   BlockWrapper,
@@ -74,6 +74,9 @@ export class EthereumApi implements ApiWrapper<EthereumBlockWrapper> {
         headers: {
           'User-Agent': `Subquery-Node ${packageVersion}`,
         },
+        allowGzip: true,
+        throttleLimit: 5,
+        throttleSlotInterval: 1,
       };
       searchParams.forEach((value, name, searchParams) => {
         (connection.headers as any)[name] = value;
@@ -147,9 +150,10 @@ export class EthereumApi implements ApiWrapper<EthereumBlockWrapper> {
   }
 
   private async getBlockPromise(num: number, includeTx = true): Promise<any> {
-    const rawBlock = await retryOnFailEth(() =>
-      this.client.send('eth_getBlockByNumber', [hexValue(num), includeTx]),
-    );
+    const rawBlock = await this.client.send('eth_getBlockByNumber', [
+      hexValue(num),
+      includeTx,
+    ]);
 
     const block = formatBlock(rawBlock);
 
@@ -201,7 +205,7 @@ export class EthereumApi implements ApiWrapper<EthereumBlockWrapper> {
       bufferBlocks.map(async (num) => {
         try {
           // Fetch Block
-          return await this.fetchBlock(num, true);
+          return await this.fetchBlock(num, false);
         } catch (e) {
           // Wrap error from an axios error to fix issue with error being undefined
           const error = new Error(e.message);
