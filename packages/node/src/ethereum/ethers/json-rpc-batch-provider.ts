@@ -98,9 +98,9 @@ export class JsonRpcBatchProvider extends JsonRpcProvider {
           provider: this,
         });
 
-        if (!Array.isArray(result)) {
-          result = [result];
-        }
+        // if (!Array.isArray(result)) {
+        //   result = [result];
+        // }
 
         // https://github.com/ethers-io/ethers.js/pull/2657
         const resultMap = result.reduce((resultMap, payload) => {

@@ -133,15 +133,17 @@ export class IndexerManager {
         },
       );
 
-      await this.storeService.setMetadataBatch(
-        [
-          { key: 'lastProcessedHeight', value: blockHeight },
-          { key: 'lastProcessedTimestamp', value: Date.now() },
-        ],
-        { transaction: tx },
-      );
-      // Db Metadata increase BlockCount, in memory ref to block-dispatcher _processedBlockCount
-      await this.storeService.incrementJsonbCount('processedBlockCount', tx);
+      await Promise.all([
+        this.storeService.setMetadataBatch(
+          [
+            { key: 'lastProcessedHeight', value: blockHeight },
+            { key: 'lastProcessedTimestamp', value: Date.now() },
+          ],
+          { transaction: tx },
+        ),
+        // Db Metadata increase BlockCount, in memory ref to block-dispatcher _processedBlockCount
+        this.storeService.incrementJsonbCount('processedBlockCount', tx),
+      ]);
 
       // Need calculate operationHash to ensure correct offset insert all time
       operationHash = this.storeService.getOperationMerkleRoot();
@@ -209,15 +211,11 @@ export class IndexerManager {
     getVM: (d: SubqlProjectDs) => Promise<IndexerSandbox>,
   ): Promise<void> {
     await this.indexBlockContent(block, dataSources, getVM);
-    if (transactions.length !== 0) {
-      for (const tx of transactions) {
-        await this.indexExtrinsic(tx, dataSources, getVM);
-        for (const log of logs.filter((l) => l.transactionHash === tx.hash)) {
-          await this.indexEvent(log, dataSources, getVM);
-        }
-      }
-    } else {
-      for (const log of logs) {
+
+    for (const tx of transactions) {
+      await this.indexTransaction(tx, dataSources, getVM);
+
+      for (const log of logs.filter((l) => l.transactionHash === tx.hash)) {
         await this.indexEvent(log, dataSources, getVM);
       }
     }
@@ -233,7 +231,7 @@ export class IndexerManager {
     }
   }
 
-  private async indexExtrinsic(
+  private async indexTransaction(
     tx: EthereumTransaction,
     dataSources: SubqlProjectDs[],
     getVM: (d: SubqlProjectDs) => Promise<IndexerSandbox>,

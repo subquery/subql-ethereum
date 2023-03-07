@@ -14,6 +14,7 @@ import {
   TargetBlockPayload,
   StoreService,
   getLogger,
+  NodeConfig,
 } from '@subql/node-core';
 
 const UPDATE_HEIGHT_INTERVAL = 60000;
@@ -46,7 +47,10 @@ export class MetaService {
   private lastReportedRpcCalls = 0;
   private lastStatsReportedTs: Date;
 
-  constructor(private storeService: StoreService) {}
+  constructor(
+    private storeService: StoreService,
+    private nodeConfig: NodeConfig,
+  ) {}
 
   getMeta() {
     return {
@@ -143,6 +147,9 @@ export class MetaService {
 
   @Interval(10000)
   blockFilteringSpeed(): void {
+    if (!this.nodeConfig.profiler) {
+      return;
+    }
     const count = this.accEnqueueBlocks - this.lastReportedEnqueueBlocks;
     this.lastReportedEnqueueBlocks = this.accEnqueueBlocks;
     const filteringCount =
