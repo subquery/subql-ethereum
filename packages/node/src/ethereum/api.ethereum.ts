@@ -90,7 +90,7 @@ export class EthereumApi implements ApiWrapper<EthereumBlockWrapper> {
       searchParams.forEach((value, name, searchParams) => {
         (connection.headers as any)[name] = value;
       });
-      this.client = new JsonRpcProvider(connection);
+      this.client = new JsonRpcBatchProvider(connection);
     } else if (protocolStr === 'ws' || protocolStr === 'wss') {
       this.client = new WebSocketProvider(this.endpoint);
     } else {
