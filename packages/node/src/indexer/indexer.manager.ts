@@ -1,7 +1,6 @@
 // Copyright 2020-2022 OnFinality Limited authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Block } from '@ethersproject/abstract-provider';
 import { Inject, Injectable } from '@nestjs/common';
 import { hexToU8a, u8aEq } from '@polkadot/util';
 import {
@@ -166,12 +165,14 @@ export class IndexerManager {
           );
         }
       }
+      await this.storeService.flushCache();
     } catch (e) {
       await tx.rollback();
       throw e;
     }
 
     await tx.commit();
+    this.storeService.resetMemoryStore();
 
     return {
       dynamicDsCreated,
