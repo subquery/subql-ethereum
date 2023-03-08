@@ -1,6 +1,6 @@
 {
   "name": "@subql/node-ethereum",
-  "version": "0.4.1-12-storeCache-0.0.3",
+  "version": "0.4.1-12-storeCache-0.0.4",
   "description": "",
   "author": "Ian He",
   "license": "Apache-2.0",
@@ -24,11 +24,11 @@
     "@nestjs/event-emitter": "^1.3.0",
     "@nestjs/platform-express": "^8.2.6",
     "@nestjs/schedule": "^1.0.2",
-    "@subql/common": "1.5.0",
+    "@subql/common": "1.7.0",
     "@subql/common-ethereum": "dev",
-    "@subql/node-core": "1.10.0-storeCache-0.0.1",
+    "@subql/node-core": "1.10.0-storeCache-0.0.2",
     "@subql/types-ethereum": "dev",
-    "@subql/utils": "1.3.2-1",
+    "@subql/utils": "1.4.1",
     "@subql/x-merkle-mountain-range": "2.0.0-0.1.2",
     "@willsoto/nestjs-prometheus": "^4.4.0",
     "algosdk": "^1.13.1",
@@ -68,7 +68,8 @@
     "supertest": "^6.2.2"
   },
   "resolutions": {
-    "@polkadot/util": "^9"
+    "@polkadot/util": "^9",
+    "@subql/common": "1.7.0"
   },
   "files": [
     "/dist",
