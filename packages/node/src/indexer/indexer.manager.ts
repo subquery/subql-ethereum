@@ -1,7 +1,6 @@
 // Copyright 2020-2022 OnFinality Limited authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import { Block } from '@ethersproject/abstract-provider';
 import { Inject, Injectable } from '@nestjs/common';
 import { hexToU8a, u8aEq } from '@polkadot/util';
 import {
@@ -54,7 +53,6 @@ const logger = getLogger('indexer');
 @Injectable()
 export class IndexerManager {
   private api: EthereumApi;
-  private filteredDataSources: SubqlProjectDs[];
 
   constructor(
     private storeService: StoreService,
@@ -206,7 +204,7 @@ export class IndexerManager {
   }
 
   private async indexBlockData(
-    { block, logs, transactions }: EthereumBlockWrapper,
+    { block, transactions }: EthereumBlockWrapper,
     dataSources: SubqlProjectDs[],
     getVM: (d: SubqlProjectDs) => Promise<IndexerSandbox>,
   ): Promise<void> {
@@ -215,7 +213,7 @@ export class IndexerManager {
     for (const tx of transactions) {
       await this.indexTransaction(tx, dataSources, getVM);
 
-      for (const log of logs.filter((l) => l.transactionHash === tx.hash)) {
+      for (const log of tx.logs ?? []) {
         await this.indexEvent(log, dataSources, getVM);
       }
     }
