@@ -18,6 +18,7 @@ import {
   EthereumResult,
   EthereumLog,
 } from '@subql/types-ethereum';
+import CacheableLookup from 'cacheable-lookup';
 import { hexDataSlice, hexValue } from 'ethers/lib/utils';
 import { retryOnFailEth } from '../utils/project';
 import { EthereumBlockWrapped } from './block.ethereum';
@@ -56,6 +57,28 @@ async function loadAssets(
   return res;
 }
 
+function getHttpAgents() {
+  // By default Nodejs doesn't cache DNS lookups
+  // https://httptoolkit.com/blog/configuring-nodejs-dns/
+  const lookup = new CacheableLookup();
+
+  const options: http.AgentOptions = {
+    keepAlive: true,
+    /*, maxSockets: 100*/
+  };
+
+  const httpAgent = new http.Agent(options);
+  const httpsAgent = new https.Agent(options);
+
+  lookup.install(httpAgent);
+  lookup.install(httpsAgent);
+
+  return {
+    http: httpAgent,
+    https: httpsAgent,
+  };
+}
+
 export class EthereumApi implements ApiWrapper<EthereumBlockWrapper> {
   private client: JsonRpcProvider;
   private genesisBlock: Record<string, any>;
@@ -82,10 +105,7 @@ export class EthereumApi implements ApiWrapper<EthereumBlockWrapper> {
         allowGzip: true,
         throttleLimit: 5,
         throttleSlotInterval: 1,
-        agents: {
-          http: new http.Agent({ keepAlive: true /*, maxSockets: 100*/ }),
-          https: new https.Agent({ keepAlive: true /*, maxSockets: 100*/ }),
-        },
+        agents: getHttpAgents(),
       };
       searchParams.forEach((value, name, searchParams) => {
         (connection.headers as any)[name] = value;
@@ -211,17 +231,7 @@ export class EthereumApi implements ApiWrapper<EthereumBlockWrapper> {
 
   async fetchBlocks(bufferBlocks: number[]): Promise<EthereumBlockWrapper[]> {
     return Promise.all(
-      bufferBlocks.map(async (num) => {
-        try {
-          // Fetch Block
-          return await this.fetchBlock(num, true);
-        } catch (e) {
-          // Wrap error from an axios error to fix issue with error being undefined
-          const error = new Error(e.message);
-          logger.error(e, `Failed to fetch block at height ${num}`);
-          throw error;
-        }
-      }),
+      bufferBlocks.map(async (num) => this.fetchBlock(num, true)),
     );
   }
 
