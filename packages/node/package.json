@@ -26,7 +26,7 @@
     "@nestjs/schedule": "^1.0.2",
     "@subql/common": "^1.7.0",
     "@subql/common-ethereum": "workspace:*",
-    "@subql/node-core": "1.10.1-storeCache-0.0.3",
+    "@subql/node-core": "1.10.1-storeCache-0.0.4",
     "@subql/types-ethereum": "workspace:*",
     "@subql/utils": "^1.4.1",
     "@subql/x-merkle-mountain-range": "2.0.0-0.1.2",
