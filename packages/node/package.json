@@ -33,6 +33,7 @@
     "@willsoto/nestjs-prometheus": "^4.4.0",
     "algosdk": "^1.13.1",
     "app-module-path": "^2.2.0",
+    "cacheable-lookup": "6",
     "cron-converter": "^1.0.2",
     "dayjs": "^1.10.7",
     "ethers": "^5.7.0",

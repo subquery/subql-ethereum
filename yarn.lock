@@ -3038,6 +3038,7 @@ __metadata:
     "@willsoto/nestjs-prometheus": ^4.4.0
     algosdk: ^1.13.1
     app-module-path: ^2.2.0
+    cacheable-lookup: 6
     cron-converter: ^1.0.2
     dayjs: ^1.10.7
     dotenv: ^15.0.1
@@ -4693,6 +4694,13 @@ __metadata:
     tar: ^6.1.11
     unique-filename: ^2.0.0
   checksum: d91409e6e57d7d9a3a25e5dcc589c84e75b178ae8ea7de05cbf6b783f77a5fae938f6e8fda6f5257ed70000be27a681e1e44829251bfffe4c10216002f8f14e6
+  languageName: node
+  linkType: hard
+
+"cacheable-lookup@npm:6":
+  version: 6.1.0
+  resolution: "cacheable-lookup@npm:6.1.0"
+  checksum: 4e37afe897219b1035335b0765106a2c970ffa930497b43cac5000b860f3b17f48d004187279fae97e2e4cbf6a3693709b6d64af65279c7d6c8453321d36d118
   languageName: node
   linkType: hard
 
