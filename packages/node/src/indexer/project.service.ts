@@ -234,7 +234,6 @@ export class ProjectService implements IProjectService {
     if (!existing.schemaMigrationCount) {
       metadata.set('schemaMigrationCount', 0);
     }
-
     if (!existing.startHeight) {
       metadata.set('startHeight', this.getStartBlockFromDataSources());
     }
