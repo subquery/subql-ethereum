@@ -72,7 +72,6 @@ export class IndexerManager {
 
     // Check that we have valid datasources
     this.assertDataSources(datasources, blockHeight);
-
     reindexBlockHeight = await this.processUnfinalizedBlocks(block);
 
     // Only index block if we're not going to reindex

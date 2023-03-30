@@ -12,7 +12,6 @@ import {
 import { EthereumBlock } from '@subql/types-ethereum';
 import { last } from 'lodash';
 import { EthereumApi } from '../ethereum';
-// import { ApiService } from './api.service';
 
 const logger = getLogger('UnfinalizedBlocks');
 
@@ -123,7 +122,6 @@ export class UnfinalizedBlocksService implements IUnfinalizedBlocksService {
     }
 
     this.unfinalizedBlocks.push([blockNumber, hash]);
-
     this.saveUnfinalizedBlocks(this.unfinalizedBlocks);
   }
 

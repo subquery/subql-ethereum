@@ -95,8 +95,6 @@ export class ProjectService implements IProjectService {
 
       await this.initHotSchemaReload();
 
-      await this.initHotSchemaReload();
-
       if (this.nodeConfig.proofOfIndex) {
         const blockOffset = await this.getMetadataBlockOffset();
         void this.setBlockOffset(Number(blockOffset));
@@ -190,7 +188,6 @@ export class ProjectService implements IProjectService {
       'processedBlockCount',
       'lastFinalizedVerifiedHeight',
       'schemaMigrationCount',
-      'unfinalizedBlocks',
     ] as const;
 
     const existing = await metadata.findMany(keys);
@@ -236,10 +233,6 @@ export class ProjectService implements IProjectService {
     }
     if (!existing.schemaMigrationCount) {
       metadata.set('schemaMigrationCount', 0);
-    }
-
-    if (!existing.unfinalizedBlocks) {
-      metadata.set('unfinalizedBlocks', '{}');
     }
 
     if (!existing.startHeight) {

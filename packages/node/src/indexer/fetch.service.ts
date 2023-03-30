@@ -623,7 +623,6 @@ export class FetchService implements OnApplicationShutdown {
     this.updateDictionary();
     this.blockDispatcher.flushQueue(blockHeight);
   }
-
   async resetForIncorrectBestBlock(blockHeight: number): Promise<void> {
     await this.syncDynamicDatascourcesFromMeta();
     this.updateDictionary();

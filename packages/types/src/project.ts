@@ -42,7 +42,7 @@ export interface ProjectManifest {
   schema: string;
 
   network: {
-    endpoint: string;
+    endpoint: string | string[];
     customTypes?: RegistryTypes;
   };
 
