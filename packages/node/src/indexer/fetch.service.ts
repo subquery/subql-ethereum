@@ -127,7 +127,7 @@ export class FetchService implements OnApplicationShutdown {
   private isShutdown = false;
   private batchSizeScale: number;
   private templateDynamicDatasouces: SubqlProjectDs[];
-  private dictionaryGenesisMatches = true;
+  private dictionaryMetaValid = false;
   private evmChainId: string;
   private bypassBlocks: number[] = [];
 
@@ -243,7 +243,7 @@ export class FetchService implements OnApplicationShutdown {
   private get useDictionary(): boolean {
     return (
       !!this.project.network.dictionary &&
-      this.dictionaryGenesisMatches &&
+      this.dictionaryMetaValid &&
       !!this.dictionaryService.getDictionaryQueryEntries(
         this.blockDispatcher.latestBufferedHeight ??
           Math.min(...this.project.dataSources.map((ds) => ds.startBlock)),
@@ -270,26 +270,19 @@ export class FetchService implements OnApplicationShutdown {
     await this.syncDynamicDatascourcesFromMeta();
 
     this.updateDictionary();
-    this.eventEmitter.emit(IndexerEvent.UsingDictionary, {
-      value: Number(this.useDictionary),
-    });
-
-    if (this.project.network.dictionary) {
-      this.evmChainId = await this.dictionaryService.getEvmChainId();
-    }
-
-    await this.getFinalizedBlockHead();
-    await this.getBestBlockHead();
-
     //  Call metadata here, other network should align with this
     //  For substrate, we might use the specVersion metadata in future if we have same error handling as in node-core
     const metadata = await this.dictionaryService.getMetadata();
+    if (this.project.network.dictionary) {
+      this.evmChainId = await this.dictionaryService.getEvmChainId();
+    }
+    const dictionaryValid = this.dictionaryValidation(metadata);
 
-    const validChecker = this.dictionaryValidation(metadata);
+    await Promise.all([this.getFinalizedBlockHead(), this.getBestBlockHead()]);
 
-    if (validChecker) {
+    if (dictionaryValid) {
       this.dictionaryService.setDictionaryStartHeight(
-        metadata._metadata.startHeight,
+        metadata?._metadata?.startHeight,
       );
     }
 
@@ -585,36 +578,43 @@ export class FetchService implements OnApplicationShutdown {
     dictionary: { _metadata: MetaData },
     startBlockHeight?: number,
   ): boolean {
-    if (dictionary !== undefined) {
-      const { _metadata: metaData } = dictionary;
+    const validate = (): boolean => {
+      if (dictionary !== undefined) {
+        const { _metadata: metaData } = dictionary;
 
-      if (
-        metaData.genesisHash !== this.api.getGenesisHash() &&
-        this.evmChainId !== this.api.getChainId().toString()
-      ) {
-        logger.error(
-          'The dictionary that you have specified does not match the chain you are indexing, it will be ignored. Please update your project manifest to reference the correct dictionary',
-        );
-        this.dictionaryGenesisMatches = false;
-        this.eventEmitter.emit(IndexerEvent.UsingDictionary, {
-          value: Number(this.useDictionary),
-        });
-        this.eventEmitter.emit(IndexerEvent.SkipDictionary);
-        return false;
-      }
+        if (
+          metaData.genesisHash !== this.api.getGenesisHash() &&
+          this.evmChainId !== this.api.getChainId().toString()
+        ) {
+          logger.error(
+            'The dictionary that you have specified does not match the chain you are indexing, it will be ignored. Please update your project manifest to reference the correct dictionary',
+          );
+          return false;
+        }
 
-      if (startBlockHeight !== undefined) {
-        if (metaData.lastProcessedHeight < startBlockHeight) {
+        if (
+          startBlockHeight !== undefined &&
+          metaData.lastProcessedHeight < startBlockHeight
+        ) {
           logger.warn(
             `Dictionary indexed block is behind current indexing block height`,
           );
-          this.eventEmitter.emit(IndexerEvent.SkipDictionary);
           return false;
         }
+        return true;
       }
-      return true;
-    }
-    return false;
+      return false;
+    };
+
+    const valid = validate();
+
+    this.dictionaryMetaValid = valid;
+    this.eventEmitter.emit(IndexerEvent.UsingDictionary, {
+      value: Number(this.useDictionary),
+    });
+    this.eventEmitter.emit(IndexerEvent.SkipDictionary);
+
+    return valid;
   }
 
   async resetForNewDs(blockHeight: number): Promise<void> {
@@ -623,7 +623,6 @@ export class FetchService implements OnApplicationShutdown {
     this.updateDictionary();
     this.blockDispatcher.flushQueue(blockHeight);
   }
-
   async resetForIncorrectBestBlock(blockHeight: number): Promise<void> {
     await this.syncDynamicDatascourcesFromMeta();
     this.updateDictionary();

@@ -89,9 +89,7 @@ export class EthereumApi implements ApiWrapper<EthereumBlockWrapper> {
   private supportsFinalization = true;
 
   constructor(private endpoint: string, private eventEmitter: EventEmitter2) {
-    const { hostname, pathname, port, protocol, searchParams } = new URL(
-      endpoint,
-    );
+    const { hostname, protocol, searchParams } = new URL(endpoint);
 
     const protocolStr = protocol.replace(':', '');
 
@@ -122,7 +120,8 @@ export class EthereumApi implements ApiWrapper<EthereumBlockWrapper> {
     this.injectClient();
     this.genesisBlock = await this.client.getBlock(0);
 
-    this.chainId = (await this.client.getNetwork()).chainId;
+    const network = await this.client.getNetwork();
+    this.chainId = network.chainId;
   }
 
   private injectClient(): void {
@@ -314,6 +313,20 @@ export class EthereumApi implements ApiWrapper<EthereumBlockWrapper> {
     } catch (e) {
       logger.warn(`Failed to parse transaction data: ${e.message}`);
       return transaction;
+    }
+  }
+
+  // eslint-disable-next-line @typescript-eslint/require-await
+  async connect(): Promise<void> {
+    logger.error('Ethereum API connect is not implemented');
+    throw new Error('Not implemented');
+  }
+
+  async disconnect(): Promise<void> {
+    if (this.client instanceof WebSocketProvider) {
+      await this.client.destroy();
+    } else {
+      logger.warn('Disconnect called on HTTP provider');
     }
   }
 }

@@ -9,11 +9,13 @@ import {
   StoreService,
   PoiService,
   MmrService,
+  ConnectionPoolService,
   StoreCacheService,
   WorkerDynamicDsService,
 } from '@subql/node-core';
 import { SubqueryProject } from '../configure/SubqueryProject';
 import { EthereumApiService } from '../ethereum';
+import { EthereumApiConnection } from '../ethereum/api.connection';
 import { DsProcessorService } from './ds-processor.service';
 import { DynamicDsService } from './dynamic-ds.service';
 import { IndexerManager } from './indexer.manager';
@@ -28,17 +30,23 @@ import { WorkerUnfinalizedBlocksService } from './worker/worker.unfinalizedBlock
     IndexerManager,
     StoreCacheService,
     StoreService,
+    ConnectionPoolService,
     {
       provide: ApiService,
       useFactory: async (
         project: SubqueryProject,
+        connectionPoolService: ConnectionPoolService<EthereumApiConnection>,
         eventEmitter: EventEmitter2,
       ) => {
-        const apiService = new EthereumApiService(project, eventEmitter);
+        const apiService = new EthereumApiService(
+          project,
+          connectionPoolService,
+          eventEmitter,
+        );
         await apiService.init();
         return apiService;
       },
-      inject: ['ISubqueryProject', EventEmitter2],
+      inject: ['ISubqueryProject', ConnectionPoolService, EventEmitter2],
     },
     SandboxService,
     DsProcessorService,

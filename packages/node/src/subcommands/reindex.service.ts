@@ -88,8 +88,7 @@ export class ReindexService {
     await initDbSchema(this.project, this.schema, this.storeService);
   }
 
-  // eslint-disable-next-line @typescript-eslint/require-await
-  private async getStartBlockFromDataSources() {
+  private getStartBlockFromDataSources(): number {
     const datasources = this.project.dataSources;
 
     const startBlocksList = datasources.map((item) => item.startBlock ?? 1);
