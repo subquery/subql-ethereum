@@ -13,7 +13,7 @@ All logs must start with the format: [x.y.z] - yyyy-mm-dd
 - Release
 
 ## [0.2.1] - 2022-11-18
-- Prerelease 0.2.0
+- Re-release 0.2.0
 
 ## [0.2.0] - 2022-11-17
 

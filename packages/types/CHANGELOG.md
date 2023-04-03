@@ -17,7 +17,7 @@ All logs must start with the format: [x.y.z] - yyyy-mm-dd
 - Add `count` to `Store` interface (#1480)
 
 ## [0.2.1] - 2022-11-18
-- Prerelease 0.2.1
+- Re-release 0.2.1
 
 ## [0.2.0] - 2022-12-06
 - Support for `bypassBlocks` (#1435)
