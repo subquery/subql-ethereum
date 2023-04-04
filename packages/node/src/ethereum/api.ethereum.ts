@@ -137,7 +137,7 @@ export class EthereumApi implements ApiWrapper<EthereumBlockWrapper> {
   async getFinalizedBlockHeight(): Promise<number> {
     try {
       if (this.supportsFinalization) {
-        return (await this.client.getBlock('finalised')).number;
+        return (await this.client.getBlock('finalized')).number;
       } else {
         // TODO make number of blocks finalised configurable
         return (await this.getBestBlockHeight()) - 15; // Consider 15 blocks finalized
