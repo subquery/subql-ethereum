@@ -10,11 +10,14 @@ import {
   getLogger,
   IndexerEvent,
 } from '@subql/node-core';
+import { EthereumBlockWrapper } from '@subql/types-ethereum';
 import { SubqueryProject } from '../configure/SubqueryProject';
 import { EthereumApiConnection } from './api.connection';
 import { EthereumApi } from './api.ethereum';
 
 const logger = getLogger('api');
+
+const MAX_RECONNECT_ATTEMPTS = 5;
 
 @Injectable()
 export class EthereumApiService extends ApiService {
@@ -96,6 +99,45 @@ export class EthereumApiService extends ApiService {
     } catch (e) {
       logger.error(e, 'Failed to init api service');
       process.exit(1);
+    }
+  }
+
+  async fetchBlocksFromFirstAvailableEndpoint(
+    batch: number[],
+  ): Promise<EthereumBlockWrapper[]> {
+    let reconnectAttempts = 0;
+    while (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+      try {
+        const blocks = await this.api.fetchBlocks(batch);
+        return blocks;
+      } catch (e) {
+        logger.error(e, 'Failed to fetch blocks');
+        reconnectAttempts++;
+      }
+    }
+    throw new Error(
+      `Maximum number of retries (${MAX_RECONNECT_ATTEMPTS}) reached.`,
+    );
+  }
+
+  async fetchBlocks(bufferBlocks: number[]): Promise<EthereumBlockWrapper[]> {
+    const api = this.api;
+    try {
+      const blocks = await api.fetchBlocks(bufferBlocks);
+      return blocks;
+    } catch (e) {
+      logger.error(
+        e,
+        `Failed to fetch blocks ${bufferBlocks[0]}...${
+          bufferBlocks[bufferBlocks.length - 1]
+        }`,
+      );
+
+      const blocks = await this.fetchBlocksFromFirstAvailableEndpoint(
+        bufferBlocks,
+      );
+
+      return blocks;
     }
   }
 
