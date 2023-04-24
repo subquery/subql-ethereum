@@ -64,7 +64,7 @@ export class IndexerManager
   @profiler(yargsOptions.argv.profiler)
   async indexBlock(
     blockContent: EthereumBlockWrapper,
-    dataSources: SubqlProjectDs[], // TODO this needs to come from this.projectService.getAllDataSources
+    dataSources: SubqlProjectDs[],
   ): Promise<ProcessBlockResponse> {
     const { block, blockHeight } = blockContent;
     let dynamicDsCreated = false;
