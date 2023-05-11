@@ -40,6 +40,7 @@ export class SandboxService {
           store,
           root: this.project.root,
           entry,
+          chainId: this.project.network.chainId,
         },
         this.nodeConfig,
       );
