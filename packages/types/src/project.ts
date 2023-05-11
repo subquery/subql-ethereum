@@ -1,7 +1,6 @@
 // Copyright 2020-2022 OnFinality Limited authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import {RegistryTypes} from '@polkadot/types/types';
 import {
   EthereumBlock,
   EthereumBlockFilter,
@@ -43,7 +42,6 @@ export interface ProjectManifest {
 
   network: {
     endpoint: string | string[];
-    customTypes?: RegistryTypes;
   };
 
   dataSources: SubqlDatasource[];

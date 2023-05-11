@@ -1,8 +1,6 @@
 // Copyright 2020-2022 OnFinality Limited authors & contributors
 // SPDX-License-Identifier: Apache-2.0
 
-import {RegisteredTypes, RegistryTypes, OverrideModuleType, OverrideBundleType} from '@polkadot/types/types';
-
 import {
   EthereumHandlerKind,
   EthereumDatasourceKind,
@@ -50,24 +48,6 @@ export class LogFilter implements EthereumLogFilter {
   @IsOptional()
   @IsArray()
   topics?: string[];
-}
-
-export class ChainTypes implements RegisteredTypes {
-  @IsObject()
-  @IsOptional()
-  types?: RegistryTypes;
-  @IsObject()
-  @IsOptional()
-  typesAlias?: Record<string, OverrideModuleType>;
-  @IsObject()
-  @IsOptional()
-  typesBundle?: OverrideBundleType;
-  @IsObject()
-  @IsOptional()
-  typesChain?: Record<string, RegistryTypes>;
-  @IsObject()
-  @IsOptional()
-  typesSpec?: Record<string, RegistryTypes>;
 }
 
 export class TransactionFilter implements EthereumTransactionFilter {

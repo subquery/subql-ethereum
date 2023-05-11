@@ -67,6 +67,7 @@ jobs:
         if: steps.changed-common-ethereum.outputs.changed == 'true'
         uses: ./.github/actions/create-prerelease
         with:
+          package-path: packages/common-ethereum
           npm-token: ${{ secrets.NPM_TOKEN }}
 
       - name: Bump node & deploy
