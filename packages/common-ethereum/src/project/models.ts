@@ -3,7 +3,6 @@
 
 import {RegisteredTypes, RegistryTypes, OverrideModuleType, OverrideBundleType} from '@polkadot/types/types';
 
-import {BaseMapping} from '@subql/common';
 import {
   EthereumHandlerKind,
   EthereumDatasourceKind,
@@ -21,7 +20,6 @@ import {
   SubqlEventHandler,
   SubqlCallHandler,
   EthereumTransactionFilter,
-  SubqlDatasource,
 } from '@subql/types-ethereum';
 import {plainToClass, Transform, Type} from 'class-transformer';
 import {

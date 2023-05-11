@@ -8,6 +8,7 @@ import {
   ApiService,
   ConnectionPoolService,
   DbModule,
+  NodeConfig,
   PoiService,
   StoreService,
 } from '@subql/node-core';

@@ -3,7 +3,6 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 import {
-  ApiService,
   NodeConfig,
   StoreService,
   getLogger,
@@ -12,6 +11,7 @@ import {
 import { EthereumBlockWrapper } from '@subql/types-ethereum';
 import { Sequelize } from 'sequelize';
 import { SubqlProjectDs, SubqueryProject } from '../configure/SubqueryProject';
+import { EthereumApiService } from '../ethereum';
 import { IndexerManager } from '../indexer/indexer.manager';
 
 const logger = getLogger('subql-testing');
@@ -26,7 +26,7 @@ export class TestingService extends BaseTestingService<
     nodeConfig: NodeConfig,
     storeService: StoreService,
     @Inject('ISubqueryProject') project: SubqueryProject,
-    apiService: ApiService,
+    apiService: EthereumApiService,
     indexerManager: IndexerManager,
   ) {
     super(

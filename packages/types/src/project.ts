@@ -108,7 +108,7 @@ export interface SubqlNetworkFilter {
   specName?: string;
 }
 
-export type SubqlDatasource = SubqlRuntimeDatasource | SubqlCustomDatasource; // | SubqlBuiltinDataSource;
+export type SubqlDatasource = SubqlRuntimeDatasource | SubqlCustomDatasource;
 
 export interface FileReference {
   file: string;
@@ -128,8 +128,6 @@ export interface SubqlCustomDatasource<
   options?: SubqlEthereumProcessorOptions;
   processor: Processor<O>;
 }
-
-//export type SubqlBuiltinDataSource = ISubqlDatasource;
 
 export interface HandlerInputTransformer_0_0_0<
   T extends EthereumHandlerKind,
@@ -189,17 +187,6 @@ export interface SubqlDatasourceProcessor<
   dsFilterProcessor(ds: DS, api: ApiWrapper): boolean;
   handlerProcessors: P;
 }
-
-// export interface DictionaryQueryCondition {
-//   field: string;
-//   value: string;
-//   matcher?: string; // defaults to "equalTo", use "contains" for JSON
-// }
-
-// export interface DictionaryQueryEntry {
-//   entity: string;
-//   conditions: DictionaryQueryCondition[];
-// }
 
 interface SecondLayerHandlerProcessorBase<
   K extends EthereumHandlerKind,
