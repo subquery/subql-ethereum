@@ -155,11 +155,11 @@ export class IndexerManager extends BaseIndexerManager<
     }
   }
 
-  protected prepareFilteredData(
+  protected async prepareFilteredData(
     kind: EthereumHandlerKind,
     data: any,
     ds: SubqlRuntimeDatasource,
-  ): any {
+  ): Promise<any> {
     return DataAbiParser[kind](this.apiService.api)(data, ds);
   }
 

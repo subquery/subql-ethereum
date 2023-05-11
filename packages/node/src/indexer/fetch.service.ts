@@ -275,7 +275,6 @@ export class FetchService extends BaseFetchService<
   protected async validatateDictionaryMeta(
     metaData: MetaData,
   ): Promise<boolean> {
-    console.log('XXXXX here');
     const evmChainId = await this.dictionaryService.getEvmChainId();
 
     return (
