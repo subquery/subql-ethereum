@@ -10,6 +10,9 @@ import JSON5 from 'json5';
 import fetch from 'node-fetch';
 import { SubqueryProject } from '../configure/SubqueryProject';
 
+const CHAIN_ALIASES_URL =
+  'https://raw.githubusercontent.com/subquery/templates/main/chainAliases.json5';
+
 @Injectable()
 export class DictionaryService
   extends CoreDictionaryService
@@ -39,9 +42,7 @@ export class DictionaryService
   }
 
   private async getEvmChainId(): Promise<Record<string, string>> {
-    const response = await fetch(
-      'https://raw.githubusercontent.com/subquery/templates/main/chainAliases.json5',
-    );
+    const response = await fetch(CHAIN_ALIASES_URL);
 
     const raw = await response.text();
     // We use JSON5 here because the file has comments in it
