@@ -22,7 +22,23 @@ export class DictionaryService
     super(project.network.dictionary, project.network.chainId, nodeConfig);
   }
 
-  async getEvmChainId(): Promise<Record<string, string>> {
+  async init(): Promise<void> {
+    /*Some dictionarys for EVM are built with other SDKs as they are chains with an EVM runtime
+     * we maintain a list of aliases so we can map the evmChainId to the genesis hash of the other SDKs
+     * e.g moonbeam is built with Substrate SDK but can be used as an EVM dictionary
+     */
+    const chainAliases = await this.getEvmChainId();
+    const chainAlias = chainAliases[this.chainId];
+
+    if (chainAlias) {
+      // Cast as any to work around read only
+      (this.chainId as any) = chainAlias;
+    }
+
+    await super.init();
+  }
+
+  private async getEvmChainId(): Promise<Record<string, string>> {
     const response = await fetch(
       'https://raw.githubusercontent.com/subquery/templates/main/chainAliases.json5',
     );
