@@ -278,7 +278,10 @@ export class FetchService extends BaseFetchService<
     metaData: MetaData,
   ): Promise<boolean> {
     return Promise.resolve(
-      metaData.genesisHash !== this.dictionaryService.chainId,
+      // When alias is not used
+      metaData.genesisHash !== this.api.getGenesisHash() &&
+        // Case when an alias is used
+        metaData.genesisHash !== this.dictionaryService.chainId,
     );
   }
 
