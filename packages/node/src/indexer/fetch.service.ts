@@ -277,11 +277,12 @@ export class FetchService extends BaseFetchService<
   protected async validatateDictionaryMeta(
     metaData: MetaData,
   ): Promise<boolean> {
-    const evmChainId = await this.dictionaryService.getEvmChainId();
-
     return (
       metaData.genesisHash !== this.api.getGenesisHash() &&
-      evmChainId !== this.api.getChainId().toString()
+      metaData.genesisHash !==
+        (await this.dictionaryService.getEvmChainId())[
+          this.api.getChainId().toString()
+        ]
     );
   }
 
