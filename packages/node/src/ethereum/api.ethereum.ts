@@ -171,7 +171,7 @@ export class EthereumApi implements ApiWrapper<EthereumBlockWrapper> {
   }
 
   getRuntimeChain(): string {
-    return this.name;
+    return this.chainId.toString();
   }
 
   getChainId(): number {
@@ -183,7 +183,7 @@ export class EthereumApi implements ApiWrapper<EthereumBlockWrapper> {
   }
 
   getSpecName(): string {
-    return 'ethereum';
+    return this.name;
   }
 
   async getBlockByHeightOrHash(heightOrHash: number | string): Promise<Block> {
