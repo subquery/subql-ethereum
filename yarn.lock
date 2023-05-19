@@ -2770,7 +2770,6 @@ __metadata:
     "@subql/testing": ^2.0.0
     "@subql/types": ^2.1.2
     "@subql/types-ethereum": "workspace:*"
-    "@subql/utils": ^2.1.1-0
     "@types/express": ^4.17.13
     "@types/jest": ^27.4.0
     "@types/lodash": ^4.14.178
@@ -2794,6 +2793,8 @@ __metadata:
     web3-providers-http: ^1.8.0
     web3-providers-ws: ^1.8.0
     yargs: ^16.2.0
+  peerDependencies:
+    "@subql/utils": "*"
   bin:
     subql-node-ethereum: ./bin/run
   languageName: unknown
@@ -2843,7 +2844,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@subql/utils@npm:2.1.1-0, @subql/utils@npm:^2.1.1-0":
+"@subql/utils@npm:2.1.1-0":
   version: 2.1.1-0
   resolution: "@subql/utils@npm:2.1.1-0"
   dependencies:
