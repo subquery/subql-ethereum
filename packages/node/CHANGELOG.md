@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2.5.1] - 2023-06-02
 ### Fixed
 - Sync with node-core 2.4.3, fixed mmr missing node due to cache lock
+### Added
+- Added parsed tx logs and decode (#97)
 
 ## [2.5.0] - 2023-06-01
 ### Added
