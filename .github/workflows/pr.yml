@@ -45,6 +45,7 @@ jobs:
           DB_DATABASE: postgres
           DB_HOST: postgres
           DB_PORT: 5432
+          NODE_OPTIONS: --no-experimental-fetch
         steps:
             - uses: actions/checkout@v3
 
