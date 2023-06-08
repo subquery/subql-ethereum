@@ -24,8 +24,7 @@ jobs:
       run: yarn pretty-quick --check --pattern 'packages/*/src/**/*' --branch origin/main
     - name: lint
       run: yarn lint
-    - name: test
-      run: yarn test:docker
+
   coverage:
         name: Coverage report
         runs-on: ubuntu-latest
@@ -45,7 +44,6 @@ jobs:
           DB_DATABASE: postgres
           DB_HOST: postgres
           DB_PORT: 5432
-          NODE_OPTIONS: --no-experimental-fetch
         steps:
             - uses: actions/checkout@v3
 
