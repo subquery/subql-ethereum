@@ -11,12 +11,13 @@ import {
   NodeConfig,
   ApiService,
 } from '@subql/node-core';
-import { Sequelize } from 'sequelize';
+import { Sequelize } from '@subql/x-sequelize';
 import {
   generateTimestampReferenceForBlockFilters,
   SubqlProjectDs,
   SubqueryProject,
 } from '../configure/SubqueryProject';
+import { EthereumApiService } from '../ethereum';
 import { DsProcessorService } from './ds-processor.service';
 import { DynamicDsService } from './dynamic-ds.service';
 import { UnfinalizedBlocksService } from './unfinalizedBlocks.service';
@@ -25,12 +26,15 @@ import { UnfinalizedBlocksService } from './unfinalizedBlocks.service';
 const { version: packageVersion } = require('../../package.json');
 
 @Injectable()
-export class ProjectService extends BaseProjectService<SubqlProjectDs> {
+export class ProjectService extends BaseProjectService<
+  EthereumApiService,
+  SubqlProjectDs
+> {
   protected packageVersion = packageVersion;
 
   constructor(
     dsProcessorService: DsProcessorService,
-    apiService: ApiService,
+    apiService: EthereumApiService,
     poiService: PoiService,
     mmrService: MmrService,
     sequelize: Sequelize,
