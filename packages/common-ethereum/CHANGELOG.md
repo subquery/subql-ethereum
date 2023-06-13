@@ -11,7 +11,7 @@ All logs must start with the format: [x.y.z] - yyyy-mm-dd
 
 ## [2.1.2] - 2023-06-13
 ### Changed
-- Update common package dependencies, use @subql/x-sequelize (#101)
+- Update common package dependencies (#101)
 
 ## [2.1.1] - 2023-06-01
 ### Changed
