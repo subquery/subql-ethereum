@@ -32,7 +32,7 @@ import { WorkerUnfinalizedBlocksService } from './worker/worker.unfinalizedBlock
     StoreService,
     ConnectionPoolService,
     {
-      provide: ApiService,
+      provide: EthereumApiService,
       useFactory: async (
         project: SubqueryProject,
         connectionPoolService: ConnectionPoolService<EthereumApiConnection>,
