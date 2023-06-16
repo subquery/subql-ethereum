@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2.6.1] - 2023-06-16
 ### Fixed
-- Fixed an issue where Node was not working with workers turned on.
+- Fixed an issue where Node was not working with workers turned on (#106)
 
 ## [2.6.0] - 2023-06-15
 ### Added
