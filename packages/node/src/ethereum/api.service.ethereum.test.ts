@@ -86,12 +86,10 @@ describe('ApiService', () => {
   });
 
   it('ensure api errorCode is exposed when throwing', async () => {
-    try {
-      await apiService
-        .safeApi(17520376)
-        .getCode('0x75F0398549C9fDEa03BbDde388361827cb376D5');
-    } catch (e) {
-      expect(e.code).toBe('INVALID_ARGUMENT');
-    }
+    expect.assertions(1);
+    return apiService
+      .safeApi(17520376)
+      .getCode('0x75F0398549C9fDEa03BbDde388361827cb376D5')
+      .catch((e) => expect(e.code).toBe('INVALID_ARGUMENT'));
   });
 });
