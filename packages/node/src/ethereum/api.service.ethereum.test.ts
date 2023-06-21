@@ -9,7 +9,6 @@ import { GraphQLSchema } from 'graphql';
 import { range } from 'lodash';
 import { SubqueryProject } from '../configure/SubqueryProject';
 import { EthereumApiService } from './api.service.ethereum';
-import { CustomError } from './utils.ethereum';
 
 // Add api key to work
 const WS_ENDPOINT = 'wss://eth.api.onfinality.io/ws?apikey=';

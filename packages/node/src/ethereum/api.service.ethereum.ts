@@ -16,7 +16,6 @@ import { SubqueryProject } from '../configure/SubqueryProject';
 import { EthereumApiConnection } from './api.connection';
 import { EthereumApi } from './api.ethereum';
 import SafeEthProvider from './safe-api';
-import { CustomError } from './utils.ethereum';
 
 const logger = getLogger('api');
 
@@ -121,7 +120,7 @@ export class EthereumApiService extends ApiService<
           return async (...args: any[]) => {
             let retries = 0;
             let currentApi = target;
-            let exposedErrorCode: string;
+            let throwingError: string;
 
             while (retries < maxRetries) {
               try {
@@ -130,16 +129,16 @@ export class EthereumApiService extends ApiService<
                 logger.warn(
                   `Request failed with api at height ${height} (retry ${retries}): ${error.message}`,
                 );
-                exposedErrorCode = error?.code;
+                throwingError = error;
                 currentApi = this.unsafeApi.getSafeApi(height);
                 retries++;
               }
             }
 
-            throw new CustomError(
+            logger.error(
               `Maximum retries (${maxRetries}) exceeded for api at height ${height}`,
-              exposedErrorCode,
             );
+            throw throwingError;
           };
         }
         return Reflect.get(target, prop, receiver);
