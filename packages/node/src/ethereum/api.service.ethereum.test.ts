@@ -9,6 +9,7 @@ import { GraphQLSchema } from 'graphql';
 import { range } from 'lodash';
 import { SubqueryProject } from '../configure/SubqueryProject';
 import { EthereumApiService } from './api.service.ethereum';
+import { CustomError } from './utils.ethereum';
 
 // Add api key to work
 const WS_ENDPOINT = 'wss://eth.api.onfinality.io/ws?apikey=';
@@ -82,5 +83,17 @@ describe('ApiService', () => {
 
     console.log('Finalized height', height);
     expect(height).toBeGreaterThan(16_000_000);
+  });
+
+  it('ensure api errorCode is exposed when throwing', async () => {
+    let thrownError: CustomError;
+    try {
+      await apiService
+        .safeApi(17520376)
+        .getCode('0x75F0398549C9fDEa03BbDde388361827cb376D5');
+    } catch (e) {
+      thrownError = e;
+    }
+    expect(thrownError.code).toBe('INVALID_ARGUMENT');
   });
 });
