@@ -120,7 +120,7 @@ export class EthereumApiService extends ApiService<
           return async (...args: any[]) => {
             let retries = 0;
             let currentApi = target;
-            let throwingError: string;
+            let throwingError: Error;
 
             while (retries < maxRetries) {
               try {
