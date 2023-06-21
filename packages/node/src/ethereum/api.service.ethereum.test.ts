@@ -86,14 +86,12 @@ describe('ApiService', () => {
   });
 
   it('ensure api errorCode is exposed when throwing', async () => {
-    let thrownError: CustomError;
     try {
       await apiService
         .safeApi(17520376)
         .getCode('0x75F0398549C9fDEa03BbDde388361827cb376D5');
     } catch (e) {
-      thrownError = e;
+      expect(e.code).toBe('INVALID_ARGUMENT');
     }
-    expect(thrownError.code).toBe('INVALID_ARGUMENT');
   });
 });

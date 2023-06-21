@@ -130,10 +130,12 @@ export function formatReceipt(
 }
 
 export class CustomError extends Error {
-  constructor(message: string, public code: string) {
+  constructor(message: string, public code?: string) {
     super(message);
     this.name = 'CustomApiError';
-    this.code = code;
-    Object.setPrototypeOf(this, CustomError.prototype);
+    if (code) {
+      this.code = code;
+      Object.setPrototypeOf(this, CustomError.prototype);
+    }
   }
 }
