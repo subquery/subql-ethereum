@@ -128,3 +128,12 @@ export function formatReceipt(
     },
   } as unknown as EthereumReceipt;
 }
+
+export class CustomError extends Error {
+  constructor(message: string, public code: string) {
+    super(message);
+    this.name = 'CustomApiError';
+    this.code = code;
+    Object.setPrototypeOf(this, CustomError.prototype);
+  }
+}
