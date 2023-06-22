@@ -236,20 +236,15 @@ export class FetchService extends BaseFetchService<
   buildDictionaryQueryEntries(startBlock: number): DictionaryQueryEntry[] {
     const groupdDynamicDs: GroupedSubqlProjectDs[] = Object.values(
       groupBy(this.templateDynamicDatasouces, (ds) => ds.name),
-    )
-      .map((grouped: SubqlProjectDs[]) => {
-        const options = grouped.map((ds) => ds.options);
-        const ref = grouped[0];
+    ).map((grouped: SubqlProjectDs[]) => {
+      const options = grouped.map((ds) => ds.options);
+      const ref = grouped[0];
 
-        return {
-          ...ref,
-          groupedOptions: options,
-        };
-      })
-      .map((ds) => {
-        delete ds.name;
-        return ds;
-      });
+      return {
+        ...ref,
+        groupedOptions: options,
+      };
+    });
 
     // Only run the ds that is equal or less than startBlock
     // sort array from lowest ds.startBlock to highest
