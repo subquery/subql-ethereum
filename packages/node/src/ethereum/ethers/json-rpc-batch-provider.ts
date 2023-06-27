@@ -22,6 +22,7 @@ interface RpcResult {
 // Experimental
 
 export class JsonRpcBatchProvider extends JsonRpcProvider {
+  private batchSize = 10;
   _pendingBatchAggregator: NodeJS.Timer;
   _pendingBatch: Array<{
     request: { method: string; params: Array<any>; id: number; jsonrpc: '2.0' };
@@ -29,8 +30,20 @@ export class JsonRpcBatchProvider extends JsonRpcProvider {
     reject: (error: Error) => void;
   }>;
 
-  constructor(url: string | ConnectionInfo, network?: Networkish) {
+  constructor(
+    url: string | ConnectionInfo,
+    network?: Networkish,
+    batchSize?: number,
+  ) {
     super(url, network);
+
+    if (batchSize) {
+      this.batchSize = batchSize;
+    }
+  }
+
+  setBatchSize(batchSize: number) {
+    this.batchSize = batchSize;
   }
 
   send(method: string, params: Array<any>): Promise<any> {
@@ -61,7 +74,7 @@ export class JsonRpcBatchProvider extends JsonRpcProvider {
       }, 1);
     }
 
-    if (this._pendingBatch.length > 10) {
+    if (this._pendingBatch.length > this.batchSize) {
       this.flush();
     }
 
