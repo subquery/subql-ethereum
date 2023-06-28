@@ -22,7 +22,9 @@ interface RpcResult {
 // Experimental
 
 export class JsonRpcBatchProvider extends JsonRpcProvider {
-  private batchSize = 10;
+  private batchSize = 1;
+  private batchSizeStatus: 'testing' | 'determined' = 'testing';
+
   _pendingBatchAggregator: NodeJS.Timer;
   _pendingBatch: Array<{
     request: { method: string; params: Array<any>; id: number; jsonrpc: '2.0' };
@@ -30,15 +32,36 @@ export class JsonRpcBatchProvider extends JsonRpcProvider {
     reject: (error: Error) => void;
   }>;
 
-  constructor(
-    url: string | ConnectionInfo,
-    network?: Networkish,
-    batchSize?: number,
-  ) {
+  constructor(url: string | ConnectionInfo, network?: Networkish) {
     super(url, network);
+  }
 
-    if (batchSize) {
-      this.batchSize = batchSize;
+  async determineBatchSize(): Promise<void> {
+    const testMethod = 'eth_blockNumber';
+    const testParams = [];
+
+    for (let size = 1; size <= 10; size++) {
+      const batchRequests = new Array(size).fill({
+        method: testMethod,
+        params: testParams,
+        id: this._nextId++,
+        jsonrpc: '2.0',
+      });
+
+      try {
+        const response = await fetchJson(
+          this.connection,
+          JSON.stringify(batchRequests),
+        );
+
+        if (Array.isArray(response) && response.length === size) {
+          this.batchSize = size;
+        } else {
+          break;
+        }
+      } catch (error) {
+        break;
+      }
     }
   }
 
@@ -127,6 +150,11 @@ export class JsonRpcBatchProvider extends JsonRpcProvider {
           });
           return;
         }
+
+        if (this.batchSizeStatus === 'testing') {
+          this.batchSize++;
+        }
+
         const resultMap = result.reduce((resultMap, payload) => {
           resultMap[payload.id] = payload;
           return resultMap;
@@ -155,6 +183,13 @@ export class JsonRpcBatchProvider extends JsonRpcProvider {
         });
 
         //logger.error(error);
+
+        //TODO: what error message do we get on exceeding batch size?
+
+        if (this.batchSizeStatus === 'testing') {
+          this.batchSize--;
+          this.batchSizeStatus = 'determined';
+        }
 
         batch.forEach((inflightRequest) => {
           inflightRequest.reject(error);

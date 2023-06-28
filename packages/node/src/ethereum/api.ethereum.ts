@@ -142,39 +142,8 @@ export class EthereumApi implements ApiWrapper<EthereumBlockWrapper> {
       return;
     }
 
-    logger.debug(
-      `checking maximum allowed batch request size for ${this.endpoint}...`,
-    );
-
     // Find and set the maximum batch size allowed by JsonRpcBatchProvider
-    let batchSize = 10; // default maximum value
-    let minBatchSize = 1;
-    let maxBatchSize = batchSize;
-    let found = false;
-
-    while (!found && minBatchSize <= maxBatchSize) {
-      try {
-        // Test the current batch size with a dummy request (getBlock)
-        const batchPromises = [];
-        for (let i = 0; i < batchSize; i++) {
-          batchPromises.push(this.client.getBlock('latest'));
-        }
-        await Promise.all(batchPromises);
-
-        minBatchSize = batchSize;
-        batchSize = Math.min(batchSize * 2, maxBatchSize);
-      } catch (error) {
-        maxBatchSize = batchSize - 1;
-        batchSize = Math.floor((minBatchSize + maxBatchSize) / 2);
-      }
-
-      if (minBatchSize === maxBatchSize) {
-        found = true;
-      }
-    }
-
-    logger.debug(`batch request size for ${this.endpoint}: ${minBatchSize}`);
-    (this.client as JsonRpcBatchProvider).setBatchSize(minBatchSize);
+    await (this.client as JsonRpcBatchProvider).determineBatchSize();
   }
 
   private async getSupportsFinalization(): Promise<boolean> {
