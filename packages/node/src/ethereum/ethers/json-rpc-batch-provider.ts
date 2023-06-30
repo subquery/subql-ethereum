@@ -23,7 +23,9 @@ interface RpcResult {
 
 export class JsonRpcBatchProvider extends JsonRpcProvider {
   private batchSize = 1;
-  private batchSizeStatus: 'testing' | 'determined' = 'testing';
+  private successfulBatchCount = 0;
+  private failedBatchCount = 0;
+  private batchSizeAdjustmentInterval = 10; // Adjust batch size after every 10 batches
 
   _pendingBatchAggregator: NodeJS.Timer;
   _pendingBatch: Array<{
@@ -34,35 +36,6 @@ export class JsonRpcBatchProvider extends JsonRpcProvider {
 
   constructor(url: string | ConnectionInfo, network?: Networkish) {
     super(url, network);
-  }
-
-  async determineBatchSize(): Promise<void> {
-    const testMethod = 'eth_blockNumber';
-    const testParams = [];
-
-    for (let size = 1; size <= 10; size++) {
-      const batchRequests = new Array(size).fill({
-        method: testMethod,
-        params: testParams,
-        id: this._nextId++,
-        jsonrpc: '2.0',
-      });
-
-      try {
-        const response = await fetchJson(
-          this.connection,
-          JSON.stringify(batchRequests),
-        );
-
-        if (Array.isArray(response) && response.length === size) {
-          this.batchSize = size;
-        } else {
-          break;
-        }
-      } catch (error) {
-        break;
-      }
-    }
   }
 
   setBatchSize(batchSize: number) {
@@ -151,10 +124,6 @@ export class JsonRpcBatchProvider extends JsonRpcProvider {
           return;
         }
 
-        if (this.batchSizeStatus === 'testing') {
-          this.batchSize++;
-        }
-
         const resultMap = result.reduce((resultMap, payload) => {
           resultMap[payload.id] = payload;
           return resultMap;
@@ -173,6 +142,9 @@ export class JsonRpcBatchProvider extends JsonRpcProvider {
             inflightRequest.resolve(payload.result);
           }
         });
+
+        this.successfulBatchCount++;
+        this.adjustBatchSize();
       })
       .catch((error) => {
         this.emit('debug', {
@@ -184,16 +156,32 @@ export class JsonRpcBatchProvider extends JsonRpcProvider {
 
         //logger.error(error);
 
-        //TODO: what error message do we get on exceeding batch size?
-
-        if (this.batchSizeStatus === 'testing') {
-          this.batchSize--;
-          this.batchSizeStatus = 'determined';
-        }
-
         batch.forEach((inflightRequest) => {
           inflightRequest.reject(error);
         });
+
+        this.failedBatchCount++;
+        this.adjustBatchSize();
       });
+  }
+
+  private adjustBatchSize() {
+    const totalBatches = this.successfulBatchCount + this.failedBatchCount;
+
+    if (totalBatches % this.batchSizeAdjustmentInterval === 0) {
+      const successRate = this.successfulBatchCount / totalBatches;
+
+      // Adjust the batch size based on the success rate.
+      // You can fine-tune the logic here to decide how to adjust the batch size.
+      if (successRate < 0.9 && this.batchSize > 1) {
+        this.batchSize--;
+      } else if (successRate > 0.95 && this.batchSize < 10) {
+        this.batchSize++;
+      }
+
+      // Reset the counters
+      this.successfulBatchCount = 0;
+      this.failedBatchCount = 0;
+    }
   }
 }

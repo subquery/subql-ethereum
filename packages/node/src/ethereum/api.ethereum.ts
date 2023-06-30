@@ -143,7 +143,7 @@ export class EthereumApi implements ApiWrapper<EthereumBlockWrapper> {
     }
 
     // Find and set the maximum batch size allowed by JsonRpcBatchProvider
-    await (this.client as JsonRpcBatchProvider).determineBatchSize();
+    //await (this.client as JsonRpcBatchProvider).determineBatchSize();
   }
 
   private async getSupportsFinalization(): Promise<boolean> {
