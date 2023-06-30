@@ -22,7 +22,7 @@ import { getLogger } from '@subql/node-core';
 const logger = getLogger('safe.api.ethereum');
 
 export default class SafeEthProvider extends Provider {
-  private network: Network;
+  private network?: Network;
   constructor(
     private baseApi: Provider,
     private blockHeight: BlockTag | Promise<BlockTag>,
