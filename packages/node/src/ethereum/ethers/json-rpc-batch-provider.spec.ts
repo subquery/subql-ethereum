@@ -1,44 +1,75 @@
 /* eslint-disable */
 import { JsonRpcBatchProvider } from './json-rpc-batch-provider';
+import { ConnectionInfo } from './web';
 
 describe('JsonRpcBatchProvider', () => {
   let batchProvider: JsonRpcBatchProvider;
+  let fetchJsonMock: jest.SpyInstance;
 
   beforeEach(() => {
     // Create a new instance of the JsonRpcBatchProvider before each test
     batchProvider = new JsonRpcBatchProvider('http://localhost:8545');
+
+    // Mock the fetchJson function from the ethers package to simulate server responses
+    fetchJsonMock = jest.spyOn(require('./web'), 'fetchJson');
+  });
+
+  afterEach(() => {
+    // Reset the fetchJson mock after each test
+    fetchJsonMock.mockRestore();
   });
 
   test('adjustBatchSize properly adjusts batch size based on success rate', async () => {
-    // Mock the `runRequests` method to simulate success and failure scenarios
-    const mockRunRequests = jest.spyOn(batchProvider as any, 'runRequests');
-    mockRunRequests.mockImplementation(async () => {
-      if (Math.random() < 0.95) {
-        batchProvider['successfulBatchCount']++;
-      } else {
-        batchProvider['failedBatchCount']++;
-      }
-      batchProvider['adjustBatchSize']();
-    });
+    // Mock fetchJson to return a successful response
+    fetchJsonMock.mockImplementation(
+      async (connection: ConnectionInfo, payload: string) => {
+        const requests = JSON.parse(payload);
+        return requests.map((request: any) => ({
+          id: request.id,
+          jsonrpc: '2.0',
+          result: '0x1',
+        }));
+      },
+    );
 
-    // Execute the mocked `runRequests` method the same number of times as the `batchSizeAdjustmentInterval`
-    const batchSizeAdjustmentInterval = (batchProvider as any)
-      .batchSizeAdjustmentInterval;
-    for (let i = 0; i < batchSizeAdjustmentInterval; i++) {
-      await (batchProvider as any).runRequests();
+    // Execute the send method multiple times to simulate successful requests
+    const requestCount = 20;
+    const promises = [];
+    for (let i = 0; i < requestCount; i++) {
+      const promise = batchProvider.send('eth_call', []);
+      promises.push(promise);
+    }
+    await Promise.all(promises);
+
+    // Check if the batch size has increased due to the success rate
+    expect(batchProvider['batchSize']).toBeGreaterThan(1);
+
+    // Now, mock fetchJson to return an error response
+    fetchJsonMock.mockImplementation(
+      async (connection: ConnectionInfo, payload: string) => {
+        const requests = JSON.parse(payload);
+        return requests.map((request: any) => ({
+          id: request.id,
+          jsonrpc: '2.0',
+          error: { code: -32603, message: 'Internal error' },
+        }));
+      },
+    );
+
+    // Execute the send method multiple times to simulate failed requests
+    const failedPromises = [];
+    for (let i = 0; i < requestCount + 10; i++) {
+      const failedPromise = batchProvider.send('eth_call', []);
+      failedPromises.push(failedPromise);
     }
 
-    const finalBatchSize = batchProvider['batchSize'];
-    const successRate =
-      batchProvider['successfulBatchCount'] / batchSizeAdjustmentInterval;
-
-    // Check if the final batch size is properly adjusted based on the success rate
-    if (successRate < 0.9) {
-      expect(finalBatchSize).toBeLessThanOrEqual(1); // The minimum batch size should be 1
-    } else if (successRate > 0.95) {
-      expect(finalBatchSize).toBeGreaterThanOrEqual(2); // The batch size should increase
-    } else {
-      expect(finalBatchSize).toBe(1); // The batch size should remain the same
+    try {
+      await Promise.all(failedPromises);
+    } catch {
+      // Catch errors due to failed requests
     }
+
+    // Check if the batch size has decreased due to the failure rate
+    expect(batchProvider['batchSize']).toBeLessThan(2);
   });
 });

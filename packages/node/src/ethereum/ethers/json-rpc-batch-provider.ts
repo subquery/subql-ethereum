@@ -121,6 +121,8 @@ export class JsonRpcBatchProvider extends JsonRpcProvider {
           batch.forEach((inflightRequest) => {
             inflightRequest.reject(error);
           });
+          this.failedBatchCount++;
+          this.adjustBatchSize();
           return;
         }
 
@@ -137,6 +139,8 @@ export class JsonRpcBatchProvider extends JsonRpcProvider {
             const error = new Error(payload.error.message);
             (<any>error).code = payload.error.code;
             (<any>error).data = payload.error.data;
+            this.failedBatchCount++;
+            this.adjustBatchSize();
             inflightRequest.reject(error);
           } else {
             inflightRequest.resolve(payload.result);
