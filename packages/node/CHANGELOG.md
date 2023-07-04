@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 ## [Unreleased]
+## Fixed
+- Limit the number of calls to eth_chainId (#123)
 
 ## [2.8.0] - 2023-06-27
 ### Changed
