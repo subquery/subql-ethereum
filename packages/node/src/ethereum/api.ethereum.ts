@@ -6,6 +6,7 @@ import http from 'http';
 import https from 'https';
 import { Interface } from '@ethersproject/abi';
 import {
+  BlockTag,
   Provider,
   Block,
   TransactionReceipt,
@@ -94,7 +95,8 @@ export class EthereumApi implements ApiWrapper<EthereumBlockWrapper> {
   private name: string;
 
   // Ethereum POS
-  private supportsFinalization = true;
+  private supportsFinalized = true;
+  private supportsSafe = true;
   private blockConfirmations = yargsOptions.argv['block-confirmations'];
 
   constructor(private endpoint: string, private eventEmitter: EventEmitter2) {
@@ -128,25 +130,29 @@ export class EthereumApi implements ApiWrapper<EthereumBlockWrapper> {
 
   async init(): Promise<void> {
     this.injectClient();
-    const [genesisBlock, network, supportsFinalization] = await Promise.all([
-      this.client.getBlock('earliest'),
-      this.client.getNetwork(),
-      this.getSupportsFinalization(),
-    ]);
+    const [genesisBlock, network, supportsFinalization, supportsSafe] =
+      await Promise.all([
+        this.client.getBlock('earliest'),
+        this.client.getNetwork(),
+        this.getSupportsTag('finalized'),
+        this.getSupportsTag('safe'),
+      ]);
     this.genesisBlock = genesisBlock;
-    this.supportsFinalization = supportsFinalization;
+    this.supportsFinalized = supportsFinalization;
+    this.supportsSafe = supportsSafe;
     this.chainId = network.chainId;
     this.name = network.name;
   }
 
-  private async getSupportsFinalization(): Promise<boolean> {
+  private async getSupportsTag(tag: BlockTag): Promise<boolean> {
     try {
       // We set the timeout here because theres a bug in ethers where it will never resolve
       // It was happening with arbitrum on a syncing node
-      await timeout(this.client.getBlock('finalized'), 2);
+      await timeout(this.client.getBlock(tag), 2);
+
       return true;
     } catch (e) {
-      logger.info('Chain doesnt support finalized tag');
+      logger.info(`Chain doesnt support ${tag} tag`);
       return false;
     }
   }
@@ -162,7 +168,7 @@ export class EthereumApi implements ApiWrapper<EthereumBlockWrapper> {
   }
 
   async getFinalizedBlock(): Promise<Block> {
-    const height = this.supportsFinalization
+    const height = this.supportsFinalized
       ? 'finalized'
       : (await this.getBestBlockHeight()) - this.blockConfirmations;
     return this.client.getBlock(height);
@@ -173,7 +179,7 @@ export class EthereumApi implements ApiWrapper<EthereumBlockWrapper> {
   }
 
   async getBestBlockHeight(): Promise<number> {
-    const tag = this.supportsFinalization ? 'safe' : 'latest';
+    const tag = this.supportsSafe ? 'safe' : 'latest';
     return (await this.client.getBlock(tag)).number;
   }
 
