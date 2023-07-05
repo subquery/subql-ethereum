@@ -121,7 +121,11 @@ export class JsonRpcBatchProvider extends JsonRpcProvider {
           batch.forEach((inflightRequest) => {
             inflightRequest.reject(error);
           });
-          // this.adjustBatchSize(false);
+          if (
+            (result as RpcResult).error?.message === 'Batch size is too large'
+          ) {
+            this.adjustBatchSize(false);
+          }
           return;
         }
 
@@ -140,7 +144,12 @@ export class JsonRpcBatchProvider extends JsonRpcProvider {
             (<any>error).data = payload.error.data;
             if (
               payload.error.message === 'Batch size limit exceeded' || // onfinality
-              payload.error.message === 'exceeded project rate limit' // infura
+              payload.error.message === 'exceeded project rate limit' || // infura
+              payload.error.message.includes(
+                'Failed to buffer the request body',
+              ) ||
+              payload.error.message.includes('Too Many Requests') ||
+              payload.error.message.includes('Request Entity Too Large')
             ) {
               this.adjustBatchSize(false);
             }
