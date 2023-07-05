@@ -66,7 +66,7 @@ describe('JsonRpcBatchProvider', () => {
     try {
       await Promise.all(failedPromises);
     } catch {
-      // Catch errors due to failed requests
+      // ignore error
     }
 
     // Check if the batch size has decreased due to the failure rate
