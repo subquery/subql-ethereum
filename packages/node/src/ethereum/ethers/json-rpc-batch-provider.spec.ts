@@ -51,7 +51,7 @@ describe('JsonRpcBatchProvider', () => {
         return requests.map((request: any) => ({
           id: request.id,
           jsonrpc: '2.0',
-          error: { code: -32603, message: 'Internal error' },
+          error: { code: -32603, message: 'Batch size limit exceeded' },
         }));
       },
     );
