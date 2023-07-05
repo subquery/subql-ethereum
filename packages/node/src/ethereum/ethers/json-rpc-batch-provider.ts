@@ -121,8 +121,7 @@ export class JsonRpcBatchProvider extends JsonRpcProvider {
           batch.forEach((inflightRequest) => {
             inflightRequest.reject(error);
           });
-          this.failedBatchCount++;
-          this.adjustBatchSize();
+          // this.adjustBatchSize(false);
           return;
         }
 
@@ -139,16 +138,19 @@ export class JsonRpcBatchProvider extends JsonRpcProvider {
             const error = new Error(payload.error.message);
             (<any>error).code = payload.error.code;
             (<any>error).data = payload.error.data;
-            this.failedBatchCount++;
-            this.adjustBatchSize();
+            if (
+              payload.error.message === 'Batch size limit exceeded' || // onfinality
+              payload.error.message === 'exceeded project rate limit' // infura
+            ) {
+              this.adjustBatchSize(false);
+            }
             inflightRequest.reject(error);
           } else {
             inflightRequest.resolve(payload.result);
           }
         });
 
-        this.successfulBatchCount++;
-        this.adjustBatchSize();
+        this.adjustBatchSize(true);
       })
       .catch((error) => {
         this.emit('debug', {
@@ -164,19 +166,18 @@ export class JsonRpcBatchProvider extends JsonRpcProvider {
           inflightRequest.reject(error);
         });
 
-        this.failedBatchCount++;
-        this.adjustBatchSize();
+        //this.adjustBatchSize(false);
       });
   }
 
-  private adjustBatchSize() {
+  private adjustBatchSize(success: boolean) {
+    success ? this.successfulBatchCount++ : this.failedBatchCount++;
     const totalBatches = this.successfulBatchCount + this.failedBatchCount;
 
     if (totalBatches % this.batchSizeAdjustmentInterval === 0) {
       const successRate = this.successfulBatchCount / totalBatches;
 
       // Adjust the batch size based on the success rate.
-      // You can fine-tune the logic here to decide how to adjust the batch size.
       if (successRate < 0.9 && this.batchSize > 1) {
         this.batchSize--;
       } else if (successRate > 0.95 && this.batchSize < 10) {
