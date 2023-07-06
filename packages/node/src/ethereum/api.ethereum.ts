@@ -95,8 +95,7 @@ export class EthereumApi implements ApiWrapper<EthereumBlockWrapper> {
   private name: string;
 
   // Ethereum POS
-  private supportsFinalized = true;
-  private supportsSafe = true;
+  private supportsFinalization = true;
   private blockConfirmations = yargsOptions.argv['block-confirmations'];
 
   constructor(private endpoint: string, private eventEmitter: EventEmitter2) {
@@ -138,8 +137,7 @@ export class EthereumApi implements ApiWrapper<EthereumBlockWrapper> {
         this.getSupportsTag('safe'),
       ]);
     this.genesisBlock = genesisBlock;
-    this.supportsFinalized = supportsFinalization;
-    this.supportsSafe = supportsSafe;
+    this.supportsFinalization = supportsFinalization && supportsSafe;
     this.chainId = network.chainId;
     this.name = network.name;
   }
@@ -148,7 +146,7 @@ export class EthereumApi implements ApiWrapper<EthereumBlockWrapper> {
     try {
       // We set the timeout here because theres a bug in ethers where it will never resolve
       // It was happening with arbitrum on a syncing node
-      await timeout(this.client.getBlock(tag), 2);
+      const result = await timeout(this.client.getBlock(tag), 2);
 
       return true;
     } catch (e) {
@@ -168,7 +166,7 @@ export class EthereumApi implements ApiWrapper<EthereumBlockWrapper> {
   }
 
   async getFinalizedBlock(): Promise<Block> {
-    const height = this.supportsFinalized
+    const height = this.supportsFinalization
       ? 'finalized'
       : (await this.getBestBlockHeight()) - this.blockConfirmations;
     return this.client.getBlock(height);
@@ -179,7 +177,7 @@ export class EthereumApi implements ApiWrapper<EthereumBlockWrapper> {
   }
 
   async getBestBlockHeight(): Promise<number> {
-    const tag = this.supportsSafe ? 'safe' : 'latest';
+    const tag = this.supportsFinalization ? 'safe' : 'latest';
     return (await this.client.getBlock(tag)).number;
   }
 

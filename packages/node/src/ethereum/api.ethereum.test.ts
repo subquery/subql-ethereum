@@ -169,22 +169,19 @@ describe('Api.ethereum', () => {
 
   it('Resolves the correct tags for finalization', async () => {
     // Ethereum
-    expect((ethApi as any).supportsFinalized).toBeTruthy();
-    expect((ethApi as any).supportsSafe).toBeTruthy();
+    expect((ethApi as any).supportsFinalization).toBeTruthy();
 
     // Moonbeam
     ethApi = new EthereumApi('https://rpc.api.moonbeam.network', eventEmitter);
     await ethApi.init();
 
-    expect((ethApi as any).supportsFinalized).toBeTruthy();
-    expect((ethApi as any).supportsSafe).toBeTruthy();
+    expect((ethApi as any).supportsFinalization).toBeTruthy();
 
     // BSC
-    ethApi = new EthereumApi('https://bsc-dataseed1.binance.org', eventEmitter);
+    ethApi = new EthereumApi('https://bsc-dataseed.binance.org', eventEmitter);
     await ethApi.init();
 
-    expect((ethApi as any).supportsFinalized).toBeTruthy();
-    expect((ethApi as any).supportsSafe).toBeFalsy();
+    expect((ethApi as any).supportsFinalized).toBeFalsy();
 
     // Polygon
     ethApi = new EthereumApi(
@@ -194,6 +191,5 @@ describe('Api.ethereum', () => {
     await ethApi.init();
 
     expect((ethApi as any).supportsFinalized).toBeFalsy();
-    expect((ethApi as any).supportsSafe).toBeFalsy();
   });
 });
