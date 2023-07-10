@@ -44,6 +44,10 @@ describe('Api.ethereum', () => {
     blockData = await ethApi.fetchBlock(16258633, true);
   });
 
+  it('Should format transaction in logs, and the transaction gas should be bigInt type', () => {
+    expect(typeof blockData.logs[0].transaction.gas).toBe('bigint');
+  });
+
   it('Decode nested logs in transactions', async () => {
     // Erc721
     const tx = blockData.transactions.find(
