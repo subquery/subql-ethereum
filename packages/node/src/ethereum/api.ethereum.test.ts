@@ -46,6 +46,14 @@ describe('Api.ethereum', () => {
 
   it('Should format transaction in logs, and the transaction gas should be bigInt type', () => {
     expect(typeof blockData.logs[0].transaction.gas).toBe('bigint');
+    expect(typeof blockData.logs[0].transaction.blockNumber).toBe('number');
+    expect(typeof blockData.logs[0].transaction.gasPrice).toBe('bigint');
+    expect(typeof blockData.logs[0].transaction.maxPriorityFeePerGas).toBe(
+      'bigint',
+    );
+    expect(typeof blockData.logs[0].transaction.transactionIndex).toBe(
+      'bigint',
+    );
   });
 
   it('Decode nested logs in transactions', async () => {
