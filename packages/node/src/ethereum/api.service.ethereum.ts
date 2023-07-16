@@ -13,6 +13,7 @@ import {
 } from '@subql/node-core';
 import { EthereumBlockWrapper } from '@subql/types-ethereum';
 import { SubqueryProject } from '../configure/SubqueryProject';
+import { yargsOptions } from '../yargs';
 import { EthereumApiConnection } from './api.connection';
 import { EthereumApi } from './api.ethereum';
 import SafeEthProvider from './safe-api';
@@ -111,7 +112,7 @@ export class EthereumApiService extends ApiService<
   }
 
   safeApi(height: number): SafeEthProvider {
-    const maxRetries = 5;
+    const maxRetries = yargsOptions.argv['api-max-retries'];
 
     const handler: ProxyHandler<SafeEthProvider> = {
       get: (target, prop, receiver) => {

@@ -424,5 +424,10 @@ export const yargsOptions = yargs(hideBin(process.argv))
       type: 'number',
       default: 100,
     },
+    'api-max-retries': {
+      describe: 'max number of retries for eth api calls',
+      type: 'number',
+      default: 5,
+    },
   })
   .hide('root'); // root is hidden because its for internal use
