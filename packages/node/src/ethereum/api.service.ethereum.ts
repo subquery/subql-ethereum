@@ -121,7 +121,6 @@ export class EthereumApiService extends ApiService<
       'TIMEOUT',
       'BAD_DATA',
       'CANCELLED',
-      'BUFFER_OVERRUN',
     ];
 
     const handler: ProxyHandler<SafeEthProvider> = {
