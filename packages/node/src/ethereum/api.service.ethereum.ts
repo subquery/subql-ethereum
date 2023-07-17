@@ -136,7 +136,7 @@ export class EthereumApiService extends ApiService<
               try {
                 return await originalMethod.apply(currentApi, args);
               } catch (error: any) {
-                // Call_exception does not have anything to do with network request, retrying would not change its outcome
+                // other than retryErrorCodes, other errors does not have anything to do with network request, retrying would not change its outcome
                 if (!retryErrorCodes.includes(error?.code)) {
                   throw error;
                 }
