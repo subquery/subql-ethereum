@@ -140,13 +140,6 @@ export class EthereumApi implements ApiWrapper<EthereumBlockWrapper> {
     this.supportsFinalization = supportsFinalization && supportsSafe;
     this.chainId = network.chainId;
     this.name = network.name;
-
-    if (this.client instanceof WebSocketProvider) {
-      return;
-    }
-
-    // Find and set the maximum batch size allowed by JsonRpcBatchProvider
-    //await (this.client as JsonRpcBatchProvider).determineBatchSize();
   }
 
   private async getSupportsTag(tag: BlockTag): Promise<boolean> {
