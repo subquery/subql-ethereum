@@ -53,7 +53,7 @@ export class EthereumApiService extends ApiService<
 
       const endpointToApiIndex: Record<string, EthereumApiConnection> = {};
 
-      for await (const [i, endpoint] of endpoints) {
+      for await (const [i, endpoint] of endpoints.entries()) {
         const connection = await EthereumApiConnection.create(
           endpoint,
           this.fetchBlockBatches,
