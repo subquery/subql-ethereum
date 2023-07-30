@@ -13,7 +13,7 @@
   "main": "dist/index.js",
   "license": "GPL-3.0",
   "dependencies": {
-    "@subql/common": "dev",
+    "@subql/common": "2.3.1-2",
     "@subql/types-ethereum": "workspace:*",
     "js-yaml": "^4.1.0",
     "pino": "^6.13.3",
