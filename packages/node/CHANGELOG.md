@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated retry logic for eth requests (#134)
 - Adjust batch size for `JsonRpcBatchProvider` dynamically (#121)
 - Sync with node-core : 
-  - inti db schema manually during test run 
+  - init db schema manually during test run 
   - fix retry logic for workers in connection pool
   - Performance scoring fix
 
