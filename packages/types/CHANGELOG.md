@@ -51,10 +51,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Sync with main sdk (#14)
 
-## [0.2.0] - 2022-12-06
-### Added
-- Support for `bypassBlocks` (#1435)
-
 ## [0.1.0] - 2022-10-31
 [Unreleased]: https://github.com/subquery/subql-ethereum/compare/types/2.2.3...HEAD
 [2.2.3]: https://github.com/subquery/subql-ethereum/compare/types/2.2.2...types/2.2.3
