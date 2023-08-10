@@ -46,11 +46,10 @@ export class SandboxService {
       );
       this.processorCache[entry] = processor;
     }
-
-    processor.freeze(api, 'api');
-    if (this.nodeConfig.unsafe) {
-      processor.freeze(this.apiService.api.api, 'unsafeApi');
-    }
+    processor.freeze(
+      this.nodeConfig.unsafe ? this.apiService.api.api : api,
+      'api',
+    );
     processor.freeze(this.project.network.chainId, 'chainId');
     return processor;
   }
