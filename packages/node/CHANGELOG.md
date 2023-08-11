@@ -7,8 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
-- Synced with main sdk: 
-  - fix injected unsafe api name in sandbox
+- Synced with main sdk:
   - add `--primary-network-endpoint` cli option
   - Support for update availability logs
 
