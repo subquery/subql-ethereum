@@ -129,17 +129,35 @@ export class EthereumApi implements ApiWrapper<EthereumBlockWrapper> {
 
   async init(): Promise<void> {
     this.injectClient();
-    const [genesisBlock, network, supportsFinalization, supportsSafe] =
-      await Promise.all([
-        this.client.getBlock('earliest'),
-        this.client.getNetwork(),
-        this.getSupportsTag('finalized'),
-        this.getSupportsTag('safe'),
-      ]);
-    this.genesisBlock = genesisBlock;
-    this.supportsFinalization = supportsFinalization && supportsSafe;
-    this.chainId = network.chainId;
-    this.name = network.name;
+
+    try {
+      const [genesisBlock, network, supportsFinalization, supportsSafe] =
+        await Promise.all([
+          this.client.getBlock('earliest'),
+          this.client.getNetwork(),
+          this.getSupportsTag('finalized'),
+          this.getSupportsTag('safe'),
+        ]);
+
+      this.genesisBlock = genesisBlock;
+      this.supportsFinalization = supportsFinalization && supportsSafe;
+      this.chainId = network.chainId;
+      this.name = network.name;
+    } catch (e) {
+      //batch request error for filecoin
+      if (e.message.includes('"message":"we can\'t execute this request"')) {
+        this.client = this.nonBatchClient;
+
+        logger.warn(
+          `The RPC Node at ${this.endpoint} cannot process batch requests. ` +
+            `Switching to non-batch mode for subsequent requests. Please consider checking if batch processing is supported on the RPC node.`,
+        );
+
+        return this.init();
+      }
+
+      throw e;
+    }
   }
 
   private async getSupportsTag(tag: BlockTag): Promise<boolean> {
