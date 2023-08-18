@@ -144,8 +144,7 @@ export class EthereumApi implements ApiWrapper<EthereumBlockWrapper> {
       this.chainId = network.chainId;
       this.name = network.name;
     } catch (e) {
-      //batch request error for filecoin
-      if (e.message.includes('"message":"we can\'t execute this request"')) {
+      if ((e as Error).message.startsWith('Invalid response')) {
         this.client = this.nonBatchClient;
 
         logger.warn(
