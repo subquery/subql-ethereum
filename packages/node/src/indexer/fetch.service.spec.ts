@@ -202,7 +202,7 @@ describe('Dictionary queries', () => {
       ]);
     });
 
-    it('If ds option and filter both provide contract address, ir should use ds options one ', () => {
+    it('If ds option and filter both provide contract address, it should use ds options one ', () => {
       const ds: SubqlRuntimeDatasource = {
         kind: EthereumDatasourceKind.Runtime,
         assets: new Map(),
