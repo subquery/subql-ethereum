@@ -92,14 +92,13 @@ export class EthereumApi implements ApiWrapper<EthereumBlockWrapper> {
 
   // This is used within the sandbox when HTTP is used
   private nonBatchClient?: JsonRpcProvider;
-  private genesisBlock: Record<string, any>;
+  private genesisBlock: Block;
   private contractInterfaces: Record<string, Interface> = {};
   private chainId: number;
   private name: string;
 
   // Ethereum POS
   private supportsFinalization = true;
-  private blockConfirmations = yargsOptions.argv['block-confirmations'];
 
   constructor(private endpoint: string, private eventEmitter: EventEmitter2) {
     const { hostname, protocol, searchParams } = new URL(endpoint);
@@ -197,10 +196,10 @@ export class EthereumApi implements ApiWrapper<EthereumBlockWrapper> {
   }
 
   async getFinalizedBlock(): Promise<Block> {
-    const height = this.supportsFinalization
-      ? 'finalized'
-      : (await this.getBestBlockHeight()) - this.blockConfirmations;
-    return this.client.getBlock(height);
+    if (!this.supportsFinalization) {
+      return this.genesisBlock;
+    }
+    return this.client.getBlock('finalized');
   }
 
   async getFinalizedBlockHeight(): Promise<number> {
