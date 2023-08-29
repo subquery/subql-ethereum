@@ -5,7 +5,6 @@ import path from 'path';
 import { Inject, Injectable, OnApplicationShutdown } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import {
-  getLogger,
   NodeConfig,
   Worker,
   SmartBatchService,
@@ -37,9 +36,6 @@ import { EthereumBlockWrapped } from '../../ethereum/block.ethereum';
 import { DynamicDsService } from '../dynamic-ds.service';
 import { UnfinalizedBlocksService } from '../unfinalizedBlocks.service';
 import { IIndexerWorker, IInitIndexerWorker } from '../worker/worker';
-// import { HostUnfinalizedBlocks } from '../worker/worker.unfinalizedBlocks.service';
-
-const logger = getLogger('WorkerBlockDispatcherService');
 
 type IndexerWorker = IIndexerWorker & {
   terminate: () => Promise<number>;
