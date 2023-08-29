@@ -6,11 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Fixed
-- Fetching logs via block height resulting in invalid results. Block hash is now used to ensure correct results. (#156)
-
-### Fixed
 - Fix reindex also start index service (#155)
 - Fix warning for filter address (#154)
+- Fetching logs via block height resulting in invalid results. Block hash is now used to ensure
+correct results. (#156)
+- Node runner options being overwritten by yargs defaults (#148)
 
 ## [2.12.3] - 2023-09-04
 ### Fixed
@@ -32,6 +32,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Custom provider for Celo (#147)
+
+### Changed
+- Update node-core and add support for project upgrades feature (#148)
 
 ## [2.11.1] - 2023-08-14
 ### Changed
