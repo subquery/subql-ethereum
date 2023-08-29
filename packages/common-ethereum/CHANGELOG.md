@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Missing imports for multi abi `codegen` (#169)
 
+### Added
+- Parent field to manifest for project upgrades (#148)
+
 ## [2.3.0] - 2023-09-12
 ### Changed
 - Migrated abi-codegen from `@subql/cli` to `common-ethereum` (#158)
