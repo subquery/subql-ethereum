@@ -1,9 +1,14 @@
 // Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
-import { Block } from '@ethersproject/abstract-provider';
+import assert from 'assert';
 import { Injectable } from '@nestjs/common';
-import { Reader, RunnerSpecs, validateSemver } from '@subql/common';
+import {
+  ParentProject,
+  Reader,
+  RunnerSpecs,
+  validateSemver,
+} from '@subql/common';
 import {
   EthereumProjectNetworkConfig,
   parseEthereumProjectManifest,
@@ -13,27 +18,34 @@ import {
   isRuntimeDs,
   EthereumHandlerKind,
   isCustomDs,
+  RuntimeDatasourceTemplate,
+  CustomDatasourceTemplate,
 } from '@subql/common-ethereum';
-import { getProjectRoot, updateDataSourcesV1_0_0 } from '@subql/node-core';
+import {
+  insertBlockFiltersCronSchedules,
+  ISubqueryProject,
+  loadProjectTemplates,
+  SubqlProjectDs,
+  updateDataSourcesV1_0_0,
+} from '@subql/node-core';
 import { buildSchemaFromString } from '@subql/utils';
 import Cron from 'cron-converter';
 import { GraphQLSchema } from 'graphql';
-import { EthereumApi } from '../ethereum/api.ethereum';
 import { updateDatasourcesFlare } from '../utils/project';
 
-export type SubqlProjectDs = SubqlEthereumDataSource & {
-  mapping: SubqlEthereumDataSource['mapping'] & { entryScript: string };
-};
+const { version: packageVersion } = require('../../package.json');
+
+export type EthereumProjectDs = SubqlProjectDs<SubqlEthereumDataSource>;
+
+export type EthereumProjectDsTemplate =
+  | SubqlProjectDs<RuntimeDatasourceTemplate>
+  | SubqlProjectDs<CustomDatasourceTemplate>;
 
 export type SubqlProjectBlockFilter = EthereumBlockFilter & {
   cronSchedule?: {
     schedule: Cron.Seeker;
     next: number;
   };
-};
-
-export type SubqlProjectDsTemplate = Omit<SubqlProjectDs, 'startBlock'> & {
-  name: string;
 };
 
 const NOT_SUPPORT = (name: string) => {
@@ -44,21 +56,43 @@ const NOT_SUPPORT = (name: string) => {
 type NetworkConfig = EthereumProjectNetworkConfig & { chainId: string };
 
 @Injectable()
-export class SubqueryProject {
-  id: string;
-  root: string;
-  network: NetworkConfig;
-  dataSources: SubqlProjectDs[];
-  schema: GraphQLSchema;
-  templates: SubqlProjectDsTemplate[];
-  runner?: RunnerSpecs;
+export class SubqueryProject implements ISubqueryProject {
+  #dataSources: EthereumProjectDs[];
+
+  constructor(
+    readonly id: string,
+    readonly root: string,
+    readonly network: NetworkConfig,
+    dataSources: EthereumProjectDs[],
+    readonly schema: GraphQLSchema,
+    readonly templates: EthereumProjectDsTemplate[],
+    readonly runner?: RunnerSpecs,
+    readonly parent?: ParentProject,
+  ) {
+    this.#dataSources = dataSources;
+  }
+
+  get dataSources(): EthereumProjectDs[] {
+    return this.#dataSources;
+  }
+
+  async applyCronTimestamps(
+    getTimestamp: (height: number) => Promise<Date>,
+  ): Promise<void> {
+    this.#dataSources = await insertBlockFiltersCronSchedules(
+      this.dataSources,
+      getTimestamp,
+      isRuntimeDs,
+      EthereumHandlerKind.Block,
+    );
+  }
 
   static async create(
     path: string,
     rawManifest: unknown,
     reader: Reader,
+    root: string, // If project local then directory otherwise temp directory
     networkOverrides?: Partial<EthereumProjectNetworkConfig>,
-    root?: string,
   ): Promise<SubqueryProject> {
     // rawManifest and reader can be reused here.
     // It has been pre-fetched and used for rebase manifest runner options with args
@@ -72,12 +106,12 @@ export class SubqueryProject {
     const manifest = parseEthereumProjectManifest(rawManifest);
 
     if (manifest.isV1_0_0) {
-      return loadProjectFromManifest1_0_0(
+      return loadProjectFromManifestBase(
         manifest.asV1_0_0,
         reader,
         path,
-        networkOverrides,
         root,
+        networkOverrides,
       );
     } else {
       NOT_SUPPORT(manifest.specVersion);
@@ -101,11 +135,9 @@ async function loadProjectFromManifestBase(
   projectManifest: SUPPORT_MANIFEST,
   reader: Reader,
   path: string,
+  root: string,
   networkOverrides?: Partial<EthereumProjectNetworkConfig>,
-  root?: string,
 ): Promise<SubqueryProject> {
-  root = root ?? (await getProjectRoot(reader));
-
   if (typeof projectManifest.network.endpoint === 'string') {
     projectManifest.network.endpoint = [projectManifest.network.endpoint];
   }
@@ -137,109 +169,28 @@ async function loadProjectFromManifestBase(
     root,
   );
 
-  const templates = await loadProjectTemplates(projectManifest, root, reader);
+  const templates = await loadProjectTemplates(
+    projectManifest.templates,
+    root,
+    reader,
+    isCustomDs,
+  );
+  const runner = projectManifest.runner;
+  assert(
+    validateSemver(packageVersion, runner.node.version),
+    new Error(
+      `Runner require node version ${runner.node.version}, current node ${packageVersion}`,
+    ),
+  );
 
-  return {
-    id: reader.root ? reader.root : path, //TODO, need to method to get project_id
+  return new SubqueryProject(
+    reader.root ? reader.root : path, //TODO, need to method to get project_id
     root,
     network,
     dataSources,
     schema,
     templates,
-  };
-}
-
-const { version: packageVersion } = require('../../package.json');
-
-async function loadProjectFromManifest1_0_0(
-  projectManifest: ProjectManifestV1_0_0Impl,
-  reader: Reader,
-  path: string,
-  networkOverrides?: Partial<EthereumProjectNetworkConfig>,
-  root?: string,
-): Promise<SubqueryProject> {
-  const project = await loadProjectFromManifestBase(
-    projectManifest,
-    reader,
-    path,
-    networkOverrides,
-    root,
+    runner,
+    projectManifest.parent,
   );
-  project.runner = projectManifest.runner;
-  if (!validateSemver(packageVersion, project.runner.node.version)) {
-    throw new Error(
-      `Runner require node version ${project.runner.node.version}, current node ${packageVersion}`,
-    );
-  }
-  return project;
-}
-
-async function loadProjectTemplates(
-  projectManifest: ProjectManifestV1_0_0Impl,
-  root: string,
-  reader: Reader,
-): Promise<SubqlProjectDsTemplate[]> {
-  if (!projectManifest.templates || !projectManifest.templates.length) {
-    return [];
-  }
-  const dsTemplates = await updateDatasourcesFlare(
-    projectManifest.templates,
-    reader,
-    root,
-  );
-
-  return dsTemplates.map((ds, index) => ({
-    ...ds,
-    name: projectManifest.templates[index].name,
-  }));
-}
-
-// eslint-disable-next-line @typescript-eslint/require-await
-export async function generateTimestampReferenceForBlockFilters(
-  dataSources: SubqlProjectDs[],
-  api: EthereumApi,
-): Promise<SubqlProjectDs[]> {
-  const cron = new Cron();
-
-  dataSources = await Promise.all(
-    dataSources.map(async (ds) => {
-      if (isRuntimeDs(ds)) {
-        const startBlock = ds.startBlock ?? 1;
-        let block: Block;
-        let timestampReference: Date;
-
-        ds.mapping.handlers = await Promise.all(
-          ds.mapping.handlers.map(async (handler) => {
-            if (handler.kind === EthereumHandlerKind.Block) {
-              if (handler.filter?.timestamp) {
-                if (!block) {
-                  block = await api.getBlockByHeightOrHash(startBlock);
-                  timestampReference = new Date(block.timestamp * 1000); // Add millis
-                }
-                try {
-                  cron.fromString(handler.filter.timestamp);
-                } catch (e) {
-                  throw new Error(
-                    `Invalid Cron string: ${handler.filter.timestamp}`,
-                  );
-                }
-
-                const schedule = cron.schedule(timestampReference);
-                (handler.filter as SubqlProjectBlockFilter).cronSchedule = {
-                  schedule: schedule,
-                  get next() {
-                    return Date.parse(this.schedule.next().format());
-                  },
-                };
-              }
-            }
-            return handler;
-          }),
-        );
-      }
-      return ds;
-    }),
-  );
-
-  return dataSources;
 }

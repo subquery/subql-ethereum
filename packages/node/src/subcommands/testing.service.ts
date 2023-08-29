@@ -7,12 +7,14 @@ import { NestFactory } from '@nestjs/core';
 import {
   NodeConfig,
   TestingService as BaseTestingService,
-  ApiService,
   NestLogger,
   TestRunner,
 } from '@subql/node-core';
 import { EthereumBlockWrapper } from '@subql/types-ethereum';
-import { SubqlProjectDs, SubqueryProject } from '../configure/SubqueryProject';
+import {
+  EthereumProjectDs,
+  SubqueryProject,
+} from '../configure/SubqueryProject';
 import { EthereumApi } from '../ethereum';
 import SafeEthProvider from '../ethereum/safe-api';
 import { IndexerManager } from '../indexer/indexer.manager';
@@ -24,7 +26,7 @@ export class TestingService extends BaseTestingService<
   EthereumApi,
   SafeEthProvider,
   EthereumBlockWrapper,
-  SubqlProjectDs
+  EthereumProjectDs
 > {
   constructor(
     nodeConfig: NodeConfig,
@@ -38,13 +40,13 @@ export class TestingService extends BaseTestingService<
       EthereumApi,
       SafeEthProvider,
       EthereumBlockWrapper,
-      SubqlProjectDs
+      EthereumProjectDs
     >
   > {
     const testContext = await NestFactory.createApplicationContext(
       TestingModule,
       {
-        logger: new NestLogger(),
+        logger: new NestLogger(this.nodeConfig.debug),
       },
     );
 

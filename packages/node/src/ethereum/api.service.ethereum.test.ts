@@ -30,7 +30,7 @@ function testSubqueryProject(endpoint: string): SubqueryProject {
     root: './',
     schema: new GraphQLSchema({}),
     templates: [],
-  };
+  } as any;
 }
 
 const prepareApiService = async (

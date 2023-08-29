@@ -23,7 +23,11 @@ type FetchFunc = (
 
 export class EthereumApiConnection
   implements
-    IApiConnectionSpecific<EthereumApi, SafeEthProvider, EthereumBlockWrapper>
+    IApiConnectionSpecific<
+      EthereumApi,
+      SafeEthProvider,
+      EthereumBlockWrapper[]
+    >
 {
   readonly networkMeta: NetworkMetadataPayload;
 

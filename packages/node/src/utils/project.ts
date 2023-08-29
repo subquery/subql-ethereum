@@ -14,7 +14,7 @@ import {
 } from '@subql/common-ethereum';
 import { retryOnFail, updateDataSourcesV1_0_0 } from '@subql/node-core';
 import { EthereumDatasourceKind, SubqlDatasource } from '@subql/types-ethereum';
-import { SubqlProjectDs } from '../configure/SubqueryProject';
+import { EthereumProjectDs } from '../configure/SubqueryProject';
 
 export function isBaseHandler(
   handler: SubqlHandler,
@@ -37,7 +37,9 @@ export async function retryOnFailEth<T>(
   return retryOnFail(request, (e) => !!errors.find((t) => t === e?.reason));
 }
 
-export function onlyHasLogDataSources(dataSources: SubqlProjectDs[]): boolean {
+export function onlyHasLogDataSources(
+  dataSources: EthereumProjectDs[],
+): boolean {
   for (const ds of dataSources) {
     for (const handler of ds.mapping.handlers) {
       if (
@@ -56,7 +58,7 @@ export async function updateDatasourcesFlare(
   _dataSources: SubqlDatasource[],
   reader: Reader,
   root: string,
-): Promise<SubqlProjectDs[]> {
+): Promise<EthereumProjectDs[]> {
   // Cast to any to make types happy
   const partialUpdate = await Promise.all(
     _dataSources.map(async (dataSource) => {

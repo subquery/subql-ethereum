@@ -5,6 +5,8 @@ import {
   BaseMapping,
   FileType,
   NodeSpec,
+  ParentProject,
+  ParentProjectModel,
   ProjectManifestBaseImpl,
   QuerySpec,
   RunnerNodeImpl,
@@ -164,6 +166,11 @@ export class DeploymentV1_0_0 {
     keepDiscriminatorProperty: true,
   })
   templates?: (RuntimeDatasourceTemplate | CustomDatasourceTemplate)[];
+
+  @IsOptional()
+  @IsObject()
+  @Type(() => ParentProjectModel)
+  parent?: ParentProject;
 }
 
 export class ProjectManifestV1_0_0Impl<D extends object = DeploymentV1_0_0>
@@ -211,6 +218,11 @@ export class ProjectManifestV1_0_0Impl<D extends object = DeploymentV1_0_0>
   @Type(() => EthereumRunnerSpecsImpl)
   runner: RunnerSpecs;
   protected _deployment: D;
+
+  @IsOptional()
+  @IsObject()
+  @Type(() => ParentProjectModel)
+  parent?: ParentProject;
 
   get deployment(): D {
     if (!this._deployment) {
