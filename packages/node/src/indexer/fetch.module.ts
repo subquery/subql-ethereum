@@ -17,6 +17,7 @@ import {
   StoreCacheService,
   PgMmrCacheService,
   MmrQueryService,
+  IProjectUpgradeService,
 } from '@subql/node-core';
 import { SubqueryProject } from '../configure/SubqueryProject';
 import { EthereumApiConnection } from '../ethereum/api.connection';
@@ -85,6 +86,7 @@ import { UnfinalizedBlocksService } from './unfinalizedBlocks.service';
         nodeConfig: NodeConfig,
         eventEmitter: EventEmitter2,
         projectService: ProjectService,
+        projectUpgradeService: IProjectUpgradeService,
         apiService: EthereumApiService,
         indexerManager: IndexerManager,
         smartBatchService: SmartBatchService,
@@ -101,6 +103,7 @@ import { UnfinalizedBlocksService } from './unfinalizedBlocks.service';
               nodeConfig,
               eventEmitter,
               projectService,
+              projectUpgradeService,
               smartBatchService,
               storeService,
               storeCacheService,
@@ -116,6 +119,7 @@ import { UnfinalizedBlocksService } from './unfinalizedBlocks.service';
               indexerManager,
               eventEmitter,
               projectService,
+              projectUpgradeService,
               smartBatchService,
               storeService,
               storeCacheService,
@@ -127,6 +131,7 @@ import { UnfinalizedBlocksService } from './unfinalizedBlocks.service';
         NodeConfig,
         EventEmitter2,
         'IProjectService',
+        'IProjectUpgradeService',
         ApiService,
         IndexerManager,
         SmartBatchService,
@@ -145,14 +150,19 @@ import { UnfinalizedBlocksService } from './unfinalizedBlocks.service';
     PoiBenchmarkService,
     {
       provide: DictionaryService,
-      useFactory: async (project: SubqueryProject, nodeConfig: NodeConfig) => {
+      useFactory: async (
+        project: SubqueryProject,
+        nodeConfig: NodeConfig,
+        eventEmitter: EventEmitter2,
+      ) => {
         const dictionaryService = await DictionaryService.create(
           project,
           nodeConfig,
+          eventEmitter,
         );
         return dictionaryService;
       },
-      inject: ['ISubqueryProject', NodeConfig],
+      inject: ['ISubqueryProject', NodeConfig, EventEmitter2],
     },
     SandboxService,
     DsProcessorService,

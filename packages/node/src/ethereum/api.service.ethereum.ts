@@ -26,7 +26,7 @@ const MAX_RECONNECT_ATTEMPTS = 5;
 export class EthereumApiService extends ApiService<
   EthereumApi,
   SafeEthProvider,
-  EthereumBlockWrapper
+  EthereumBlockWrapper[]
 > {
   constructor(
     @Inject('ISubqueryProject') private project: SubqueryProject,

@@ -32,7 +32,7 @@ import {
   EthereumLogFilter,
   EthereumTransactionFilter,
 } from '@subql/types-ethereum';
-import { SubqlProjectDs } from '../configure/SubqueryProject';
+import { EthereumProjectDs } from '../configure/SubqueryProject';
 import { EthereumApi, EthereumApiService } from '../ethereum';
 import { EthereumBlockWrapped } from '../ethereum/block.ethereum';
 import SafeEthProvider from '../ethereum/safe-api';
@@ -114,8 +114,8 @@ export class IndexerManager extends BaseIndexerManager<
 
   protected async indexBlockData(
     { block, transactions }: EthereumBlockWrapper,
-    dataSources: SubqlProjectDs[],
-    getVM: (d: SubqlProjectDs) => Promise<IndexerSandbox>,
+    dataSources: EthereumProjectDs[],
+    getVM: (d: EthereumProjectDs) => Promise<IndexerSandbox>,
   ): Promise<void> {
     await this.indexBlockContent(block, dataSources, getVM);
 
@@ -130,8 +130,8 @@ export class IndexerManager extends BaseIndexerManager<
 
   private async indexBlockContent(
     block: EthereumBlock,
-    dataSources: SubqlProjectDs[],
-    getVM: (d: SubqlProjectDs) => Promise<IndexerSandbox>,
+    dataSources: EthereumProjectDs[],
+    getVM: (d: EthereumProjectDs) => Promise<IndexerSandbox>,
   ): Promise<void> {
     for (const ds of dataSources) {
       await this.indexData(EthereumHandlerKind.Block, block, ds, getVM);
@@ -140,8 +140,8 @@ export class IndexerManager extends BaseIndexerManager<
 
   private async indexTransaction(
     tx: EthereumTransaction,
-    dataSources: SubqlProjectDs[],
-    getVM: (d: SubqlProjectDs) => Promise<IndexerSandbox>,
+    dataSources: EthereumProjectDs[],
+    getVM: (d: EthereumProjectDs) => Promise<IndexerSandbox>,
   ): Promise<void> {
     for (const ds of dataSources) {
       await this.indexData(EthereumHandlerKind.Call, tx, ds, getVM);
@@ -150,8 +150,8 @@ export class IndexerManager extends BaseIndexerManager<
 
   private async indexEvent(
     log: EthereumLog,
-    dataSources: SubqlProjectDs[],
-    getVM: (d: SubqlProjectDs) => Promise<IndexerSandbox>,
+    dataSources: EthereumProjectDs[],
+    getVM: (d: EthereumProjectDs) => Promise<IndexerSandbox>,
   ): Promise<void> {
     for (const ds of dataSources) {
       await this.indexData(EthereumHandlerKind.Event, log, ds, getVM);

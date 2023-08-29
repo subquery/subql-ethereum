@@ -2,16 +2,12 @@
 // SPDX-License-Identifier: GPL-3.0
 
 import { Injectable } from '@nestjs/common';
-import { Header, IUnfinalizedBlocksService } from '@subql/node-core';
-import { BlockWrapper, EthereumBlock } from '@subql/types-ethereum';
-
-export type HostUnfinalizedBlocks = {
-  unfinalizedBlocksProcess: (header: Header) => Promise<number | null>;
-};
-
-export const hostUnfinalizedBlocksKeys: (keyof HostUnfinalizedBlocks)[] = [
-  'unfinalizedBlocksProcess',
-];
+import {
+  Header,
+  HostUnfinalizedBlocks,
+  IUnfinalizedBlocksService,
+} from '@subql/node-core';
+import { BlockWrapper } from '@subql/types-ethereum';
 
 @Injectable()
 export class WorkerUnfinalizedBlocksService

@@ -7,6 +7,7 @@ import { ScheduleModule, SchedulerRegistry } from '@nestjs/schedule';
 import {
   ApiService,
   ConnectionPoolService,
+  ConnectionPoolStateManager,
   DbModule,
   NodeConfig,
   PoiService,
@@ -39,6 +40,7 @@ import { TestingService } from './testing.service';
     UnfinalizedBlocksService,
     ProjectService,
     UnfinalizedBlocksService,
+    ConnectionPoolStateManager,
     ConnectionPoolService,
     {
       provide: 'IProjectService',
