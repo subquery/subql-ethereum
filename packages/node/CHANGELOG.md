@@ -209,7 +209,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Init release
 
-[Unreleased]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/2.12.1...HEAD
+[Unreleased]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/2.12.2...HEAD
 [2.12.1]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/2.12.0...node-ethereum/2.12.1
 [2.12.0]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/2.11.1...node-ethereum/2.12.0
 [2.11.1]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/2.10.0...node-ethereum/2.11.1
