@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.12.1] - 2023-09-01
+- Update `node-core` to 4.2.6, fix timeout issue for unavailable networks in dictionary resolver.
+
 ## [2.12.0] - 2023-09-01
 ### Fixed
 - Fallback to singular provider if batch provider is not supported (#144)
