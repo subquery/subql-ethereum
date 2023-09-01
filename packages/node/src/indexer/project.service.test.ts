@@ -37,8 +37,6 @@ describe('ProjectService', () => {
       null,
       null,
       null,
-      null,
-      null,
     );
   });
 

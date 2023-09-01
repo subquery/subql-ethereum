@@ -5,15 +5,11 @@ import { Inject, Injectable } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import {
   PoiService,
-  MmrService,
   BaseProjectService,
   StoreService,
   NodeConfig,
   ApiService,
-  MmrQueryService,
   IProjectUpgradeService,
-  IProjectNetworkConfig,
-  ISubqueryProject,
 } from '@subql/node-core';
 import { EthereumBlockWrapper } from '@subql/types-ethereum';
 import { Sequelize } from '@subql/x-sequelize';
@@ -41,8 +37,6 @@ export class ProjectService extends BaseProjectService<
     dsProcessorService: DsProcessorService,
     apiService: ApiService,
     poiService: PoiService,
-    mmrService: MmrService,
-    mmrQueryService: MmrQueryService,
     sequelize: Sequelize,
     @Inject('ISubqueryProject') project: SubqueryProject,
     @Inject('IProjectUpgradeService')
@@ -57,8 +51,6 @@ export class ProjectService extends BaseProjectService<
       dsProcessorService,
       apiService,
       poiService,
-      mmrService,
-      mmrQueryService,
       sequelize,
       project,
       projectUpgradeService,
@@ -76,14 +68,7 @@ export class ProjectService extends BaseProjectService<
     return new Date(block.timestamp * 1000); // TODO test and make sure its in MS not S
   }
 
-  protected onProjectChange(
-    project: ISubqueryProject<
-      IProjectNetworkConfig,
-      EthereumProjectDs,
-      unknown,
-      unknown
-    >,
-  ): void | Promise<void> {
+  protected onProjectChange(project: SubqueryProject): void | Promise<void> {
     // TODO update this when implementing skipBlock feature for Eth
     // this.apiService.updateBlockFetching();
   }

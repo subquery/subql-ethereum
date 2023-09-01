@@ -8,8 +8,6 @@ import {
   ApiService,
   DbModule,
   ForceCleanService,
-  MmrService,
-  PgMmrCacheService,
   StoreCacheService,
   StoreService,
   ReindexService,
@@ -24,8 +22,6 @@ import { UnfinalizedBlocksService } from '../indexer/unfinalizedBlocks.service';
     StoreCacheService,
     StoreService,
     ReindexService,
-    MmrService,
-    PgMmrCacheService,
     ForceCleanService,
     {
       provide: 'UnfinalizedBlocksService',
