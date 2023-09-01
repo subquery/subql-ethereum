@@ -2995,8 +2995,8 @@ __metadata:
   linkType: hard
 
 "@subql/apollo-links@npm:^1.0.2":
-  version: 1.0.8
-  resolution: "@subql/apollo-links@npm:1.0.8"
+  version: 1.0.2
+  resolution: "@subql/apollo-links@npm:1.0.2"
   dependencies:
     "@metamask/eth-sig-util": 5.1.0
     apollo-link-error: ^1.1.13
@@ -3009,7 +3009,7 @@ __metadata:
   peerDependencies:
     "@apollo/client": "*"
     graphql: "*"
-  checksum: 1436197844a4f2cb99e3eb106d98735f17115c10a080b100735fc7a5082e6da13543e6967f3a0a039e34927093d641635d4718fd0fcc64534ee889cbd44c2d35
+  checksum: b7e3511d78d136bdda4e1ae1722c22522a10dacbe7b0908fe7065233cd1ed2e61a6e3a599b9a37b356bedf48833212eb037593324bc409def6e562c094605376
   languageName: node
   linkType: hard
 
