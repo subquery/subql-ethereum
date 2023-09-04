@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
-- Fix warning for filter address
+- Fix warning for filter address (#154)
 
 ## [2.12.3] - 2023-09-04
 ### Fixed
