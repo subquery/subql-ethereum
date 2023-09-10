@@ -49,6 +49,8 @@ export function prepareSortedAssets(
     .filter((d) => !!d?.assets && (isRuntimeDs(d) || isCustomDs(d) || validateCustomDsDs(d)))
     .forEach((d) => {
       Object.entries(d.assets).map(([name, value]) => {
+        // should do a if covert to absolute
+        // if value.file is not absolute, the
         const filePath = path.join(projectPath, value.file);
         if (!fs.existsSync(filePath)) {
           throw new Error(`Error: Asset ${name}, file ${value.file} does not exist`);
@@ -68,7 +70,7 @@ export function prepareAbiJob(
   loadReadAbi: (filePath: string) => abiInterface[] | {abi: abiInterface[]}
 ): abiRenderProps[] {
   const renderInterfaceJobs: abiRenderProps[] = [];
-  Object.entries(sortedAssets).forEach(([value, key]) => {
+  Object.entries(sortedAssets).forEach(([key, value]) => {
     const renderProps: abiRenderProps = {name: key, events: [], functions: []};
     const readAbi = loadReadAbi(path.join(projectPath, value));
     // We need to use for loop instead of map, due to events/function name could be duplicate,
@@ -87,7 +89,7 @@ export function prepareAbiJob(
     }
 
     if (!abiArray.length) {
-      throw new Error(`Invalid abi is provided at asset: ${key}`);
+      throw new Error(`Invalid abi is provided at asset: ${key}, ${value}, ${(readAbi as any).length}`);
     }
 
     const duplicateEventNames = abiArray
