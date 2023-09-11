@@ -4,11 +4,11 @@
 import fs from 'fs';
 import path from 'path';
 import {promisify} from 'util';
-import {abiInterface, joinInputAbiName, prepareAbiJob, prepareSortedAssets} from '@subql/common-ethereum';
 import {EthereumDatasourceKind, EthereumHandlerKind} from '@subql/types-ethereum';
 import ejs from 'ejs';
 import {upperFirst} from 'lodash';
 import rimraf from 'rimraf';
+import {abiInterface, joinInputAbiName, prepareAbiJob, prepareSortedAssets} from './codegen-controller';
 
 describe('Codegen spec', () => {
   const PROJECT_PATH = path.join(__dirname, '../../test/abiTest');
