@@ -31,10 +31,10 @@ export class EthereumApiService extends ApiService<
   constructor(
     @Inject('ISubqueryProject') private project: SubqueryProject,
     connectionPoolService: ConnectionPoolService<EthereumApiConnection>,
-    private eventEmitter: EventEmitter2,
+    eventEmitter: EventEmitter2,
     private nodeConfig: NodeConfig,
   ) {
-    super(connectionPoolService);
+    super(connectionPoolService, eventEmitter);
   }
 
   networkMeta: NetworkMetadataPayload;
@@ -100,7 +100,7 @@ export class EthereumApiService extends ApiService<
     }
   }
 
-  private metadataMismatchError(
+  protected metadataMismatchError(
     metadata: string,
     expected: string,
     actual: string,

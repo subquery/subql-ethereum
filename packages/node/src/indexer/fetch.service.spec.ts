@@ -1,7 +1,6 @@
 // Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
-import { NodeConfig } from '@subql/node-core';
 import {
   EthereumDatasourceKind,
   EthereumHandlerKind,
@@ -12,8 +11,6 @@ import {
   EthereumProjectDsTemplate,
   SubqueryProject,
 } from '../configure/SubqueryProject';
-import { DsProcessorService } from './ds-processor.service';
-import { DynamicDsService } from './dynamic-ds.service';
 import { buildDictionaryQueryEntries, FetchService } from './fetch.service';
 
 const HTTP_ENDPOINT = 'https://eth.api.onfinality.io/public';
@@ -265,7 +262,7 @@ describe('Dictionary queries', () => {
         },
       };
 
-      const result = buildDictionaryQueryEntries([ds], 1);
+      const result = buildDictionaryQueryEntries([ds]);
       expect(result).toEqual([
         {
           entity: 'evmTransactions',
@@ -304,7 +301,7 @@ describe('Dictionary queries', () => {
         },
       };
 
-      const result = buildDictionaryQueryEntries([ds], 1);
+      const result = buildDictionaryQueryEntries([ds]);
       expect(result).toEqual([
         {
           entity: 'evmTransactions',
