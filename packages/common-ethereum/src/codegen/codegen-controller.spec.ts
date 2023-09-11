@@ -108,7 +108,7 @@ describe('Codegen spec', () => {
     };
 
     const a = path.join(projectPath, './abis/erc20.json');
-    const b = path.join(projectPath, './abis/Erc20.sol/erc20.json');
+    const b = path.join(projectPath, './abis/Erc20.sol/Erc20.json');
 
     const abisRendered = prepareAbiJob(abisAssetObj, projectPath, (filePath) => require(a));
     const artifactRendered = prepareAbiJob(artifactAssetObj, projectPath, (filePath) => require(b));
