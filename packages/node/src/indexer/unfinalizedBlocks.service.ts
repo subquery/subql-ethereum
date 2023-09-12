@@ -1,7 +1,6 @@
 // Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
-import { Block } from '@ethersproject/abstract-provider';
 import { Injectable } from '@nestjs/common';
 import {
   ApiService,
@@ -12,6 +11,8 @@ import {
   StoreCacheService,
 } from '@subql/node-core';
 import { BlockContent } from './types';
+import { Block } from 'ethers/lib.commonjs/providers';
+
 
 export function blockToHeader(block: BlockContent | Block): Header {
   return {

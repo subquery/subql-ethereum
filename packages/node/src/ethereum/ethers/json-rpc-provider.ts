@@ -1,8 +1,16 @@
 /* eslint-disable */
-import { deepCopy } from '@ethersproject/properties';
+// import { deepCopy } from '@ethersproject/properties';
 
-import { JsonRpcProvider as BaseJsonRpcProvider } from '@ethersproject/providers';
-import { Networkish } from '@ethersproject/networks';
+// import {JsonRpcApiProvider, JsonRpcProvider} from "ethers/lib.commonjs/lib.esm/providers/provider-jsonrpc";
+import { FetchRequest } from 'ethers/lib.commonjs/utils';
+import {
+  JsonRpcApiProviderOptions,
+  JsonRpcPayload,
+  JsonRpcProvider as BaseJsonRpcProvider,
+  JsonRpcResult,
+  Networkish,
+} from 'ethers/lib.commonjs/providers';
+import { cloneDeep } from 'lodash';
 import { ConnectionInfo, fetchJson } from './web';
 
 function getResult(payload: {
@@ -21,40 +29,39 @@ function getResult(payload: {
 }
 
 export class JsonRpcProvider extends BaseJsonRpcProvider {
-  constructor(url: string | ConnectionInfo, network?: Networkish) {
-    super(url, network);
+  private cache: Record<string, Promise<any>> = {};
+  constructor(
+    url?: string | FetchRequest,
+    network?: Networkish,
+    options?: JsonRpcApiProviderOptions,
+  ) {
+    super(url, network, options);
   }
-
-  send(method: string, params: Array<any>): Promise<any> {
-    const request = {
-      method: method,
-      params: params,
-      id: this._nextId++,
-      jsonrpc: '2.0',
-    };
-
-    this.emit('debug', {
+  _send(payload: JsonRpcPayload): Promise<Array<JsonRpcResult>> {
+    super.emit('debug', {
       action: 'request',
-      request: deepCopy(request),
+      request: cloneDeep(payload),
       provider: this,
     });
 
-    // We can expand this in the future to any call, but for now these
-    // are the biggest wins and do not require any serializing parameters.
-    const cache = ['eth_chainId', 'eth_blockNumber'].indexOf(method) >= 0;
-    if (cache && this._cache[method]) {
-      return this._cache[method];
+    const cacheKey = ['eth_chainId', 'eth_blockNumber'].includes(
+      payload.method,
+    );
+
+    if (cacheKey && this.cache[payload.method]) {
+      // unable to access cache here ?
+      return this.cache[payload.method];
     }
 
     const result = fetchJson(
-      this.connection,
-      JSON.stringify(request),
+      super._getConnection(),
+      JSON.stringify(payload),
       getResult,
     ).then(
       (result) => {
-        this.emit('debug', {
+        super.emit('debug', {
           action: 'response',
-          request: request,
+          request: payload,
           response: result,
           provider: this,
         });
@@ -62,22 +69,20 @@ export class JsonRpcProvider extends BaseJsonRpcProvider {
         return result;
       },
       (error) => {
-        this.emit('debug', {
+        super.emit('debug', {
           action: 'response',
           error: error,
-          request: request,
+          request: payload,
           provider: this,
         });
 
         throw error;
       },
     );
-
-    // Cache the fetch, but clear it on the next event loop
-    if (cache) {
-      this._cache[method] = result;
+    if (cacheKey) {
+      this.cache[payload.method] = result;
       setTimeout(() => {
-        this._cache[method] = null;
+        this.cache[payload.method] = null;
       }, 0);
     }
 

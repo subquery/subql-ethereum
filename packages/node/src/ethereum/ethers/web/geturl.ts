@@ -5,15 +5,13 @@ import http from 'http';
 import https from 'https';
 import { gunzipSync } from 'zlib';
 import { parse } from 'url';
-
-import { arrayify, concat } from '@ethersproject/bytes';
-import { shallowCopy } from '@ethersproject/properties';
-
+import {
+  assert,
+  concat,
+  getBytes,
+  toUtf8Bytes,
+} from 'ethers/lib.commonjs/utils';
 import type { GetUrlResponse, Options } from './types';
-
-import { Logger } from '@ethersproject/logger';
-import { version } from './_version';
-const logger = new Logger(version);
 
 export { GetUrlResponse, Options };
 
@@ -39,13 +37,14 @@ function getResponse(request: http.ClientRequest): Promise<GetUrlResponse> {
         if (response.body == null) {
           response.body = new Uint8Array(0);
         }
-        response.body = concat([response.body, chunk]);
+        // TODO unsure if this is correct
+        response.body = toUtf8Bytes(concat([response.body, chunk]));
       });
 
       resp.on('end', () => {
         if (response.headers['content-encoding'] === 'gzip') {
           //const size = response.body.length;
-          response.body = arrayify(gunzipSync(response.body));
+          response.body = getBytes(gunzipSync(response.body));
           //console.log("Delta:", response.body.length - size, Buffer.from(response.body).toString());
         }
         resolve(response);
@@ -92,7 +91,7 @@ export async function getUrl(
     path: nonnull(url.pathname) + nonnull(url.search),
 
     method: options.method || 'GET',
-    headers: shallowCopy(options.headers || {}),
+    headers: Object.assign(options.headers || {}),
     agent: null,
   };
 
@@ -116,13 +115,13 @@ export async function getUrl(
       break;
     default:
       /* istanbul ignore next */
-      logger.throwError(
-        `unsupported protocol ${url.protocol}`,
-        Logger.errors.UNSUPPORTED_OPERATION,
+      assert(
         {
           protocol: url.protocol,
           operation: 'request',
         },
+        `unsupported protocol ${url.protocol}`,
+        'UNSUPPORTED_OPERATION',
       );
   }
 

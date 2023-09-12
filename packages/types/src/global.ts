@@ -1,9 +1,9 @@
 // Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
-import {Provider} from '@ethersproject/abstract-provider';
+import {AbstractProvider} from 'ethers/lib.commonjs/providers';
 
 declare global {
-  const api: Provider;
-  const unsafeApi: Provider | undefined;
+  const api: AbstractProvider;
+  const unsafeApi: AbstractProvider | undefined;
 }

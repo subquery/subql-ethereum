@@ -4,14 +4,6 @@
 import fs from 'fs';
 import http from 'http';
 import https from 'https';
-import { Interface } from '@ethersproject/abi';
-import {
-  BlockTag,
-  Provider,
-  Block,
-  TransactionReceipt,
-} from '@ethersproject/abstract-provider';
-import { WebSocketProvider } from '@ethersproject/providers';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { getLogger, timeout } from '@subql/node-core';
 import {
@@ -25,14 +17,24 @@ import {
   LightEthereumLog,
 } from '@subql/types-ethereum';
 import CacheableLookup from 'cacheable-lookup';
-import { hexDataSlice, hexValue } from 'ethers/lib/utils';
+import { Interface } from 'ethers';
+import { hashMessage } from 'ethers/lib.commonjs/hash';
+import {
+  BlockTag,
+  Provider,
+  Block,
+  TransactionReceipt,
+  WebSocketProvider,
+  JsonRpcProvider as BaseJsonRpcProvider,
+} from 'ethers/lib.commonjs/providers';
+import { dataSlice, FetchRequest, toQuantity } from 'ethers/lib.commonjs/utils';
 import { retryOnFailEth } from '../utils/project';
 import { CeloJsonRpcBatchProvider } from './ethers/celo/celo-json-rpc-batch-provider';
 import { CeloJsonRpcProvider } from './ethers/celo/celo-json-rpc-provider';
 import { CeloWsProvider } from './ethers/celo/celo-ws-provider';
 import { JsonRpcBatchProvider } from './ethers/json-rpc-batch-provider';
 import { JsonRpcProvider } from './ethers/json-rpc-provider';
-import { ConnectionInfo } from './ethers/web';
+// import { ConnectionInfo } from './ethers/web';
 import SafeEthProvider from './safe-api';
 import {
   formatBlock,
@@ -88,7 +90,7 @@ function getHttpAgents() {
 }
 
 export class EthereumApi implements ApiWrapper {
-  private client: JsonRpcProvider;
+    private client: BaseJsonRpcProvider | WebSocketProvider;
 
   // This is used within the sandbox when HTTP is used
   private nonBatchClient?: JsonRpcProvider;
@@ -116,16 +118,21 @@ export class EthereumApi implements ApiWrapper {
 
     logger.info(`Api host: ${hostname}, method: ${protocolStr}`);
     if (protocolStr === 'https' || protocolStr === 'http') {
-      const connection: ConnectionInfo = {
-        url: this.endpoint.split('?')[0],
-        headers: {
-          'User-Agent': `Subquery-Node ${packageVersion}`,
-        },
-        allowGzip: true,
-        throttleLimit: 5,
-        throttleSlotInterval: 1,
-        agents: getHttpAgents(),
-      };
+      const connection = new FetchRequest(this.endpoint.split('?')[0]);
+      connection.setHeader('User-Agent', `Subquery-Node ${packageVersion}`);
+      connection.setThrottleParams({ maxAttempts: 5, slotInterval: 1 });
+      connection.allowGzip = true;
+      // not sure where agents go ?
+      // const connection  = {
+      //   url: this.endpoint.split('?')[0],
+      //   headers: {
+      //     'User-Agent': `Subquery-Node ${packageVersion}`,
+      //   },
+      //   allowGzip: true,
+      //   // throttleLimit: 5,
+      //   // throttleSlotInterval: 1,
+      //   agents: getHttpAgents(),
+      // };
       searchParams.forEach((value, name, searchParams) => {
         (connection.headers as any)[name] = value;
       });
@@ -144,12 +151,17 @@ export class EthereumApi implements ApiWrapper {
     const network = await this.client.getNetwork();
 
     //celo
-    if (network.chainId === 42220) {
+    if (network.chainId === BigInt(42220)) {
       if (this.client instanceof WebSocketProvider) {
-        this.client = new CeloWsProvider(this.client.connection.url);
+        // TODO ensure this is the correct practice
+        this.client = new CeloWsProvider(this.endpoint);
       } else {
-        this.client = new CeloJsonRpcBatchProvider(this.client.connection);
-        this.nonBatchClient = new CeloJsonRpcProvider(this.client.connection);
+        this.client = new CeloJsonRpcBatchProvider(
+          this.client._getConnection().url,
+        );
+        this.nonBatchClient = new CeloJsonRpcProvider(
+          this.client._getConnection().url,
+        );
       }
     }
 
@@ -163,7 +175,7 @@ export class EthereumApi implements ApiWrapper {
 
       this.genesisBlock = genesisBlock;
       this.supportsFinalization = supportsFinalization && supportsSafe;
-      this.chainId = network.chainId;
+      this.chainId = Number(network.chainId);
       this.name = network.name;
     } catch (e) {
       if ((e as Error).message.startsWith('Invalid response')) {
@@ -245,14 +257,14 @@ export class EthereumApi implements ApiWrapper {
 
   async getBlockByHeightOrHash(heightOrHash: number | string): Promise<Block> {
     if (typeof heightOrHash === 'number') {
-      heightOrHash = hexValue(heightOrHash);
+      heightOrHash = toQuantity(heightOrHash);
     }
     return this.client.getBlock(heightOrHash);
   }
 
   private async getBlockPromise(num: number, includeTx = true): Promise<any> {
     const rawBlock = await this.client.send('eth_getBlockByNumber', [
-      hexValue(num),
+      toQuantity(num),
       includeTx,
     ]);
 
@@ -262,7 +274,7 @@ export class EthereumApi implements ApiWrapper {
 
     const block = formatBlock(rawBlock);
 
-    block.stateRoot = this.client.formatter.hash(block.stateRoot);
+    block.stateRoot = hashMessage(block.stateRoot);
 
     return block;
   }
@@ -388,7 +400,7 @@ export class EthereumApi implements ApiWrapper {
       const iface = this.buildInterface(ds.options.abi, await loadAssets(ds));
       return {
         ...log,
-        args: iface?.parseLog(log).args as T,
+        args: iface?.parseLog(log).args as unknown as T,
       };
     } catch (e) {
       logger.warn(`Failed to parse log data: ${e.message}`);
@@ -407,8 +419,11 @@ export class EthereumApi implements ApiWrapper {
       }
       const assets = await loadAssets(ds);
       const iface = this.buildInterface(ds.options.abi, assets);
-      const func = iface.getFunction(hexDataSlice(transaction.input, 0, 4));
-      const args = iface.decodeFunctionData(func, transaction.input) as T;
+      const func = iface.getFunction(dataSlice(transaction.input, 0, 4));
+      const args = iface.decodeFunctionData(
+        func,
+        transaction.input,
+      ) as unknown as T;
 
       transaction.logs =
         transaction.logs &&

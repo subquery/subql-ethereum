@@ -31,7 +31,7 @@
     "@subql/types-ethereum": "workspace:*",
     "cacheable-lookup": "6",
     "cron-converter": "^1.0.2",
-    "ethers": "^5.7.0",
+    "ethers": "^6.7.1",
     "eventemitter2": "^6.4.5",
     "json5": "^2.2.3",
     "lodash": "^4.17.21",

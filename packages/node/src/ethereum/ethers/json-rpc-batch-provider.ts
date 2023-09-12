@@ -1,8 +1,15 @@
 /* eslint-disable */
-import { deepCopy } from '@ethersproject/properties';
 
-import { JsonRpcProvider } from '@ethersproject/providers';
-import { Networkish } from '@ethersproject/networks';
+// import { JsonRpcProvider } from '@ethersproject/providers';
+// import { Networkish } from '@ethersproject/networks';
+import {
+  JsonRpcApiProviderOptions,
+  JsonRpcPayload,
+  Networkish,
+} from 'ethers/lib.commonjs/providers';
+import { FetchRequest } from 'ethers/lib.commonjs/utils';
+import { cloneDeep } from 'lodash';
+import { JsonRpcProvider } from './json-rpc-provider';
 import { ConnectionInfo, fetchJson } from './web';
 import { getLogger } from '@subql/node-core';
 
@@ -36,31 +43,31 @@ export class JsonRpcBatchProvider extends JsonRpcProvider {
 
   _chainIdCache: string | null = null;
 
-  constructor(url: string | ConnectionInfo, network?: Networkish) {
-    super(url, network);
+  constructor(
+    url: string | FetchRequest,
+    network?: Networkish,
+    options?: JsonRpcApiProviderOptions,
+  ) {
+    super(url, network, options);
+
+    // options.batchMaxSize = this.batchSize;
+    // options.
   }
 
   setBatchSize(batchSize: number) {
     this.batchSize = batchSize;
   }
 
-  send(method: string, params: Array<any>): Promise<any> {
-    if (method === 'eth_chainId' && this._chainIdCache !== null) {
+  _send(payload: JsonRpcPayload): Promise<any> {
+    if (payload.method === 'eth_chainId' && this._chainIdCache !== null) {
       return Promise.resolve(this._chainIdCache);
     }
-
-    const request = {
-      method: method,
-      params: params,
-      id: this._nextId++,
-      jsonrpc: '2.0',
-    };
 
     if (this._pendingBatch == null) {
       this._pendingBatch = [];
     }
 
-    const inflightRequest: any = { request, resolve: null, reject: null };
+    const inflightRequest: any = { payload, resolve: null, reject: null };
 
     const promise = new Promise((resolve, reject) => {
       inflightRequest.resolve = resolve;
@@ -100,15 +107,15 @@ export class JsonRpcBatchProvider extends JsonRpcProvider {
     // Get the request as an array of requests
     const request = batch.map((inflight) => inflight.request);
 
-    this.emit('debug', {
+    super.emit('debug', {
       action: 'requestBatch',
-      request: deepCopy(request),
+      request: cloneDeep(request),
       provider: this,
     });
 
-    return fetchJson(this.connection, JSON.stringify(request))
+    return fetchJson(super._getConnection(), JSON.stringify(request))
       .then((result: RpcResult[]) => {
-        this.emit('debug', {
+        super.emit('debug', {
           action: 'response',
           request: request,
           response: result,
@@ -198,7 +205,7 @@ export class JsonRpcBatchProvider extends JsonRpcProvider {
         this.adjustBatchSize(true);
       })
       .catch((error) => {
-        this.emit('debug', {
+        super.emit('debug', {
           action: 'response',
           error: error,
           request: request,

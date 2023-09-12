@@ -1,9 +1,6 @@
 // Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
-import { getAddress } from '@ethersproject/address';
-import { BigNumber } from '@ethersproject/bignumber';
-import { Zero } from '@ethersproject/constants';
 import {
   ApiWrapper,
   EthereumBlock,
@@ -12,6 +9,7 @@ import {
   EthereumResult,
   EthereumTransaction,
 } from '@subql/types-ethereum';
+import { getAddress } from 'ethers/lib.commonjs/address';
 import { omit } from 'lodash';
 
 export function calcInterval(api: ApiWrapper): number {
@@ -26,38 +24,39 @@ function handleAddress(value: string): string | null {
   return getAddress(value);
 }
 
-function handleNumber(value: string | number): BigNumber {
+function handleNumber(value: string | number): bigint {
   if (value === undefined) {
-    return Zero;
+    return BigInt(0);
   }
   if (value === '0x') {
-    return Zero;
+    return BigInt(0);
   }
   if (value === null) {
-    return Zero;
+    return BigInt(0);
   }
-  return BigNumber.from(value);
+  return BigInt(value);
 }
 
 export function formatBlock(block: Record<string, any>): EthereumBlock {
   return {
     ...block,
-    difficulty: handleNumber(block.difficulty).toBigInt(),
-    gasLimit: handleNumber(block.gasLimit).toBigInt(),
-    gasUsed: handleNumber(block.gasUsed).toBigInt(),
-    number: handleNumber(block.number).toNumber(),
-    size: handleNumber(block.size).toBigInt(),
-    timestamp: handleNumber(block.timestamp).toBigInt(),
-    totalDifficulty: handleNumber(block.totalDifficulty).toBigInt(),
+    difficulty: handleNumber(block.difficulty),
+    gasLimit: handleNumber(block.gasLimit),
+    gasUsed: handleNumber(block.gasUsed),
+    number: Number(handleNumber(block.number)),
+    size: handleNumber(block.size),
+    timestamp: handleNumber(block.timestamp),
+    totalDifficulty: handleNumber(block.totalDifficulty),
     baseFeePerGas: block.baseFeePerGas
-      ? handleNumber(block.baseFeePerGas).toBigInt()
+      ? handleNumber(block.baseFeePerGas)
       : undefined,
     blockGasCost: block.blockGasCost
-      ? handleNumber(block.blockGasCost).toBigInt()
+      ? handleNumber(block.blockGasCost)
       : undefined,
     logs: [], // Filled in at AvalancheBlockWrapped constructor
   } as EthereumBlock;
 }
+
 export function formatLog(
   log: Omit<
     EthereumLog<EthereumResult> | EthereumLog,
@@ -68,9 +67,9 @@ export function formatLog(
   return {
     ...log,
     address: handleAddress(log.address),
-    blockNumber: handleNumber(log.blockNumber).toNumber(),
-    transactionIndex: handleNumber(log.transactionIndex).toNumber(),
-    logIndex: handleNumber(log.logIndex).toNumber(),
+    blockNumber: Number(handleNumber(log.blockNumber)),
+    transactionIndex: Number(handleNumber(log.transactionIndex)),
+    logIndex: Number(handleNumber(log.logIndex)),
     block,
     get transaction() {
       const rawTransaction = block.transactions?.find(
@@ -94,19 +93,17 @@ export function formatTransaction(
     ...(tx as Partial<EthereumTransaction>),
     from: handleAddress(tx.from),
     to: handleAddress(tx.to),
-    blockNumber: handleNumber(tx.blockNumber).toNumber(),
+    blockNumber: Number(handleNumber(tx.blockNumber)),
     blockTimestamp: block.timestamp,
-    gas: handleNumber(tx.gas).toBigInt(),
-    gasPrice: handleNumber(tx.gasPrice).toBigInt(),
-    nonce: handleNumber(tx.nonce).toBigInt(),
-    transactionIndex: handleNumber(tx.transactionIndex).toBigInt(),
-    value: handleNumber(tx.value).toBigInt(),
-    v: handleNumber(tx.v).toBigInt(),
-    maxFeePerGas: tx.maxFeePerGas
-      ? handleNumber(tx.maxFeePerGas).toBigInt()
-      : undefined,
+    gas: handleNumber(tx.gas),
+    gasPrice: handleNumber(tx.gasPrice),
+    nonce: handleNumber(tx.nonce),
+    transactionIndex: handleNumber(tx.transactionIndex),
+    value: handleNumber(tx.value),
+    v: handleNumber(tx.v),
+    maxFeePerGas: tx.maxFeePerGas ? handleNumber(tx.maxFeePerGas) : undefined,
     maxPriorityFeePerGas: tx.maxPriorityFeePerGas
-      ? handleNumber(tx.maxPriorityFeePerGas).toBigInt()
+      ? handleNumber(tx.maxPriorityFeePerGas)
       : undefined,
     receipt: undefined, // Filled in at AvalancheApi.fetchBlocks
     toJSON(): string {
@@ -123,13 +120,13 @@ export function formatReceipt(
     ...receipt,
     from: handleAddress(receipt.from),
     to: handleAddress(receipt.to),
-    blockNumber: handleNumber(receipt.blockNumber).toNumber(),
-    cumulativeGasUsed: handleNumber(receipt.cumulativeGasUsed).toBigInt(),
-    effectiveGasPrice: handleNumber(receipt.effectiveGasPrice).toBigInt(),
-    gasUsed: handleNumber(receipt.gasUsed).toBigInt(),
+    blockNumber: Number(handleNumber(receipt.blockNumber)),
+    cumulativeGasUsed: handleNumber(receipt.cumulativeGasUsed),
+    effectiveGasPrice: handleNumber(receipt.effectiveGasPrice),
+    gasUsed: handleNumber(receipt.gasUsed),
     logs: receipt.logs.map(formatLog),
-    status: Boolean(handleNumber(receipt.status).toNumber()),
-    transactionIndex: handleNumber(receipt.transactionIndex).toNumber(),
+    status: Boolean(handleNumber(receipt.status)),
+    transactionIndex: handleNumber(receipt.transactionIndex),
     toJSON(): string {
       return JSON.stringify(omit(this, ['toJSON']));
     },

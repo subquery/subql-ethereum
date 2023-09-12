@@ -5,7 +5,10 @@
     "sourceMap": true,
     "tsBuildInfoFile": "dist/.tsbuildinfo",
     "rootDir": "src",
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "paths": {
+      "ethers/providers": ["ethers/lib.esm/providers"]
+    }
   },
   "references": [{ "path": "../common-ethereum" }, { "path": "../types" }],
   "include": ["src/**/*"]

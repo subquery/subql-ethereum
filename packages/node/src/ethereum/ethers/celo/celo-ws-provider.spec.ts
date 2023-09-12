@@ -1,7 +1,7 @@
 // Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
-import { BigNumber, constants, utils } from 'ethers';
+import { toQuantity } from 'ethers/lib.commonjs/utils';
 import { formatBlock } from '../../utils.ethereum';
 import { CeloWsProvider } from './celo-ws-provider';
 
@@ -15,12 +15,9 @@ describe('CeloJsonRpcProvider', () => {
   // Test if gasLimit is correctly set for blocks before the hard fork
   it('should set gasLimit to zero for blocks before the hard fork', async () => {
     const block = formatBlock(
-      await provider.send('eth_getBlockByNumber', [
-        utils.hexValue(16068684),
-        true,
-      ]),
+      await provider.send('eth_getBlockByNumber', [toQuantity(16068684), true]),
     );
-    expect(BigNumber.from(block.gasLimit)).toEqual(constants.Zero);
+    expect(BigInt(block.gasLimit)).toEqual(BigInt(0));
   });
 
   // Test if gasLimit is correctly set for blocks after the hard fork
@@ -28,6 +25,6 @@ describe('CeloJsonRpcProvider', () => {
     const block = formatBlock(
       await provider.send('eth_getBlockByNumber', ['latest', true]),
     );
-    expect(BigNumber.from(block.gasLimit)).toEqual(BigNumber.from(0x01e84800));
+    expect(BigInt(block.gasLimit)).toEqual(BigInt(0x01e84800));
   });
 });

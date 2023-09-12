@@ -1,7 +1,7 @@
 // Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
-import {Block} from '@ethersproject/abstract-provider';
+import {Block} from 'ethers/lib.commonjs/providers';
 import {EthereumBlock, LightEthereumBlock} from './ethereum';
 
 export interface ApiWrapper {

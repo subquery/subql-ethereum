@@ -1,19 +1,24 @@
 /* eslint-disable */
 'use strict';
 
+import { base64Decode } from '@subql/utils';
 import http from 'http';
 import https from 'https';
 import {
-  decode as base64Decode,
-  encode as base64Encode,
-} from '@ethersproject/base64';
-import { hexlify, isBytesLike } from '@ethersproject/bytes';
-import { shallowCopy } from '@ethersproject/properties';
-import { toUtf8Bytes, toUtf8String } from '@ethersproject/strings';
+  assert,
+  assertArgument,
+  decodeBase64,
+  encodeBase64,
+  hexlify,
+  isBytesLike,
+  toUtf8Bytes,
+  toUtf8String,
+} from 'ethers/lib.commonjs/utils';
+// import { shallowCopy } from '@ethersproject/properties';
 
-import { Logger } from '@ethersproject/logger';
-import { version } from './_version';
-const logger = new Logger(version);
+// import { Logger } from '@ethersproject/logger';
+// import { version } from './_version';
+// const logger = new Logger(version);
 
 import { getUrl, GetUrlResponse, Options } from './geturl';
 
@@ -118,13 +123,14 @@ export function _fetchData<T = Uint8Array>(
   connection: string | ConnectionInfo,
   body?: Uint8Array,
   processFunc?: (value: Uint8Array, response: FetchJsonResponse) => T,
-): Promise<T> {
+): Promise<void | Awaited<T>> {
+  // TODO unsure if this is right for change
   // How many times to retry in the event of a throttle
   const attemptLimit =
     typeof connection === 'object' && connection.throttleLimit != null
       ? connection.throttleLimit
       : 12;
-  logger.assertArgument(
+  assertArgument(
     attemptLimit > 0 && attemptLimit % 1 === 0,
     'invalid connection throttle limit',
     'connection.throttleLimit',
@@ -138,7 +144,7 @@ export function _fetchData<T = Uint8Array>(
     typeof connection.throttleSlotInterval === 'number'
       ? connection.throttleSlotInterval
       : 100;
-  logger.assertArgument(
+  assertArgument(
     throttleSlotInterval > 0 && throttleSlotInterval % 1 === 0,
     'invalid connection throttle slot interval',
     'connection.throttleSlotInterval',
@@ -195,22 +201,21 @@ export function _fetchData<T = Uint8Array>(
         url.substring(0, 6) !== 'https:' &&
         connection.allowInsecureAuthentication !== true
       ) {
-        logger.throwError(
-          'basic authentication requires a secure https url',
-          Logger.errors.INVALID_ARGUMENT,
+        assert(
           {
             argument: 'url',
             url: url,
             user: connection.user,
             password: '[REDACTED]',
           },
+          'basic authentication requires a secure https url',
+          'INVALID_ARGUMENT',
         );
       }
-
       const authorization = connection.user + ':' + connection.password;
       headers['authorization'] = {
         key: 'Authorization',
-        value: 'Basic ' + base64Encode(toUtf8Bytes(authorization)),
+        value: 'Basic ' + encodeBase64(toUtf8Bytes(authorization)),
       };
     }
 
@@ -219,7 +224,7 @@ export function _fetchData<T = Uint8Array>(
     }
 
     if (connection.fetchOptions != null) {
-      options.fetchOptions = shallowCopy(connection.fetchOptions);
+      options.fetchOptions = Object.assign(connection.fetchOptions);
     }
 
     if (connection.agents != null) {
@@ -246,9 +251,7 @@ export function _fetchData<T = Uint8Array>(
       }
       return Promise.resolve(<T>(<unknown>result));
     } catch (error) {
-      logger.throwError(
-        'processing response error',
-        Logger.errors.SERVER_ERROR,
+      assert(
         {
           body: bodyify(dataMatch[1], dataMatch[2]),
           error: error,
@@ -256,6 +259,8 @@ export function _fetchData<T = Uint8Array>(
           requestMethod: 'GET',
           url: url,
         },
+        'processing response error',
+        'SERVER_ERROR',
       );
     }
   }
@@ -295,12 +300,16 @@ export function _fetchData<T = Uint8Array>(
           timer = null;
 
           reject(
-            logger.makeError('timeout', Logger.errors.TIMEOUT, {
-              requestBody: bodyify(options.body, flatHeaders['content-type']),
-              requestMethod: options.method,
-              timeout: timeout,
-              url: url,
-            }),
+            assert(
+              {
+                requestBody: bodyify(options.body, flatHeaders['content-type']),
+                requestMethod: options.method,
+                timeout: timeout,
+                url: url,
+              },
+              'timeout',
+              'TIMEOUT',
+            ),
           );
         }, timeout);
       }
@@ -369,12 +378,16 @@ export function _fetchData<T = Uint8Array>(
         response = (<any>error).response;
         if (response == null) {
           runningTimeout.cancel();
-          logger.throwError('missing response', Logger.errors.SERVER_ERROR, {
-            requestBody: bodyify(options.body, flatHeaders['content-type']),
-            requestMethod: options.method,
-            serverError: error,
-            url: url,
-          });
+          assert(
+            {
+              requestBody: bodyify(options.body, flatHeaders['content-type']),
+              requestMethod: options.method,
+              serverError: error,
+              url: url,
+            },
+            'missing response',
+            'SERVER_ERROR',
+          );
         }
       }
 
@@ -387,17 +400,21 @@ export function _fetchData<T = Uint8Array>(
         (response.statusCode < 200 || response.statusCode >= 300)
       ) {
         runningTimeout.cancel();
-        logger.throwError('bad response', Logger.errors.SERVER_ERROR, {
-          status: response.statusCode,
-          headers: response.headers,
-          body: bodyify(
-            body,
-            response.headers ? response.headers['content-type'] : null,
-          ),
-          requestBody: bodyify(options.body, flatHeaders['content-type']),
-          requestMethod: options.method,
-          url: url,
-        });
+        assert(
+          {
+            status: response.statusCode,
+            headers: response.headers,
+            body: bodyify(
+              body,
+              response.headers ? response.headers['content-type'] : null,
+            ),
+            requestBody: bodyify(options.body, flatHeaders['content-type']),
+            requestMethod: options.method,
+            url: url,
+          },
+          'bad response',
+          'SERVER_ERROR',
+        );
       }
 
       if (processFunc) {
@@ -424,9 +441,7 @@ export function _fetchData<T = Uint8Array>(
           }
 
           runningTimeout.cancel();
-          logger.throwError(
-            'processing response error',
-            Logger.errors.SERVER_ERROR,
+          assert(
             {
               body: bodyify(
                 body,
@@ -437,6 +452,8 @@ export function _fetchData<T = Uint8Array>(
               requestMethod: options.method,
               url: url,
             },
+            'processing response error',
+            'SERVER_ERROR',
           );
         }
       }
@@ -448,11 +465,15 @@ export function _fetchData<T = Uint8Array>(
       return <T>(<unknown>body);
     }
 
-    return logger.throwError('failed response', Logger.errors.SERVER_ERROR, {
-      requestBody: bodyify(options.body, flatHeaders['content-type']),
-      requestMethod: options.method,
-      url: url,
-    });
+    return assert(
+      {
+        requestBody: bodyify(options.body, flatHeaders['content-type']),
+        requestMethod: options.method,
+        url: url,
+      },
+      'failed response',
+      'SERVER_ERROR',
+    );
   })();
 
   return Promise.race([runningTimeout.promise, runningFetch]);
@@ -469,10 +490,14 @@ export function fetchJson(
       try {
         result = JSON.parse(toUtf8String(value));
       } catch (error) {
-        logger.throwError('invalid JSON', Logger.errors.SERVER_ERROR, {
-          body: value,
-          error: error,
-        });
+        assert(
+          {
+            body: value,
+            error: error,
+          },
+          'invalid JSON',
+          'SERVER_ERROR',
+        );
       }
     }
 
@@ -494,14 +519,14 @@ export function fetchJson(
     const updated: ConnectionInfo =
       typeof connection === 'string'
         ? { url: connection }
-        : shallowCopy(connection);
+        : Object.assign(connection);
     if (updated.headers) {
       const hasContentType =
         Object.keys(updated.headers).filter(
           (k) => k.toLowerCase() === 'content-type',
         ).length !== 0;
       if (!hasContentType) {
-        updated.headers = shallowCopy(updated.headers);
+        updated.headers = Object.assign(updated.headers);
         updated.headers['content-type'] = 'application/json';
       }
     } else {
@@ -520,7 +545,7 @@ export function poll<T>(
   if (!options) {
     options = {};
   }
-  options = shallowCopy(options);
+  options = Object.assign(options);
   if (options.floor == null) {
     options.floor = 0;
   }

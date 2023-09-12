@@ -12,7 +12,9 @@ import {
 } from '@subql/node-core';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const { version: ethersSdkVersion } = require('ethers/package.json');
+const {
+  version: ethersSdkVersion,
+} = require('ethers/lib.commonjs/package.json');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { version: packageVersion } = require('../../package.json');
 const logger = getLogger('profiler');
