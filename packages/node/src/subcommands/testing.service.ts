@@ -7,7 +7,6 @@ import { NestFactory } from '@nestjs/core';
 import {
   NodeConfig,
   TestingService as BaseTestingService,
-  ApiService,
   NestLogger,
   TestRunner,
 } from '@subql/node-core';
@@ -50,11 +49,7 @@ export class TestingService extends BaseTestingService<
 
     await testContext.init();
 
-    const projectService: ProjectService = testContext.get(ProjectService);
-    const apiService = testContext.get(EthereumApi);
-
-    // Initialise async services, we do this here rather than in factories, so we can capture one off events
-    await apiService.init();
+    const projectService: ProjectService = testContext.get('IProjectService');
     await projectService.init();
 
     return testContext.get(TestRunner);

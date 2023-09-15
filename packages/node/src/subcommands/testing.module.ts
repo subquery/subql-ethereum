@@ -7,9 +7,14 @@ import { ScheduleModule, SchedulerRegistry } from '@nestjs/schedule';
 import {
   ApiService,
   ConnectionPoolService,
+  ConnectionPoolStateManager,
   DbModule,
+  MmrQueryService,
+  MmrService,
   NodeConfig,
+  PgMmrCacheService,
   PoiService,
+  StoreCacheService,
   StoreService,
   TestRunner,
 } from '@subql/node-core';
@@ -30,15 +35,17 @@ import { TestingService } from './testing.service';
 @Module({
   providers: [
     StoreService,
-    TestingService,
+    StoreCacheService,
+    MmrService,
+    PgMmrCacheService,
+    MmrQueryService,
     EventEmitter2,
     PoiService,
     SandboxService,
     DsProcessorService,
     DynamicDsService,
     UnfinalizedBlocksService,
-    ProjectService,
-    UnfinalizedBlocksService,
+    ConnectionPoolStateManager,
     ConnectionPoolService,
     {
       provide: 'IProjectService',
@@ -80,7 +87,7 @@ import { TestingService } from './testing.service';
     },
   ],
 
-  imports: [MetaModule, FetchModule],
+  imports: [MetaModule],
   controllers: [],
   exports: [TestRunner],
 })
