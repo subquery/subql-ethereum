@@ -3,14 +3,11 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { ProjectNetworkV1_0_0 } from '@subql/common-ethereum';
 import {
   ApiService,
   ConnectionPoolService,
-  NetworkMetadataPayload,
   getLogger,
   NodeConfig,
-  IndexerEvent,
 } from '@subql/node-core';
 import { EthereumBlockWrapper } from '@subql/types-ethereum';
 import { SubqueryProject } from '../configure/SubqueryProject';
@@ -37,67 +34,39 @@ export class EthereumApiService extends ApiService<
     super(connectionPoolService, eventEmitter);
   }
 
-  networkMeta: NetworkMetadataPayload;
-
   async init(): Promise<EthereumApiService> {
+    let network;
     try {
-      let network: ProjectNetworkV1_0_0;
-      try {
-        network = this.project.network;
-      } catch (e) {
-        logger.error(Object.keys(e));
-        process.exit(1);
-      }
+      network = this.project.network;
+    } catch (e) {
+      logger.error(Object.keys(e));
+      process.exit(1);
+    }
 
-      const endpoints = Array.isArray(network.endpoint)
-        ? network.endpoint
-        : [network.endpoint];
+    const endpoints = Array.isArray(network.endpoint)
+      ? network.endpoint
+      : [network.endpoint];
 
-      if (this.nodeConfig.primaryNetworkEndpoint) {
-        endpoints.push(this.nodeConfig.primaryNetworkEndpoint);
-      }
+    if (this.nodeConfig.primaryNetworkEndpoint) {
+      endpoints.push(this.nodeConfig.primaryNetworkEndpoint);
+    }
 
-      const endpointToApiIndex: Record<string, EthereumApiConnection> = {};
-
-      for await (const [i, endpoint] of endpoints.entries()) {
-        const connection = await EthereumApiConnection.create(
+    await this.createConnections(
+      network,
+      (endpoint) =>
+        EthereumApiConnection.create(
           endpoint,
           this.fetchBlockBatches,
           this.eventEmitter,
-        );
-
+        ),
+      //eslint-disable-next-line @typescript-eslint/require-await
+      async (connection: EthereumApiConnection) => {
         const api = connection.unsafeApi;
+        return api.getChainId().toString();
+      },
+    );
 
-        this.eventEmitter.emit(IndexerEvent.ApiConnected, {
-          value: 1,
-          apiIndex: i,
-          endpoint: endpoint,
-        });
-
-        if (!this.networkMeta) {
-          this.networkMeta = connection.networkMeta;
-        }
-
-        if (network.chainId !== api.getChainId().toString()) {
-          throw this.metadataMismatchError(
-            'ChainId',
-            network.chainId,
-            api.getChainId().toString(),
-          );
-        }
-
-        endpointToApiIndex[endpoint] = connection;
-      }
-
-      await this.connectionPoolService.addBatchToConnections(
-        endpointToApiIndex,
-      );
-
-      return this;
-    } catch (e) {
-      logger.error(e, 'Failed to init api service');
-      process.exit(1);
-    }
+    return this;
   }
 
   protected metadataMismatchError(

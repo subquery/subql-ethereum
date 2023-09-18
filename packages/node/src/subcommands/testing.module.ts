@@ -11,6 +11,7 @@ import {
   DbModule,
   NodeConfig,
   PoiService,
+  StoreCacheService,
   StoreService,
   TestRunner,
 } from '@subql/node-core';
@@ -31,14 +32,12 @@ import { TestingService } from './testing.service';
 @Module({
   providers: [
     StoreService,
-    TestingService,
+    StoreCacheService,
     EventEmitter2,
     PoiService,
     SandboxService,
     DsProcessorService,
     DynamicDsService,
-    UnfinalizedBlocksService,
-    ProjectService,
     UnfinalizedBlocksService,
     ConnectionPoolStateManager,
     ConnectionPoolService,
@@ -82,7 +81,6 @@ import { TestingService } from './testing.service';
     },
   ],
 
-  imports: [MetaModule, FetchModule],
   controllers: [],
   exports: [TestRunner],
 })
