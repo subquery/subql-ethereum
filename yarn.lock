@@ -3054,19 +3054,36 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@subql/node-core@npm:^4.2.9":
-  version: 4.2.9
-  resolution: "@subql/node-core@npm:4.2.9"
+"@subql/common@npm:2.7.1-0":
+  version: 2.7.1-0
+  resolution: "@subql/common@npm:2.7.1-0"
+  dependencies:
+    axios: ^0.27.2
+    class-transformer: ^0.5.1
+    class-validator: ^0.14.0
+    fs-extra: ^10.1.0
+    ipfs-http-client: 56
+    js-yaml: ^4.1.0
+    reflect-metadata: ^0.1.13
+    semver: ^7.5.2
+    update-notifier: 5.1.0
+  checksum: d4bf3b39d817c966a0b30944b21c47653a303039e65df341c3464c6f7a3f913e27ea1f0ce2e14a86f35c0fb172bb1e92b3191aed104603ecbc832fd754acd2cd
+  languageName: node
+  linkType: hard
+
+"@subql/node-core@npm:4.2.4-16":
+  version: 4.2.4-16
+  resolution: "@subql/node-core@npm:4.2.4-16"
   dependencies:
     "@apollo/client": ^3.7.16
     "@nestjs/common": ^9.4.0
     "@nestjs/event-emitter": ^2.0.0
     "@nestjs/schedule": ^3.0.1
     "@subql/apollo-links": ^1.0.2
-    "@subql/common": 2.7.0
+    "@subql/common": 2.7.1-0
     "@subql/testing": 2.0.2
     "@subql/types": 2.2.1-1
-    "@subql/utils": 2.4.3
+    "@subql/utils": 2.4.4-1
     "@subql/x-sequelize": 6.32.0-0.0.2
     "@willsoto/nestjs-prometheus": ^5.4.0
     async-lock: ^1.4.0
@@ -3081,7 +3098,7 @@ __metadata:
     tar: ^6.1.11
     vm2: ^3.9.19
     yargs: ^16.2.0
-  checksum: be099b07674e01c7bd75baa5694dd58d7f6103c6164a32fa610e5e8a96bd3c2160852456d33bc005e6fabe8d01e8fa99580d7db26e9bdb4083605e42524d7e26
+  checksum: a837fef368287bdefff825d1e2f434b41e706b6f1453e40adf77f23b4bde54edaa86ff1e208645cefd9ef8a8a885ab6871f57f8c863a210b0dee60f35b2c2ddc
   languageName: node
   linkType: hard
 
@@ -3099,7 +3116,7 @@ __metadata:
     "@nestjs/testing": ^9.4.0
     "@subql/common": 2.6.1-4
     "@subql/common-ethereum": "workspace:*"
-    "@subql/node-core": ^4.2.9
+    "@subql/node-core": 4.2.4-16
     "@subql/testing": ^2.0.0
     "@subql/types": ^2.1.4
     "@subql/types-ethereum": "workspace:*"
@@ -3193,9 +3210,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@subql/utils@npm:2.4.3":
-  version: 2.4.3
-  resolution: "@subql/utils@npm:2.4.3"
+"@subql/utils@npm:2.4.4-1":
+  version: 2.4.4-1
+  resolution: "@subql/utils@npm:2.4.4-1"
   dependencies:
     "@polkadot/util": ^12.2.1
     "@polkadot/util-crypto": ^12.2.1
@@ -3212,7 +3229,7 @@ __metadata:
     rotating-file-stream: ^3.0.2
     semver: ^7.5.2
     tar: ^6.1.11
-  checksum: fa6aa95bb0b158fedfec67a8609dbb66a047e68e55412b2498fcfeb2d85e8daff7f2df5d7852a70da3ec814ab773f31b28f5c3f7f72c8a224b6f04b9ef1a8e46
+  checksum: f80fac522d9739a493b8afe8f69029996b1e597241a60c8e2641a6192da1a03300c76738f9bcdaedc973f208ed60c6e9608483e60dd8711b0d0843d42b647b42
   languageName: node
   linkType: hard
 
@@ -3894,13 +3911,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@willsoto/nestjs-prometheus@npm:^5.1.1":
-  version: 5.1.2
-  resolution: "@willsoto/nestjs-prometheus@npm:5.1.2"
+"@willsoto/nestjs-prometheus@npm:^5.4.0":
+  version: 5.5.0
+  resolution: "@willsoto/nestjs-prometheus@npm:5.5.0"
   peerDependencies:
     "@nestjs/common": ^7.0.0 || ^8.0.0 || ^9.0.0 || ^10.0.0
     prom-client: ^13.0.0 || ^14.0.0
-  checksum: 3c5ebabd42ea10f1ceec751b514fd62a5797c77f547d1caffe50cc2c430821be664b7a8df46e314ab3e118f707d352162f13b0de08323715f5a49c02f16da9bf
+  checksum: a4bd0517f23ac80edd7eda68eebe138847ab045a7a53b9ab8e206c043aa7fff37e2d7c6d2209ec71b4d39ac7fddec8059ab3c827de579a2121838fe3e50aa90b
   languageName: node
   linkType: hard
 
