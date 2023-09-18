@@ -28,6 +28,6 @@ describe('CeloJsonRpcProvider', () => {
     const block = formatBlock(
       await provider.send('eth_getBlockByNumber', ['latest', true]),
     );
-    expect(BigNumber.from(block.gasLimit)).toEqual(BigNumber.from(0x1312d00));
+    expect(BigNumber.from(block.gasLimit)).toEqual(BigNumber.from(0x01e84800));
   });
 });

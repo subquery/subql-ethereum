@@ -22,7 +22,7 @@ const HTTP_ENDPOINT = 'https://eth.api.onfinality.io/public';
 function testSubqueryProject(endpoint: string): SubqueryProject {
   return {
     network: {
-      endpoint,
+      endpoint: [endpoint],
       chainId: '1',
     },
     dataSources: [],
