@@ -3025,7 +3025,7 @@ __metadata:
     "@types/lodash": ^4
     "@types/pino": ^6.3.12
     "@types/rimraf": 3.0.2
-    ejs: 3.1.6
+    ejs: 3.1.7
     js-yaml: ^4.1.0
     lodash: 4.17.21
     pino: ^6.13.3
@@ -3054,26 +3054,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@subql/common@npm:2.7.0":
-  version: 2.7.0
-  resolution: "@subql/common@npm:2.7.0"
-  dependencies:
-    axios: ^0.27.2
-    class-transformer: ^0.5.1
-    class-validator: ^0.14.0
-    fs-extra: ^10.1.0
-    ipfs-http-client: 56
-    js-yaml: ^4.1.0
-    reflect-metadata: ^0.1.13
-    semver: ^7.5.2
-    update-notifier: 5.1.0
-  checksum: e592c68eb856b050a52be99a8eff6e5a4cac8a3635fda2a35cfc6a8d721c52f140fb90e488a5eb72c91de50eff3ea9e00cdcf7cd473a68a075064d302f9151e0
-  languageName: node
-  linkType: hard
-
-"@subql/node-core@npm:4.2.4-9":
-  version: 4.2.4-9
-  resolution: "@subql/node-core@npm:4.2.4-9"
+"@subql/node-core@npm:^4.2.9":
+  version: 4.2.9
+  resolution: "@subql/node-core@npm:4.2.9"
   dependencies:
     "@apollo/client": ^3.7.16
     "@nestjs/common": ^9.4.0
@@ -3098,7 +3081,7 @@ __metadata:
     tar: ^6.1.11
     vm2: ^3.9.19
     yargs: ^16.2.0
-  checksum: 5b48f3913c72dd6804ccb2d3bfc6af46ce30e49484cec5503e0e90485e97e59ae074c03ef28b7d6f4e4efeae22517662464f2e359f5623824e73beb1e5f92e40
+  checksum: be099b07674e01c7bd75baa5694dd58d7f6103c6164a32fa610e5e8a96bd3c2160852456d33bc005e6fabe8d01e8fa99580d7db26e9bdb4083605e42524d7e26
   languageName: node
   linkType: hard
 
@@ -3116,7 +3099,7 @@ __metadata:
     "@nestjs/testing": ^9.4.0
     "@subql/common": 2.6.1-4
     "@subql/common-ethereum": "workspace:*"
-    "@subql/node-core": 4.2.4-9
+    "@subql/node-core": ^4.2.9
     "@subql/testing": ^2.0.0
     "@subql/types": ^2.1.4
     "@subql/types-ethereum": "workspace:*"
@@ -3126,7 +3109,6 @@ __metadata:
     "@types/pino": ^6.3.12
     "@types/tar": ^6.1.1
     "@types/yargs": ^16.0.4
-    "@willsoto/nestjs-prometheus": ^4.4.0
     cacheable-lookup: 6
     cron-converter: ^1.0.2
     dotenv: ^15.0.1
@@ -3912,19 +3894,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@willsoto/nestjs-prometheus@npm:^4.4.0":
-  version: 4.7.0
-  resolution: "@willsoto/nestjs-prometheus@npm:4.7.0"
-  peerDependencies:
-    "@nestjs/common": ^7.0.0 || ^8.0.0 || ^9.0.0
-    prom-client: ^13.0.0 || ^14.0.0
-  checksum: 06020f2cb36bf6f98b1f7ca3494103cc77bea227ab766bb66e0294040c6a1399c3ff2a1781b7d163a5590cd9ccf0903fc08fc3bd9d3112d63c7400c4d6d55f23
-  languageName: node
-  linkType: hard
-
-"@willsoto/nestjs-prometheus@npm:^5.4.0":
-  version: 5.4.0
-  resolution: "@willsoto/nestjs-prometheus@npm:5.4.0"
+"@willsoto/nestjs-prometheus@npm:^5.1.1":
+  version: 5.1.2
+  resolution: "@willsoto/nestjs-prometheus@npm:5.1.2"
   peerDependencies:
     "@nestjs/common": ^7.0.0 || ^8.0.0 || ^9.0.0 || ^10.0.0
     prom-client: ^13.0.0 || ^14.0.0
@@ -5800,14 +5772,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ejs@npm:3.1.6":
-  version: 3.1.6
-  resolution: "ejs@npm:3.1.6"
+"ejs@npm:3.1.7":
+  version: 3.1.7
+  resolution: "ejs@npm:3.1.7"
   dependencies:
-    jake: ^10.6.1
+    jake: ^10.8.5
   bin:
-    ejs: ./bin/cli.js
-  checksum: 81a9cdea0b4ded3b5a4b212b7c17e20bb07468f08394e2d519708d367957a70aef3d282a6d5d38bf6ad313ba25802b9193d4227f29b084d2ee0f28d115141d48
+    ejs: bin/cli.js
+  checksum: fe40764af39955ce8f8b116716fc8b911959946698edb49ecab85df597746c07aa65d5b74ead28a1e2ffa75b0f92d9bedd752f1c29437da6137b3518271e988c
   languageName: node
   linkType: hard
 
@@ -8098,7 +8070,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jake@npm:^10.6.1":
+"jake@npm:^10.8.5":
   version: 10.8.7
   resolution: "jake@npm:10.8.7"
   dependencies:

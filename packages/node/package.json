@@ -1,6 +1,6 @@
 {
   "name": "@subql/node-ethereum",
-  "version": "2.12.4-2",
+  "version": "2.12.6-0",
   "description": "",
   "author": "Ian He",
   "license": "GPL-3.0",
@@ -30,7 +30,6 @@
     "@subql/testing": "^2.0.0",
     "@subql/types": "^2.1.4",
     "@subql/types-ethereum": "workspace:*",
-    "@willsoto/nestjs-prometheus": "^4.4.0",
     "cacheable-lookup": "6",
     "cron-converter": "^1.0.2",
     "ethers": "^5.7.0",
@@ -67,5 +66,5 @@
     "/dist",
     "/bin"
   ],
-  "stableVersion": "2.12.4-1"
+  "stableVersion": "2.12.5"
 }

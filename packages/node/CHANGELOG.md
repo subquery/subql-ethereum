@@ -12,6 +12,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 correct results. (#156)
 - Node runner options being overwritten by yargs defaults (#148)
 
+### Fixed
+- Fix yargs default override runner nodeOptions (#166)
+
+## [2.12.5] - 2023-09-12
+### Fixed
+- Fix nestjs-prometheus dependency issue (#163)
+- Sync with node-core 4.2.8, fix NodeConfig scaleBatchSize call itself
+
+## [2.12.4] - 2023-09-12
+### Fixed
+- Fetching logs via block height resulting in invalid results. Block hash is now used to ensure correct results. (#156)
+- Fix reindex also start index service (#155)
+- Fix warning for filter address (#154)
+- Update to node-core 4.2.7, fix set and remove in same block height causing empty in block range issue
+
 ## [2.12.3] - 2023-09-04
 ### Fixed
 - lock to `@subql/common` 2.6.0, in order to fix unknown reader issue. (#152)
@@ -229,7 +244,9 @@ correct results. (#156)
 ### Added
 - Init release
 
-[Unreleased]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/2.12.3...HEAD
+[Unreleased]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/2.12.5...HEAD
+[2.12.5]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/2.12.4...node-ethereum/2.12.5
+[2.12.4]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/2.12.3...node-ethereum/2.12.4
 [2.12.3]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/2.12.2...node-ethereum/2.12.3
 [2.12.2]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/2.12.1...node-ethereum/2.12.2
 [2.12.1]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/2.12.0...node-ethereum/2.12.1
