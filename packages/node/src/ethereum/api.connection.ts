@@ -12,28 +12,30 @@ import {
   TimeoutError,
   IApiConnectionSpecific,
 } from '@subql/node-core';
-import { EthereumBlockWrapper } from '@subql/types-ethereum';
+import { EthereumBlock, LightEthereumBlock } from '@subql/types-ethereum';
 import { EthereumApi } from './api.ethereum';
 import SafeEthProvider from './safe-api';
 
-type FetchFunc = (
-  api: EthereumApi,
-  batch: number[],
-) => Promise<EthereumBlockWrapper[]>;
+export type FetchFunc =
+  | ((api: EthereumApi, batch: number[]) => Promise<EthereumBlock[]>)
+  | ((api: EthereumApi, batch: number[]) => Promise<LightEthereumBlock[]>);
+
+// We use a function to get the fetch function because it can change depending on the skipBlocks feature
+export type GetFetchFunc = () => FetchFunc;
 
 export class EthereumApiConnection
   implements
     IApiConnectionSpecific<
       EthereumApi,
       SafeEthProvider,
-      EthereumBlockWrapper[]
+      EthereumBlock[] | LightEthereumBlock[]
     >
 {
   readonly networkMeta: NetworkMetadataPayload;
 
   constructor(
     public unsafeApi: EthereumApi,
-    private fetchBlocksBatches: FetchFunc,
+    private fetchBlocksBatches: GetFetchFunc,
   ) {
     this.networkMeta = {
       chain: unsafeApi.getChainId().toString(),
@@ -44,14 +46,14 @@ export class EthereumApiConnection
 
   static async create(
     endpoint: string,
-    fetchBlockBatches: FetchFunc,
+    fetchBlocksBatches: GetFetchFunc,
     eventEmitter: EventEmitter2,
   ): Promise<EthereumApiConnection> {
     const api = new EthereumApi(endpoint, eventEmitter);
 
     await api.init();
 
-    return new EthereumApiConnection(api, fetchBlockBatches);
+    return new EthereumApiConnection(api, fetchBlocksBatches);
   }
 
   safeApi(height: number): SafeEthProvider {
@@ -66,8 +68,10 @@ export class EthereumApiConnection
     await this.unsafeApi.disconnect();
   }
 
-  async fetchBlocks(heights: number[]): Promise<EthereumBlockWrapper[]> {
-    const blocks = await this.fetchBlocksBatches(this.unsafeApi, heights);
+  async fetchBlocks(
+    heights: number[],
+  ): Promise<EthereumBlock[] | LightEthereumBlock[]> {
+    const blocks = await this.fetchBlocksBatches()(this.unsafeApi, heights);
     return blocks;
   }
 

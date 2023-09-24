@@ -8,13 +8,16 @@ import {
   ConnectionPoolService,
   getLogger,
   NodeConfig,
+  profilerWrap,
 } from '@subql/node-core';
-import {
-  EthereumBlockWrapper,
-  EthereumNetworkConfig,
-} from '@subql/types-ethereum';
+import { EthereumBlock, EthereumNetworkConfig, LightEthereumBlock } from '@subql/types-ethereum';
 import { SubqueryProject } from '../configure/SubqueryProject';
-import { EthereumApiConnection } from './api.connection';
+import { isOnlyEventHandlers } from '../utils/project';
+import {
+  EthereumApiConnection,
+  FetchFunc,
+  GetFetchFunc,
+} from './api.connection';
 import { EthereumApi } from './api.ethereum';
 import SafeEthProvider from './safe-api';
 
@@ -24,8 +27,11 @@ const logger = getLogger('api');
 export class EthereumApiService extends ApiService<
   EthereumApi,
   SafeEthProvider,
-  EthereumBlockWrapper[]
+  EthereumBlock[] | LightEthereumBlock[]
 > {
+  private fetchBlocksFunction: FetchFunc;
+  private fetchBlocksBatches: GetFetchFunc = () => this.fetchBlocksFunction;
+
   constructor(
     @Inject('ISubqueryProject') private project: SubqueryProject,
     connectionPoolService: ConnectionPoolService<EthereumApiConnection>,
@@ -33,6 +39,8 @@ export class EthereumApiService extends ApiService<
     private nodeConfig: NodeConfig,
   ) {
     super(connectionPoolService, eventEmitter);
+
+    this.updateBlockFetching();
   }
 
   async init(): Promise<EthereumApiService> {
@@ -57,7 +65,7 @@ export class EthereumApiService extends ApiService<
       (endpoint) =>
         EthereumApiConnection.create(
           endpoint,
-          this.fetchBlockBatches,
+          this.fetchBlocksBatches,
           this.eventEmitter,
         ),
       //eslint-disable-next-line @typescript-eslint/require-await
@@ -139,10 +147,56 @@ export class EthereumApiService extends ApiService<
     return new Proxy(this.unsafeApi.getSafeApi(height), handler);
   }
 
-  private async fetchBlockBatches(
+  private async fetchFullBlocksBatch(
     api: EthereumApi,
     batch: number[],
-  ): Promise<EthereumBlockWrapper[]> {
+  ): Promise<EthereumBlock[]> {
     return api.fetchBlocks(batch);
+  }
+
+  private async fetchLightBlocksBatch(
+    api: EthereumApi,
+    batch: number[],
+  ): Promise<LightEthereumBlock[]> {
+    return api.fetchBlocksLight(batch);
+  }
+
+  updateBlockFetching(): void {
+    const onlyEventHandlers = isOnlyEventHandlers(this.project);
+    const skipBlock = this.nodeConfig.skipBlock && onlyEventHandlers;
+
+    if (this.nodeConfig.skipBlock) {
+      if (onlyEventHandlers) {
+        logger.info(
+          'skipBlock is enabled, only events and block headers will be fetched.',
+        );
+      } else {
+        logger.info(
+          `skipBlock is disabled, the project contains handlers that aren't event handlers.`,
+        );
+      }
+    } else {
+      if (onlyEventHandlers) {
+        logger.warn(
+          'skipBlock is disabled, the project contains only event handlers, it could be enabled to improve indexing performance.',
+        );
+      } else {
+        logger.info(`skipBlock is disabled.`);
+      }
+    }
+
+    const fetchFunc = skipBlock
+      ? this.fetchLightBlocksBatch.bind(this)
+      : this.fetchFullBlocksBatch.bind(this);
+
+    if (this.nodeConfig?.profiler) {
+      this.fetchBlocksFunction = profilerWrap(
+        fetchFunc,
+        'SubstrateUtil',
+        'fetchBlocksBatches',
+      );
+    } else {
+      this.fetchBlocksFunction = fetchFunc;
+    }
   }
 }

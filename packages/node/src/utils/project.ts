@@ -11,11 +11,15 @@ import {
   EthereumHandlerKind,
   SubqlEthereumHandlerKind,
   isCustomDs,
+  isRuntimeDs,
 } from '@subql/common-ethereum';
 import { retryOnFail, updateDataSourcesV1_0_0 } from '@subql/node-core';
 import { Reader } from '@subql/types-core';
 import { EthereumDatasourceKind, SubqlDatasource } from '@subql/types-ethereum';
-import { EthereumProjectDs } from '../configure/SubqueryProject';
+import {
+  EthereumProjectDs,
+  SubqueryProject,
+} from '../configure/SubqueryProject';
 
 export function isBaseHandler(
   handler: SubqlHandler,
@@ -108,4 +112,27 @@ export async function updateDatasourcesFlare(
   );
 
   return updateDataSourcesV1_0_0(partialUpdate, reader, root, isCustomDs);
+}
+
+function dsContainsNonEventHandlers(ds: EthereumProjectDs): boolean {
+  if (isRuntimeDs(ds)) {
+    return !!ds.mapping.handlers.find(
+      (handler) => handler.kind !== EthereumHandlerKind.Event,
+    );
+  } else if (isCustomDs(ds)) {
+    // TODO this can be improved upon in the future.
+    return true;
+  }
+  return true;
+}
+
+export function isOnlyEventHandlers(project: SubqueryProject): boolean {
+  const hasNonEventHandler = !!project.dataSources.find((ds) =>
+    dsContainsNonEventHandlers(ds),
+  );
+  const hasNonEventTemplate = !!project.templates.find((ds) =>
+    dsContainsNonEventHandlers(ds),
+  );
+
+  return !hasNonEventHandler && !hasNonEventTemplate;
 }

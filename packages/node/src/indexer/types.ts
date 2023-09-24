@@ -2,6 +2,10 @@
 // SPDX-License-Identifier: GPL-3.0
 
 import { Entity } from '@subql/types-core';
+import {
+  EthereumBlock,
+  LightEthereumBlock,
+} from '@subql/types-ethereum';
 
 export enum OperationType {
   Set = 'Set',
@@ -15,3 +19,5 @@ export type OperationEntity = {
 };
 
 export type BestBlocks = Record<number, string>;
+
+export type BlockContent = EthereumBlock | LightEthereumBlock;

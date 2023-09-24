@@ -11,9 +11,9 @@ import {
   NodeConfig,
   StoreCacheService,
 } from '@subql/node-core';
-import { BlockWrapper, EthereumBlock } from '@subql/types-ethereum';
+import { BlockContent } from './types';
 
-export function blockToHeader(block: EthereumBlock | Block): Header {
+export function blockToHeader(block: BlockContent | Block): Header {
   return {
     blockHeight: block.number,
     blockHash: block.hash,
@@ -22,7 +22,7 @@ export function blockToHeader(block: EthereumBlock | Block): Header {
 }
 
 @Injectable()
-export class UnfinalizedBlocksService extends BaseUnfinalizedBlocksService<BlockWrapper> {
+export class UnfinalizedBlocksService extends BaseUnfinalizedBlocksService<BlockContent> {
   constructor(
     private readonly apiService: ApiService,
     nodeConfig: NodeConfig,
@@ -32,8 +32,8 @@ export class UnfinalizedBlocksService extends BaseUnfinalizedBlocksService<Block
   }
 
   @mainThreadOnly()
-  protected blockToHeader(block: BlockWrapper): Header {
-    return blockToHeader(block.block);
+  protected blockToHeader(block: BlockContent): Header {
+    return blockToHeader(block);
   }
 
   @mainThreadOnly()

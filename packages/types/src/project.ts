@@ -17,6 +17,7 @@ import {
   EthereumLogFilter,
   EthereumTransaction,
   EthereumTransactionFilter,
+  LightEthereumLog,
 } from './ethereum';
 import {ApiWrapper} from './interfaces';
 
@@ -58,7 +59,7 @@ export enum EthereumHandlerKind {
 export type EthereumRuntimeHandlerInputMap = {
   [EthereumHandlerKind.Block]: EthereumBlock;
   [EthereumHandlerKind.Call]: EthereumTransaction;
-  [EthereumHandlerKind.Event]: EthereumLog;
+  [EthereumHandlerKind.Event]: EthereumLog | LightEthereumLog;
 };
 
 type EthereumRuntimeFilterMap = {

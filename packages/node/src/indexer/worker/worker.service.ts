@@ -11,9 +11,9 @@ import {
   BaseWorkerService,
   IProjectUpgradeService,
 } from '@subql/node-core';
-import { BlockWrapper } from '@subql/types-ethereum';
 import { EthereumProjectDs } from '../../configure/SubqueryProject';
 import { IndexerManager } from '../indexer.manager';
+import { BlockContent } from '../types';
 
 export type FetchBlockResponse = { parentHash: string } | undefined;
 
@@ -26,7 +26,7 @@ export type WorkerStatusResponse = {
 
 @Injectable()
 export class WorkerService extends BaseWorkerService<
-  BlockWrapper,
+  BlockContent,
   FetchBlockResponse,
   SubqlEthereumDataSource,
   {}
@@ -46,19 +46,19 @@ export class WorkerService extends BaseWorkerService<
   protected async fetchChainBlock(
     heights: number,
     extra: {},
-  ): Promise<BlockWrapper> {
+  ): Promise<BlockContent> {
     const [block] = await this.apiService.fetchBlocks([heights]);
     return block;
   }
 
-  protected toBlockResponse(block: BlockWrapper): { parentHash: string } {
+  protected toBlockResponse(block: BlockContent): { parentHash: string } {
     return {
-      parentHash: block.block.parentHash,
+      parentHash: block.parentHash,
     };
   }
 
   protected async processFetchedBlock(
-    block: BlockWrapper,
+    block: BlockContent,
     dataSources: SubqlEthereumDataSource[],
   ): Promise<ProcessBlockResponse> {
     return this.indexerManager.indexBlock(block, dataSources);

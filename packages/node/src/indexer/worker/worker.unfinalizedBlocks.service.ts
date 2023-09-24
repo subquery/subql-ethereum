@@ -8,11 +8,11 @@ import {
   HostUnfinalizedBlocks,
   IUnfinalizedBlocksService,
 } from '@subql/node-core';
-import { BlockWrapper } from '@subql/types-ethereum';
+import { BlockContent } from '../types';
 
 @Injectable()
 export class WorkerUnfinalizedBlocksService
-  implements IUnfinalizedBlocksService<BlockWrapper>
+  implements IUnfinalizedBlocksService<BlockContent>
 {
   constructor(private host: HostUnfinalizedBlocks) {
     if (isMainThread) {
@@ -25,12 +25,13 @@ export class WorkerUnfinalizedBlocksService
   }
 
   async processUnfinalizedBlocks({
-    block: { hash: blockHash, parentHash },
-    blockHeight,
-  }: BlockWrapper): Promise<number | null> {
+    hash,
+    number,
+    parentHash,
+  }: BlockContent): Promise<number | null> {
     return this.host.unfinalizedBlocksProcess({
-      blockHash,
-      blockHeight,
+      blockHash: hash,
+      blockHeight: number,
       parentHash,
     });
   }

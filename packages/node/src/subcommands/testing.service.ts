@@ -10,7 +10,6 @@ import {
   NestLogger,
   TestRunner,
 } from '@subql/node-core';
-import { EthereumBlockWrapper } from '@subql/types-ethereum';
 import {
   EthereumProjectDs,
   SubqueryProject,
@@ -19,13 +18,14 @@ import { EthereumApi } from '../ethereum';
 import SafeEthProvider from '../ethereum/safe-api';
 import { IndexerManager } from '../indexer/indexer.manager';
 import { ProjectService } from '../indexer/project.service';
+import { BlockContent } from '../indexer/types';
 import { TestingModule } from './testing.module';
 
 @Injectable()
 export class TestingService extends BaseTestingService<
   EthereumApi,
   SafeEthProvider,
-  EthereumBlockWrapper,
+  BlockContent,
   EthereumProjectDs
 > {
   constructor(
@@ -41,7 +41,7 @@ export class TestingService extends BaseTestingService<
       runner: TestRunner<
         EthereumApi,
         SafeEthProvider,
-        EthereumBlockWrapper,
+        BlockContent,
         EthereumProjectDs
       >,
     ]
@@ -63,7 +63,7 @@ export class TestingService extends BaseTestingService<
   }
 
   async indexBlock(
-    block: EthereumBlockWrapper,
+    block: BlockContent,
     handler: string,
     indexerManager: IndexerManager,
   ): Promise<void> {

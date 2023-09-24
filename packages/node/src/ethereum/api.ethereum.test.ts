@@ -4,13 +4,17 @@
 import path from 'path';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import {
+  EthereumBlock,
   EthereumDatasourceKind,
   EthereumHandlerKind,
   EthereumLogFilter,
   SubqlRuntimeDatasource,
 } from '@subql/types-ethereum';
 import { EthereumApi } from './api.ethereum';
-import { EthereumBlockWrapped } from './block.ethereum';
+import {
+  filterLogsProcessor,
+  filterTransactionsProcessor,
+} from './block.ethereum';
 
 // Add api key to work
 const HTTP_ENDPOINT = 'https://eth.api.onfinality.io/public';
@@ -38,11 +42,18 @@ jest.setTimeout(90000);
 describe('Api.ethereum', () => {
   let ethApi: EthereumApi;
   const eventEmitter = new EventEmitter2();
-  let blockData: EthereumBlockWrapped;
+  let blockData: EthereumBlock;
+
+  const fetchBlock = async (height: number) => {
+    const block = await ethApi.fetchBlock(height);
+
+    return block as EthereumBlock;
+  };
+
   beforeEach(async () => {
     ethApi = new EthereumApi(HTTP_ENDPOINT, eventEmitter);
     await ethApi.init();
-    blockData = await ethApi.fetchBlock(16258633, true);
+    blockData = await fetchBlock(16258633);
   });
 
   it('Should format transaction in logs, and the transaction gas should be bigInt type', () => {
@@ -83,10 +94,10 @@ describe('Api.ethereum', () => {
     const beamEndpoint = 'https://rpc.api.moonbeam.network';
     ethApi = new EthereumApi(beamEndpoint, eventEmitter);
     await ethApi.init();
-    blockData = await ethApi.fetchBlock(2847447, true);
+    blockData = await fetchBlock(2847447);
     const result = blockData.transactions.filter((tx) => {
       if (
-        EthereumBlockWrapped.filterTransactionsProcessor(
+        filterTransactionsProcessor(
           tx,
           { to: null },
           '0x72a33394f0652e2bf15d7901f3cd46863d968424',
@@ -120,19 +131,19 @@ describe('Api.ethereum', () => {
       ],
     };
 
-    blockData = await ethApi.fetchBlock(4015990, true);
+    blockData = await fetchBlock(4015990);
     const transaction = blockData.transactions.find(
       (tx) =>
         tx.hash ===
         '0xeb2e443f2d4e784193fa13bbbae2b85e6ee459e7b7b53f8ca098ffae9b25b059',
     );
     const erc20Transfers = transaction.logs.filter((log) => {
-      if (EthereumBlockWrapped.filterLogsProcessor(log, filter_2)) {
+      if (filterLogsProcessor(log, filter_2)) {
         return log;
       }
     });
     const erc721Transfers = transaction.logs.filter((log) => {
-      if (EthereumBlockWrapped.filterLogsProcessor(log, filter_1)) {
+      if (filterLogsProcessor(log, filter_1)) {
         return log;
       }
     });
@@ -145,11 +156,11 @@ describe('Api.ethereum', () => {
     const beamEndpoint = 'https://rpc.api.moonbeam.network';
     ethApi = new EthereumApi(beamEndpoint, eventEmitter);
     await ethApi.init();
-    blockData = await ethApi.fetchBlock(2847447, true);
+    blockData = await fetchBlock(2847447);
     blockData.transactions[1].to = undefined;
     const result = blockData.transactions.filter((tx) => {
       if (
-        EthereumBlockWrapped.filterTransactionsProcessor(
+        filterTransactionsProcessor(
           tx,
           { to: null },
           '0x72a33394f0652e2bf15d7901f3cd46863d968424',
@@ -168,10 +179,10 @@ describe('Api.ethereum', () => {
     const beamEndpoint = 'https://rpc.api.moonbeam.network';
     ethApi = new EthereumApi(beamEndpoint, eventEmitter);
     await ethApi.init();
-    blockData = await ethApi.fetchBlock(2847447, true);
+    blockData = await fetchBlock(2847447);
     const result = blockData.transactions.filter((tx) => {
       if (
-        EthereumBlockWrapped.filterTransactionsProcessor(
+        filterTransactionsProcessor(
           tx,
           undefined,
           '0x72a33394f0652e2bf15d7901f3cd46863d968424',
@@ -187,10 +198,10 @@ describe('Api.ethereum', () => {
     const beamEndpoint = 'https://rpc.api.moonbeam.network';
     ethApi = new EthereumApi(beamEndpoint, eventEmitter);
     await ethApi.init();
-    blockData = await ethApi.fetchBlock(2847447, true);
+    blockData = await fetchBlock(2847447);
     const result = blockData.transactions.filter((tx) => {
       if (
-        EthereumBlockWrapped.filterTransactionsProcessor(
+        filterTransactionsProcessor(
           tx,
           { to: undefined },
           '0x72a33394f0652e2bf15d7901f3cd46863d968424',
@@ -205,11 +216,11 @@ describe('Api.ethereum', () => {
     const beamEndpoint = 'https://rpc.api.moonbeam.network';
     ethApi = new EthereumApi(beamEndpoint, eventEmitter);
     await ethApi.init();
-    blockData = await ethApi.fetchBlock(2847447, true);
+    blockData = await fetchBlock(2847447);
     const result = blockData.transactions.filter((tx) => {
       tx.to = undefined;
       if (
-        EthereumBlockWrapped.filterTransactionsProcessor(
+        filterTransactionsProcessor(
           tx,
           { to: null },
           '0x72a33394f0652e2bf15d7901f3cd46863d968424',

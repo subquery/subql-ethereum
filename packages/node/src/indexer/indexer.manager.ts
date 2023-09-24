@@ -25,16 +25,21 @@ import {
 import {
   EthereumTransaction,
   EthereumLog,
-  EthereumBlockWrapper,
   EthereumBlock,
   SubqlRuntimeDatasource,
   EthereumBlockFilter,
   EthereumLogFilter,
   EthereumTransactionFilter,
+  LightEthereumLog,
 } from '@subql/types-ethereum';
 import { EthereumProjectDs } from '../configure/SubqueryProject';
-import { EthereumApi, EthereumApiService } from '../ethereum';
-import { EthereumBlockWrapped } from '../ethereum/block.ethereum';
+import { EthereumApi } from '../ethereum';
+import {
+  filterBlocksProcessor,
+  filterLogsProcessor,
+  filterTransactionsProcessor,
+  isFullBlock,
+} from '../ethereum/block.ethereum';
 import SafeEthProvider from '../ethereum/safe-api';
 import {
   asSecondLayerHandlerProcessor_1_0_0,
@@ -43,6 +48,7 @@ import {
 import { DynamicDsService } from './dynamic-ds.service';
 import { ProjectService } from './project.service';
 import { SandboxService } from './sandbox.service';
+import { BlockContent } from './types';
 import { UnfinalizedBlocksService } from './unfinalizedBlocks.service';
 
 const logger = getLogger('indexer');
@@ -51,7 +57,7 @@ const logger = getLogger('indexer');
 export class IndexerManager extends BaseIndexerManager<
   SafeEthProvider,
   EthereumApi,
-  EthereumBlockWrapper,
+  BlockContent,
   ApiService,
   SubqlEthereumDataSource,
   SubqlEthereumCustomDataSource,
@@ -91,7 +97,7 @@ export class IndexerManager extends BaseIndexerManager<
 
   @profiler()
   async indexBlock(
-    block: EthereumBlockWrapper,
+    block: BlockContent,
     dataSources: SubqlEthereumDataSource[],
   ): Promise<ProcessBlockResponse> {
     return super.internalIndexBlock(block, dataSources, () =>
@@ -99,30 +105,36 @@ export class IndexerManager extends BaseIndexerManager<
     );
   }
 
-  getBlockHeight(block: EthereumBlockWrapper): number {
-    return block.blockHeight;
+  getBlockHeight(block: BlockContent): number {
+    return block.number;
   }
 
-  getBlockHash(block: EthereumBlockWrapper): string {
-    return block.block.hash;
+  getBlockHash(block: BlockContent): string {
+    return block.hash;
   }
 
   // eslint-disable-next-line @typescript-eslint/require-await
-  private async getApi(block: EthereumBlockWrapper): Promise<SafeEthProvider> {
+  private async getApi(block: BlockContent): Promise<SafeEthProvider> {
     return this.apiService.safeApi(this.getBlockHeight(block));
   }
 
   protected async indexBlockData(
-    { block, transactions }: EthereumBlockWrapper,
+    block: BlockContent,
     dataSources: EthereumProjectDs[],
     getVM: (d: EthereumProjectDs) => Promise<IndexerSandbox>,
   ): Promise<void> {
-    await this.indexBlockContent(block, dataSources, getVM);
+    if (isFullBlock(block)) {
+      await this.indexBlockContent(block, dataSources, getVM);
 
-    for (const tx of transactions) {
-      await this.indexTransaction(tx, dataSources, getVM);
+      for (const tx of block.transactions) {
+        await this.indexTransaction(tx, dataSources, getVM);
 
-      for (const log of tx.logs ?? []) {
+        for (const log of tx.logs ?? []) {
+          await this.indexEvent(log, dataSources, getVM);
+        }
+      }
+    } else {
+      for (const log of block.logs ?? []) {
         await this.indexEvent(log, dataSources, getVM);
       }
     }
@@ -149,7 +161,7 @@ export class IndexerManager extends BaseIndexerManager<
   }
 
   private async indexEvent(
-    log: EthereumLog,
+    log: EthereumLog | LightEthereumLog,
     dataSources: EthereumProjectDs[],
     getVM: (d: EthereumProjectDs) => Promise<IndexerSandbox>,
   ): Promise<void> {
@@ -185,34 +197,24 @@ const FilterTypeMap = {
     data: EthereumBlock,
     filter: EthereumBlockFilter,
     ds: SubqlEthereumDataSource,
-  ) =>
-    EthereumBlockWrapped.filterBlocksProcessor(
-      data,
-      filter,
-      ds.options?.address,
-    ),
+  ) => filterBlocksProcessor(data, filter, ds.options?.address),
   [EthereumHandlerKind.Event]: (
-    data: EthereumLog,
+    data: EthereumLog | LightEthereumLog,
     filter: EthereumLogFilter,
     ds: SubqlEthereumDataSource,
-  ) =>
-    EthereumBlockWrapped.filterLogsProcessor(data, filter, ds.options?.address),
+  ) => filterLogsProcessor(data, filter, ds.options?.address),
   [EthereumHandlerKind.Call]: (
     data: EthereumTransaction,
     filter: EthereumTransactionFilter,
     ds: SubqlEthereumDataSource,
-  ) =>
-    EthereumBlockWrapped.filterTransactionsProcessor(
-      data,
-      filter,
-      ds.options?.address,
-    ),
+  ) => filterTransactionsProcessor(data, filter, ds.options?.address),
 };
 
 const DataAbiParser = {
   [EthereumHandlerKind.Block]: () => (data: EthereumBlock) => data,
   [EthereumHandlerKind.Event]:
-    (api: EthereumApi) => (data: EthereumLog, ds: SubqlRuntimeDatasource) =>
+    (api: EthereumApi) =>
+    (data: EthereumLog | LightEthereumLog, ds: SubqlRuntimeDatasource) =>
       api.parseLog(data, ds),
   [EthereumHandlerKind.Call]:
     (api: EthereumApi) =>
