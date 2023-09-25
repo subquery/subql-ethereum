@@ -7,6 +7,7 @@ import {
   ApiService,
   BaseUnfinalizedBlocksService,
   Header,
+  mainThreadOnly,
   NodeConfig,
   StoreCacheService,
 } from '@subql/node-core';
@@ -30,20 +31,24 @@ export class UnfinalizedBlocksService extends BaseUnfinalizedBlocksService<Block
     super(nodeConfig, storeCache);
   }
 
+  @mainThreadOnly()
   protected blockToHeader(block: BlockWrapper): Header {
     return blockToHeader(block.block);
   }
 
+  @mainThreadOnly()
   protected async getFinalizedHead(): Promise<Header> {
     const finalizedBlock = await this.apiService.api.getFinalizedBlock();
     return blockToHeader(finalizedBlock);
   }
 
+  @mainThreadOnly()
   protected async getHeaderForHash(hash: string): Promise<Header> {
     const block = await this.apiService.api.getBlockByHeightOrHash(hash);
     return blockToHeader(block);
   }
 
+  @mainThreadOnly()
   protected async getHeaderForHeight(height: number): Promise<Header> {
     const block = await this.apiService.api.getBlockByHeightOrHash(height);
     return blockToHeader(block);

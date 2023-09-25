@@ -9,15 +9,16 @@ import {
   getLogger,
   NodeConfig,
 } from '@subql/node-core';
-import { EthereumBlockWrapper } from '@subql/types-ethereum';
+import {
+  EthereumBlockWrapper,
+  EthereumNetworkConfig,
+} from '@subql/types-ethereum';
 import { SubqueryProject } from '../configure/SubqueryProject';
 import { EthereumApiConnection } from './api.connection';
 import { EthereumApi } from './api.ethereum';
 import SafeEthProvider from './safe-api';
 
 const logger = getLogger('api');
-
-const MAX_RECONNECT_ATTEMPTS = 5;
 
 @Injectable()
 export class EthereumApiService extends ApiService<
@@ -35,7 +36,7 @@ export class EthereumApiService extends ApiService<
   }
 
   async init(): Promise<EthereumApiService> {
-    let network;
+    let network: EthereumNetworkConfig;
     try {
       network = this.project.network;
     } catch (e) {

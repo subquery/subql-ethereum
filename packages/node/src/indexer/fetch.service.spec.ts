@@ -199,7 +199,7 @@ describe('Dictionary queries', () => {
       ]);
     });
 
-    it('If ds option and filter both provide contract address, it should use ds options one ', () => {
+    it('If ds option and filter both provide contract address, it should use ds options one', () => {
       const ds: SubqlRuntimeDatasource = {
         kind: EthereumDatasourceKind.Runtime,
         assets: new Map(),
@@ -239,7 +239,7 @@ describe('Dictionary queries', () => {
       ]);
     });
 
-    it('If ds option provide contract address, it should use ds options "address" ', () => {
+    it('If ds option provide contract address, it should use ds options "address"', () => {
       const ds: SubqlRuntimeDatasource = {
         kind: EthereumDatasourceKind.Runtime,
         assets: new Map(),
@@ -278,7 +278,7 @@ describe('Dictionary queries', () => {
       ]);
     });
 
-    it('If filter  provide contract address, it should use filter "to" ', () => {
+    it('If filter  provide contract address, it should use filter "to"', () => {
       const ds: SubqlRuntimeDatasource = {
         kind: EthereumDatasourceKind.Runtime,
         assets: new Map(),
@@ -394,7 +394,6 @@ describe('Dictionary queries', () => {
         null,
         null,
         project,
-        null,
         null,
         null,
         null,
