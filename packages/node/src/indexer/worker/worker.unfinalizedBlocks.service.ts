@@ -1,6 +1,7 @@
 // Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
+import { isMainThread } from 'worker_threads';
 import { Injectable } from '@nestjs/common';
 import {
   Header,
@@ -13,7 +14,11 @@ import { BlockWrapper } from '@subql/types-ethereum';
 export class WorkerUnfinalizedBlocksService
   implements IUnfinalizedBlocksService<BlockWrapper>
 {
-  constructor(private host: HostUnfinalizedBlocks) {}
+  constructor(private host: HostUnfinalizedBlocks) {
+    if (isMainThread) {
+      throw new Error('Expected to be worker thread');
+    }
+  }
 
   async processUnfinalizedBlockHeader(header: Header): Promise<number | null> {
     return this.host.unfinalizedBlocksProcess(header);

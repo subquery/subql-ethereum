@@ -3,7 +3,7 @@
 
 import fs from 'fs';
 import path from 'path';
-import { LocalReader, Reader } from '@subql/common';
+import { LocalReader } from '@subql/common';
 import {
   SubqlRuntimeHandler,
   SubqlCustomHandler,
@@ -13,6 +13,7 @@ import {
   isCustomDs,
 } from '@subql/common-ethereum';
 import { retryOnFail, updateDataSourcesV1_0_0 } from '@subql/node-core';
+import { Reader } from '@subql/types-core';
 import { EthereumDatasourceKind, SubqlDatasource } from '@subql/types-ethereum';
 import { EthereumProjectDs } from '../configure/SubqueryProject';
 

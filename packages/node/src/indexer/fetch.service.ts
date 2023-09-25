@@ -22,17 +22,13 @@ import {
 import { DictionaryQueryCondition, DictionaryQueryEntry } from '@subql/types';
 import { SubqlDatasource } from '@subql/types-ethereum';
 import { groupBy, partition, sortBy, uniqBy } from 'lodash';
-import {
-  EthereumProjectDs,
-  SubqueryProject,
-} from '../configure/SubqueryProject';
+import { SubqueryProject } from '../configure/SubqueryProject';
 import { EthereumApi } from '../ethereum';
 import { calcInterval } from '../ethereum/utils.ethereum';
 import { eventToTopic, functionToSighash } from '../utils/string';
 import { yargsOptions } from '../yargs';
 import { IEthereumBlockDispatcher } from './blockDispatcher';
 import { DictionaryService } from './dictionary.service';
-import { DsProcessorService } from './ds-processor.service';
 import { DynamicDsService } from './dynamic-ds.service';
 import { ProjectService } from './project.service';
 import {
@@ -236,7 +232,6 @@ export class FetchService extends BaseFetchService<
     @Inject('IBlockDispatcher')
     blockDispatcher: IEthereumBlockDispatcher,
     dictionaryService: DictionaryService,
-    private dsProcessorService: DsProcessorService,
     dynamicDsService: DynamicDsService,
     private unfinalizedBlocksService: UnfinalizedBlocksService,
     eventEmitter: EventEmitter2,
@@ -259,7 +254,8 @@ export class FetchService extends BaseFetchService<
   }
 
   protected buildDictionaryQueryEntries(
-    dataSources: SubqlDatasource[],
+    // Add name to dataousrces as templates have this set
+    dataSources: (SubqlDatasource & { name?: string })[],
   ): DictionaryQueryEntry[] {
     const [normalDataSources, templateDataSources] = partition(
       dataSources,

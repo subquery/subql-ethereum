@@ -21,13 +21,10 @@ import { EthereumApiService } from '../ethereum';
 import { EthereumApiConnection } from '../ethereum/api.connection';
 import { DsProcessorService } from '../indexer/ds-processor.service';
 import { DynamicDsService } from '../indexer/dynamic-ds.service';
-import { FetchModule } from '../indexer/fetch.module';
 import { IndexerManager } from '../indexer/indexer.manager';
 import { ProjectService } from '../indexer/project.service';
 import { SandboxService } from '../indexer/sandbox.service';
 import { UnfinalizedBlocksService } from '../indexer/unfinalizedBlocks.service';
-import { MetaModule } from '../meta/meta.module';
-import { TestingService } from './testing.service';
 
 @Module({
   providers: [
@@ -73,14 +70,13 @@ import { TestingService } from './testing.service';
     TestRunner,
     {
       provide: 'IApi',
-      useClass: EthereumApiService,
+      useExisting: ApiService,
     },
     {
       provide: 'IIndexerManager',
       useClass: IndexerManager,
     },
   ],
-
   controllers: [],
   exports: [TestRunner],
 })

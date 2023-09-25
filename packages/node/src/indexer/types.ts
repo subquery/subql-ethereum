@@ -1,7 +1,7 @@
 // Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
-import { Entity } from '@subql/types-ethereum';
+import { Entity } from '@subql/types-core';
 
 export enum OperationType {
   Set = 'Set',

@@ -6,10 +6,7 @@ import { Module } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import {
   ApiService,
-  StoreService,
-  PoiService,
   ConnectionPoolService,
-  StoreCacheService,
   WorkerDynamicDsService,
   WorkerConnectionPoolStateManager,
   ConnectionPoolStateManager,
@@ -30,8 +27,6 @@ import { WorkerUnfinalizedBlocksService } from './worker/worker.unfinalizedBlock
 @Module({
   providers: [
     IndexerManager,
-    StoreCacheService,
-    StoreService,
     {
       provide: ConnectionPoolStateManager,
       useFactory: () => {
@@ -77,22 +72,16 @@ import { WorkerUnfinalizedBlocksService } from './worker/worker.unfinalizedBlock
         return new WorkerDynamicDsService((global as any).host);
       },
     },
-    PoiService,
     {
       provide: 'IProjectService',
       useClass: ProjectService,
     },
-    WorkerService,
     {
       provide: UnfinalizedBlocksService,
-      useFactory: () => {
-        if (isMainThread) {
-          throw new Error('Expected to be worker thread');
-        }
-        return new WorkerUnfinalizedBlocksService((global as any).host);
-      },
+      useFactory: () =>
+        new WorkerUnfinalizedBlocksService((global as any).host),
     },
+    WorkerService,
   ],
-  exports: [StoreService],
 })
-export class IndexerModule {}
+export class WorkerFetchModule {}

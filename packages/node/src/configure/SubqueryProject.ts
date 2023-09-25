@@ -3,14 +3,8 @@
 
 import assert from 'assert';
 import { Injectable } from '@nestjs/common';
+import { validateSemver } from '@subql/common';
 import {
-  ParentProject,
-  Reader,
-  RunnerSpecs,
-  validateSemver,
-} from '@subql/common';
-import {
-  EthereumProjectNetworkConfig,
   parseEthereumProjectManifest,
   SubqlEthereumDataSource,
   EthereumBlockFilter,
@@ -18,16 +12,19 @@ import {
   isRuntimeDs,
   EthereumHandlerKind,
   isCustomDs,
-  RuntimeDatasourceTemplate,
-  CustomDatasourceTemplate,
 } from '@subql/common-ethereum';
 import {
   insertBlockFiltersCronSchedules,
   ISubqueryProject,
   loadProjectTemplates,
   SubqlProjectDs,
-  updateDataSourcesV1_0_0,
 } from '@subql/node-core';
+import { ParentProject, Reader, RunnerSpecs } from '@subql/types-core';
+import {
+  EthereumNetworkConfig,
+  RuntimeDatasourceTemplate,
+  CustomDatasourceTemplate,
+} from '@subql/types-ethereum';
 import { buildSchemaFromString } from '@subql/utils';
 import Cron from 'cron-converter';
 import { GraphQLSchema } from 'graphql';
@@ -53,7 +50,7 @@ const NOT_SUPPORT = (name: string) => {
 };
 
 // This is the runtime type after we have mapped genesisHash to chainId and endpoint/dict have been provided when dealing with deployments
-type NetworkConfig = EthereumProjectNetworkConfig & { chainId: string };
+type NetworkConfig = EthereumNetworkConfig & { chainId: string };
 
 @Injectable()
 export class SubqueryProject implements ISubqueryProject {
@@ -92,7 +89,7 @@ export class SubqueryProject implements ISubqueryProject {
     rawManifest: unknown,
     reader: Reader,
     root: string, // If project local then directory otherwise temp directory
-    networkOverrides?: Partial<EthereumProjectNetworkConfig>,
+    networkOverrides?: Partial<EthereumNetworkConfig>,
   ): Promise<SubqueryProject> {
     // rawManifest and reader can be reused here.
     // It has been pre-fetched and used for rebase manifest runner options with args
@@ -136,7 +133,7 @@ async function loadProjectFromManifestBase(
   reader: Reader,
   path: string,
   root: string,
-  networkOverrides?: Partial<EthereumProjectNetworkConfig>,
+  networkOverrides?: Partial<EthereumNetworkConfig>,
 ): Promise<SubqueryProject> {
   if (typeof projectManifest.network.endpoint === 'string') {
     projectManifest.network.endpoint = [projectManifest.network.endpoint];

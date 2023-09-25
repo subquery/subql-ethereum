@@ -10,13 +10,13 @@ import {loadEthereumProjectManifest} from './load';
 const projectsDir = path.join(__dirname, '../../test');
 
 describe('test eth project.yaml', () => {
-  it('could get eth project template name from its deployment ', () => {
+  it('could get eth project template name from its deployment', () => {
     const manifest = loadEthereumProjectManifest(path.join(projectsDir, 'project_1.0.0.yaml'));
     const deployment = manifest.toDeployment();
     expect(deployment).toContain('name: Pool');
   });
 
-  it('could get options in template from its deployment ', () => {
+  it('could get options in template from its deployment', () => {
     const manifest = loadEthereumProjectManifest(path.join(projectsDir, 'project_1.0.0.yaml'));
     const deployment = manifest.toDeployment();
     expect(deployment).toContain('abi: Pool');
@@ -66,8 +66,8 @@ describe('project.yaml', () => {
     deployment.specVersion = '1.0.0';
     deployment.runner = new EthereumRunnerSpecsImpl();
 
-    nodeImp.name = '@subql/node';
-    nodeImp.version = '0.29.1';
+    nodeImp.name = '@subql/node-ethereum';
+    nodeImp.version = '*';
     deployment.runner.node = nodeImp;
 
     queryImp.name = '@subql/query';
@@ -75,7 +75,8 @@ describe('project.yaml', () => {
 
     deployment.runner.query = queryImp;
 
-    validateSync(deployment.runner, {whitelist: true, forbidNonWhitelisted: true});
+    const errors = validateSync(deployment.runner, {whitelist: true, forbidNonWhitelisted: true});
+    expect(errors.length).toBe(0);
   });
 
   it('can validate a v1.0.0 project.yaml with unsupported runner node', () => {
