@@ -27,7 +27,6 @@ import {
 import CacheableLookup from 'cacheable-lookup';
 import { hexDataSlice, hexValue } from 'ethers/lib/utils';
 import { retryOnFailEth } from '../utils/project';
-import { yargsOptions } from '../yargs';
 import { CeloJsonRpcBatchProvider } from './ethers/celo/celo-json-rpc-batch-provider';
 import { CeloJsonRpcProvider } from './ethers/celo/celo-json-rpc-provider';
 import { CeloWsProvider } from './ethers/celo/celo-ws-provider';
@@ -100,9 +99,17 @@ export class EthereumApi implements ApiWrapper {
 
   // Ethereum POS
   private supportsFinalization = true;
-  private blockConfirmations = yargsOptions.argv['block-confirmations'];
 
-  constructor(private endpoint: string, private eventEmitter: EventEmitter2) {
+  /**
+   * @param {string} endpoint - The endpoint of the RPC provider
+   * @param {number} blockConfirmations - Used to determine how many blocks behind the head a block is considered finalized. Not used if the network has a concrete finalization mechanism.
+   * @param {object} eventEmitter - Used to monitor the number of RPC requests
+   */
+  constructor(
+    private endpoint: string,
+    private blockConfirmations: number,
+    private eventEmitter: EventEmitter2,
+  ) {
     const { hostname, protocol, searchParams } = new URL(endpoint);
 
     const protocolStr = protocol.replace(':', '');

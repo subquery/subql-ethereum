@@ -8,6 +8,7 @@ import { ProjectService } from './project.service';
 const mockApiService = (): EthereumApiService => {
   const ethApi = new EthereumApi(
     'https://eth.api.onfinality.io/public',
+    20,
     new EventEmitter2(),
   );
 

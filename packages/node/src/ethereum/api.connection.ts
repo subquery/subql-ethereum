@@ -46,10 +46,11 @@ export class EthereumApiConnection
 
   static async create(
     endpoint: string,
+    blockConfirmations: number,
     fetchBlocksBatches: GetFetchFunc,
     eventEmitter: EventEmitter2,
   ): Promise<EthereumApiConnection> {
-    const api = new EthereumApi(endpoint, eventEmitter);
+    const api = new EthereumApi(endpoint, blockConfirmations, eventEmitter);
 
     await api.init();
 

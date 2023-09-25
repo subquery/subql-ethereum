@@ -18,6 +18,7 @@ import {
 
 // Add api key to work
 const HTTP_ENDPOINT = 'https://eth.api.onfinality.io/public';
+const BLOCK_CONFIRMATIONS = 20;
 
 const ds: SubqlRuntimeDatasource = {
   mapping: {
@@ -51,7 +52,7 @@ describe('Api.ethereum', () => {
   };
 
   beforeEach(async () => {
-    ethApi = new EthereumApi(HTTP_ENDPOINT, eventEmitter);
+    ethApi = new EthereumApi(HTTP_ENDPOINT, BLOCK_CONFIRMATIONS, eventEmitter);
     await ethApi.init();
     blockData = await fetchBlock(16258633);
   });
@@ -92,7 +93,7 @@ describe('Api.ethereum', () => {
   });
   it('Null filter support', async () => {
     const beamEndpoint = 'https://rpc.api.moonbeam.network';
-    ethApi = new EthereumApi(beamEndpoint, eventEmitter);
+    ethApi = new EthereumApi(beamEndpoint, BLOCK_CONFIRMATIONS, eventEmitter);
     await ethApi.init();
     blockData = await fetchBlock(2847447);
     const result = blockData.transactions.filter((tx) => {
@@ -114,7 +115,7 @@ describe('Api.ethereum', () => {
 
   it('!null filter support for logs, expect to filter out', async () => {
     const beamEndpoint = 'https://rpc.api.moonbeam.network';
-    ethApi = new EthereumApi(beamEndpoint, eventEmitter);
+    ethApi = new EthereumApi(beamEndpoint, BLOCK_CONFIRMATIONS, eventEmitter);
     await ethApi.init();
     const filter_1: EthereumLogFilter = {
       topics: [
@@ -154,7 +155,7 @@ describe('Api.ethereum', () => {
 
   it('Null filter support, for undefined transaction.to', async () => {
     const beamEndpoint = 'https://rpc.api.moonbeam.network';
-    ethApi = new EthereumApi(beamEndpoint, eventEmitter);
+    ethApi = new EthereumApi(beamEndpoint, BLOCK_CONFIRMATIONS, eventEmitter);
     await ethApi.init();
     blockData = await fetchBlock(2847447);
     blockData.transactions[1].to = undefined;
@@ -177,7 +178,7 @@ describe('Api.ethereum', () => {
 
   it('Should return all tx if filter.to is not defined', async () => {
     const beamEndpoint = 'https://rpc.api.moonbeam.network';
-    ethApi = new EthereumApi(beamEndpoint, eventEmitter);
+    ethApi = new EthereumApi(beamEndpoint, BLOCK_CONFIRMATIONS, eventEmitter);
     await ethApi.init();
     blockData = await fetchBlock(2847447);
     const result = blockData.transactions.filter((tx) => {
@@ -196,7 +197,7 @@ describe('Api.ethereum', () => {
 
   it('filter.to Should support only null not undefined', async () => {
     const beamEndpoint = 'https://rpc.api.moonbeam.network';
-    ethApi = new EthereumApi(beamEndpoint, eventEmitter);
+    ethApi = new EthereumApi(beamEndpoint, BLOCK_CONFIRMATIONS, eventEmitter);
     await ethApi.init();
     blockData = await fetchBlock(2847447);
     const result = blockData.transactions.filter((tx) => {
@@ -214,7 +215,7 @@ describe('Api.ethereum', () => {
   });
   it('If transaction is undefined, with null filter, should be supported', async () => {
     const beamEndpoint = 'https://rpc.api.moonbeam.network';
-    ethApi = new EthereumApi(beamEndpoint, eventEmitter);
+    ethApi = new EthereumApi(beamEndpoint, BLOCK_CONFIRMATIONS, eventEmitter);
     await ethApi.init();
     blockData = await fetchBlock(2847447);
     const result = blockData.transactions.filter((tx) => {
@@ -237,13 +238,21 @@ describe('Api.ethereum', () => {
     expect((ethApi as any).supportsFinalization).toBeTruthy();
 
     // Moonbeam
-    ethApi = new EthereumApi('https://rpc.api.moonbeam.network', eventEmitter);
+    ethApi = new EthereumApi(
+      'https://rpc.api.moonbeam.network',
+      BLOCK_CONFIRMATIONS,
+      eventEmitter,
+    );
     await ethApi.init();
 
     expect((ethApi as any).supportsFinalization).toBeTruthy();
 
     // BSC
-    ethApi = new EthereumApi('https://bsc-dataseed.binance.org', eventEmitter);
+    ethApi = new EthereumApi(
+      'https://bsc-dataseed.binance.org',
+      BLOCK_CONFIRMATIONS,
+      eventEmitter,
+    );
     await ethApi.init();
 
     expect((ethApi as any).supportsFinalized).toBeFalsy();
@@ -251,6 +260,7 @@ describe('Api.ethereum', () => {
     // Polygon
     ethApi = new EthereumApi(
       'https://polygon.api.onfinality.io/public',
+      BLOCK_CONFIRMATIONS,
       eventEmitter,
     );
     await ethApi.init();
