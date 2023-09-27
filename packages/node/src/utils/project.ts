@@ -131,7 +131,7 @@ export function isOnlyEventHandlers(project: SubqueryProject): boolean {
     dsContainsNonEventHandlers(ds),
   );
   const hasNonEventTemplate = !!project.templates.find((ds) =>
-    dsContainsNonEventHandlers(ds),
+    dsContainsNonEventHandlers(ds as EthereumProjectDs),
   );
 
   return !hasNonEventHandler && !hasNonEventTemplate;
