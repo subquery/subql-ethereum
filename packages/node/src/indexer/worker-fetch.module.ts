@@ -1,7 +1,6 @@
 // Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
-import { isMainThread } from 'worker_threads';
 import { Module } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import {
@@ -29,12 +28,8 @@ import { WorkerUnfinalizedBlocksService } from './worker/worker.unfinalizedBlock
     IndexerManager,
     {
       provide: ConnectionPoolStateManager,
-      useFactory: () => {
-        if (isMainThread) {
-          throw new Error('Expected to be worker thread');
-        }
-        return new WorkerConnectionPoolStateManager((global as any).host);
-      },
+      useFactory: () =>
+        new WorkerConnectionPoolStateManager((global as any).host),
     },
     ConnectionPoolService,
     {
@@ -65,12 +60,7 @@ import { WorkerUnfinalizedBlocksService } from './worker/worker.unfinalizedBlock
     DsProcessorService,
     {
       provide: DynamicDsService,
-      useFactory: () => {
-        if (isMainThread) {
-          throw new Error('Expected to be worker thread');
-        }
-        return new WorkerDynamicDsService((global as any).host);
-      },
+      useFactory: () => new WorkerDynamicDsService((global as any).host),
     },
     {
       provide: 'IProjectService',

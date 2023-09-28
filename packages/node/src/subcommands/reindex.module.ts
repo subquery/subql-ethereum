@@ -11,6 +11,7 @@ import {
   StoreCacheService,
   StoreService,
   ReindexService,
+  PoiService,
 } from '@subql/node-core';
 import { ConfigureModule } from '../configure/configure.module';
 import { DsProcessorService } from '../indexer/ds-processor.service';
@@ -22,6 +23,7 @@ import { UnfinalizedBlocksService } from '../indexer/unfinalizedBlocks.service';
     StoreCacheService,
     StoreService,
     ReindexService,
+    PoiService,
     ForceCleanService,
     {
       provide: 'UnfinalizedBlocksService',
