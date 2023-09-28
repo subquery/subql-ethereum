@@ -18,7 +18,7 @@ import {
   SubqlMapping,
   SubqlRuntimeDatasource,
 } from '@subql/types-ethereum';
-import {plainToClass, Transform, TransformFnParams, Type} from 'class-transformer';
+import {plainToInstance, Transform, TransformFnParams, Type} from 'class-transformer';
 import {
   Equals,
   IsArray,
@@ -30,16 +30,11 @@ import {
   ValidateNested,
   validateSync,
 } from 'class-validator';
-import {CustomDataSourceBase, EthereumMapping, RuntimeDataSourceBase} from '../../models';
+import {CustomDataSourceBase, RuntimeDataSourceBase} from '../../models';
 import {SubqlEthereumDataSource, SubqlRuntimeHandler} from '../../types';
 
 const Ethereum_NODE_NAME = `@subql/node-ethereum`;
 const Flare_NODE_NAME = `@subql/node-flare`;
-
-export class EthereumProjectMapping extends EthereumMapping {
-  @IsString()
-  file: string;
-}
 
 export class EthereumRunnerNodeImpl extends RunnerNodeImpl {
   @IsIn([Ethereum_NODE_NAME, Flare_NODE_NAME], {
@@ -126,7 +121,7 @@ export class DeploymentV1_0_0 extends BaseDeploymentV1_0_0 {
     if (params.value.genesisHash && !params.value.chainId) {
       params.value.chainId = params.value.genesisHash;
     }
-    return plainToClass(ProjectNetworkDeploymentV1_0_0, params.value);
+    return plainToInstance(ProjectNetworkDeploymentV1_0_0, params.value);
   })
   @ValidateNested()
   @Type(() => ProjectNetworkDeploymentV1_0_0)

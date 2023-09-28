@@ -3,6 +3,4 @@
 
 import { EthereumBlock, LightEthereumBlock } from '@subql/types-ethereum';
 
-export type BestBlocks = Record<number, string>;
-
 export type BlockContent = EthereumBlock | LightEthereumBlock;

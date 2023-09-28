@@ -3,10 +3,10 @@
 
 import fs from 'fs';
 import path from 'path';
-import {isCustomDs, isRuntimeDs} from '@subql/common-ethereum';
 import {SubqlRuntimeDatasource} from '@subql/types-ethereum';
 import {Data} from 'ejs';
 import {runTypeChain, glob, parseContractPath} from 'typechain';
+import {isCustomDs, isRuntimeDs} from '../project';
 import {CUSTOM_EVM_HANDLERS} from './constants';
 import {loadReadAbi} from './utils';
 
