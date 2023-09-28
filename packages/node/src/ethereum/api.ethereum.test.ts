@@ -138,16 +138,13 @@ describe('Api.ethereum', () => {
         tx.hash ===
         '0xeb2e443f2d4e784193fa13bbbae2b85e6ee459e7b7b53f8ca098ffae9b25b059',
     );
-    const erc20Transfers = transaction.logs.filter((log) => {
-      if (filterLogsProcessor(log, filter_2)) {
-        return log;
-      }
-    });
-    const erc721Transfers = transaction.logs.filter((log) => {
-      if (filterLogsProcessor(log, filter_1)) {
-        return log;
-      }
-    });
+
+    const erc20Transfers = transaction.logs.filter((log) =>
+      filterLogsProcessor(log, filter_2),
+    );
+    const erc721Transfers = transaction.logs.filter((log) =>
+      filterLogsProcessor(log, filter_1),
+    );
 
     expect(erc20Transfers.length).toBe(7);
     expect(erc721Transfers.length).toBe(2);

@@ -33,7 +33,7 @@ describe('ProjectService', () => {
       null,
       null,
       null,
-      null,
+      {} as any,
       null,
       null,
       null,

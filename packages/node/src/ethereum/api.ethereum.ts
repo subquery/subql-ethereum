@@ -280,7 +280,7 @@ export class EthereumApi implements ApiWrapper {
           this.getTransactionReceipt(tx.hash).then((r) =>
             formatReceipt(r, block),
           ),
-        logs: logs.filter((l) => l.transactionHash === tx),
+        logs: logs.filter((l) => l.transactionHash === tx.hash),
       }));
 
       const ret = {
