@@ -19,7 +19,10 @@ import {
   getLogger,
   getModulos,
 } from '@subql/node-core';
-import { DictionaryQueryCondition, DictionaryQueryEntry } from '@subql/types';
+import {
+  DictionaryQueryCondition,
+  DictionaryQueryEntry,
+} from '@subql/types-core';
 import { SubqlDatasource } from '@subql/types-ethereum';
 import { groupBy, partition, sortBy, uniqBy } from 'lodash';
 import { SubqueryProject } from '../configure/SubqueryProject';
