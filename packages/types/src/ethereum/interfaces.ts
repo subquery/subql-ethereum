@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: GPL-3.0
 
 import {BlockFilter} from '@subql/types-core';
-import {BlockWrapper} from '../interfaces';
 
 export type EthereumBlockFilter = BlockFilter;
 
@@ -149,10 +148,14 @@ export type EthereumLog<T extends EthereumResult = EthereumResult> = {
 
 export type FlareLog<T extends FlareResult = FlareResult> = EthereumLog<T>;
 
-export type EthereumBlockWrapper = BlockWrapper<
-  EthereumBlock,
-  EthereumTransaction,
-  EthereumLog,
-  EthereumTransactionFilter,
-  EthereumLogFilter
->;
+export type LightEthereumLog<T extends EthereumResult = EthereumResult> = Omit<
+  EthereumLog<T>,
+  'transaction' | 'block'
+> & {
+  block: LightEthereumBlock;
+};
+
+export type LightEthereumBlock = Omit<EthereumBlock, 'transactions' | 'logs'> & {
+  logs: LightEthereumLog[];
+  transactions: string[];
+};

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0
 
 import { initLogger } from '@subql/node-core/logger';
+import { boolean } from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import yargs from 'yargs/yargs';
 
@@ -255,6 +256,12 @@ export const yargsOptions = yargs(hideBin(process.argv))
       describe: 'Enable subscription by create notification triggers',
       type: 'boolean',
       default: false,
+    },
+    skipTransactions: {
+      demandOption: false,
+      describe: `If the project contains only event handlers and doesn't require transaction information then this can be used to skip fetching transactions reducing bandwith and memory. This will be automatically disabled if handlers other than EventHandlers are detected.`,
+      type: 'boolean',
+      // NOTE: don't set a default for this. It will break apply args from manifest. The default should be set in NodeConfig
     },
     timeout: {
       demandOption: false,

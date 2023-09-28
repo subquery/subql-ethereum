@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Parent field to manifest for project upgrades (#148)
+- Light Log types to codegen (#170)
 
 ## [2.3.0] - 2023-09-12
 ### Changed

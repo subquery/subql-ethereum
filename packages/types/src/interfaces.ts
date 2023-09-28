@@ -2,33 +2,9 @@
 // SPDX-License-Identifier: GPL-3.0
 
 import {Block} from '@ethersproject/abstract-provider';
-import {
-  EthereumBlock,
-  EthereumBlockWrapper,
-  EthereumLog,
-  EthereumLogFilter,
-  EthereumTransaction,
-  EthereumTransactionFilter,
-} from './ethereum';
+import {EthereumBlock, LightEthereumBlock} from './ethereum';
 
-export interface BlockWrapper<
-  B extends EthereumBlock = EthereumBlock,
-  C extends EthereumTransaction = EthereumTransaction,
-  E extends EthereumLog = EthereumLog,
-  CF extends EthereumTransactionFilter = EthereumTransactionFilter,
-  EF extends EthereumLogFilter = EthereumLogFilter
-> {
-  block: B;
-  blockHeight: number;
-  specVersion?: number;
-  hash: string;
-  calls?: (filters?: CF | CF[], ds?: any) => C[];
-  transactions?: C[];
-  events?: (filters?: EF | EF[], ds?: any) => E[];
-  logs?: E[];
-}
-
-export interface ApiWrapper<BW extends BlockWrapper = EthereumBlockWrapper> {
+export interface ApiWrapper {
   init: () => Promise<void>;
   getGenesisHash: () => string;
   getRuntimeChain: () => string;
@@ -37,5 +13,5 @@ export interface ApiWrapper<BW extends BlockWrapper = EthereumBlockWrapper> {
   getFinalizedBlockHeight: () => Promise<number>;
   getBestBlockHeight: () => Promise<number>;
   getBlockByHeightOrHash: (hashOrHeight: number | string) => Promise<Block>;
-  fetchBlocks: (bufferBlocks: number[]) => Promise<BW[]>;
+  fetchBlocks: (bufferBlocks: number[]) => Promise<EthereumBlock[] | LightEthereumBlock[]>; // TODO make sure this is correct
 }

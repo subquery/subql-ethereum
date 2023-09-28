@@ -6,7 +6,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Fixed
+- Fix reindex also start index service (#155)
+- Fix warning for filter address (#154)
+- Fetching logs via block height resulting in invalid results. Block hash is now used to ensure
+  correct results. (#156)
 - Node runner options being overwritten by yargs defaults (#148)
+- Fix yargs default override runner nodeOptions (#166)
+
+### Added
+- skipTransactions feature to avoid fetching transactions (#170)
 
 ## [2.12.5] - 2023-09-12
 ### Fixed

@@ -31,9 +31,8 @@ import {
   SubqueryProject,
 } from '../../configure/SubqueryProject';
 import { EthereumApiConnection } from '../../ethereum/api.connection';
-
-import { EthereumBlockWrapped } from '../../ethereum/block.ethereum';
 import { DynamicDsService } from '../dynamic-ds.service';
+import { BlockContent } from '../types';
 import { UnfinalizedBlocksService } from '../unfinalizedBlocks.service';
 import { IIndexerWorker, IInitIndexerWorker } from '../worker/worker';
 
@@ -44,7 +43,7 @@ type IndexerWorker = IIndexerWorker & {
 async function createIndexerWorker(
   store: Store,
   dynamicDsService: IDynamicDsService<EthereumProjectDs>,
-  unfinalizedBlocksService: IUnfinalizedBlocksService<EthereumBlockWrapped>,
+  unfinalizedBlocksService: IUnfinalizedBlocksService<BlockContent>,
   connectionPoolState: ConnectionPoolStateManager<EthereumApiConnection>,
 
   root: string,

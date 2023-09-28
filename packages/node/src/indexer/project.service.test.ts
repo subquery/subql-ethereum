@@ -2,13 +2,13 @@
 // SPDX-License-Identifier: GPL-3.0
 
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { ApiService } from '@subql/node-core';
-import { EthereumApi } from '../ethereum';
+import { EthereumApi, EthereumApiService } from '../ethereum';
 import { ProjectService } from './project.service';
 
-const mockApiService = (): ApiService => {
+const mockApiService = (): EthereumApiService => {
   const ethApi = new EthereumApi(
     'https://eth.api.onfinality.io/public',
+    20,
     new EventEmitter2(),
   );
 
@@ -33,7 +33,7 @@ describe('ProjectService', () => {
       null,
       null,
       null,
-      null,
+      {} as any,
       null,
       null,
       null,

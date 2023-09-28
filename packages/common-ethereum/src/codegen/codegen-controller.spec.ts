@@ -139,12 +139,15 @@ describe('Codegen spec', () => {
       '// SPDX-License-Identifier: Apache-2.0\n' +
       '\n' +
       '// Auto-generated , DO NOT EDIT\n' +
-      'import {EthereumLog, EthereumTransaction} from "@subql/types-ethereum";\n' +
+      'import {EthereumLog, EthereumTransaction, LightEthereumLog} from "@subql/types-ethereum";\n' +
       '\n' +
       "import {ApprovalEvent, Erc20} from '../contracts/Erc20'\n" +
       '\n' +
       '\n' +
       'export type ApprovalLog = EthereumLog<ApprovalEvent["args"]>\n' +
+      '\n' +
+      '\n' +
+      'export type LightApprovalLog = LightEthereumLog<ApprovalEvent["args"]>\n' +
       '\n' +
       '\n' +
       "export type Transaction = EthereumTransaction<Parameters<Erc20['functions']['approve']>>";

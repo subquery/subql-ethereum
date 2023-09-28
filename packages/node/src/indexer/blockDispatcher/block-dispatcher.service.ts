@@ -15,20 +15,20 @@ import {
   ApiService,
   IProjectUpgradeService,
 } from '@subql/node-core';
-import { EthereumBlockWrapper } from '@subql/types-ethereum';
 import {
   EthereumProjectDs,
   SubqueryProject,
 } from '../../configure/SubqueryProject';
 import { DynamicDsService } from '../dynamic-ds.service';
 import { IndexerManager } from '../indexer.manager';
+import { BlockContent } from '../types';
 
 /**
  * @description Intended to behave the same as WorkerBlockDispatcherService but doesn't use worker threads or any parallel processing
  */
 @Injectable()
 export class BlockDispatcherService
-  extends BlockDispatcher<EthereumBlockWrapper, EthereumProjectDs>
+  extends BlockDispatcher<BlockContent, EthereumProjectDs>
   implements OnApplicationShutdown
 {
   constructor(
@@ -62,12 +62,12 @@ export class BlockDispatcherService
     );
   }
 
-  protected getBlockHeight(block: EthereumBlockWrapper): number {
-    return block.blockHeight;
+  protected getBlockHeight(block: BlockContent): number {
+    return block.number;
   }
 
   protected async indexBlock(
-    block: EthereumBlockWrapper,
+    block: BlockContent,
   ): Promise<ProcessBlockResponse> {
     return this.indexerManager.indexBlock(
       block,
