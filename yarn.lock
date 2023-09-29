@@ -3150,12 +3150,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@subql/types-core@npm:0.0.0-2":
-  version: 0.0.0-2
-  resolution: "@subql/types-core@npm:0.0.0-2"
+"@subql/types-core@npm:0.0.1":
+  version: 0.0.1
+  resolution: "@subql/types-core@npm:0.0.1"
   dependencies:
     package-json-type: ^1.0.3
-  checksum: 3cd6a90391a8d206d0140bc84fff3b019a54488b711ce4f3d8c59f5b326dba9fc8b76d233add90b6a8dc953b09a7d3057f5132ec04a4b46e18c1aac49e8c685f
+  checksum: 2324d331f94562c0fecd6af92b22340ac361e6ad14f28bb05b686c42ebfa3847c890d397c87e33c4a6d47b82adf537b7336fdd392881c7727a2e585ad20937bb
+  languageName: node
+  linkType: hard
+
+"@subql/types-core@npm:^0.0.0-1":
+  version: 0.0.0
+  resolution: "@subql/types-core@npm:0.0.0"
+  dependencies:
+    package-json-type: ^1.0.3
+  checksum: 9b72fa0831303c67394b263e7332e90d190e71e106762c22a38583d107ac7997d4a72ee9e01e55a2fd42dc0a80023b2e5f67c529662bd2d73d9b0f24a5742727
   languageName: node
   linkType: hard
 
