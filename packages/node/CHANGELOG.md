@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix reindex service without poi feature with `node-core`
 
 ### Changed
-- Version bump with `types-core` 0.1.1
+- Version bump with `types-ethereum` and `common-ethereum`
 
 ## [3.0.1] - 2023-10-03
 ### Fixed
