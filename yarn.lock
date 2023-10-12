@@ -3055,7 +3055,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@subql/node-core@npm:6.0.1":
+"@subql/node-core@npm:^6.0.1":
   version: 6.0.1
   resolution: "@subql/node-core@npm:6.0.1"
   dependencies:
@@ -3100,7 +3100,7 @@ __metadata:
     "@nestjs/testing": ^9.4.0
     "@subql/common": 3.1.2
     "@subql/common-ethereum": "workspace:*"
-    "@subql/node-core": 6.0.1
+    "@subql/node-core": ^6.0.1
     "@subql/testing": ^2.0.2
     "@subql/types-ethereum": "workspace:*"
     "@types/express": ^4.17.13
