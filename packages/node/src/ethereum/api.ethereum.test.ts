@@ -16,7 +16,6 @@ import {
   filterLogsProcessor,
   filterTransactionsProcessor,
 } from './block.ethereum';
-import { EthereumBlockWrapped } from './block.ethereum';
 import { JsonRpcProvider } from './ethers/json-rpc-provider';
 
 // Add api key to work
@@ -24,7 +23,6 @@ const HTTP_ENDPOINT = 'https://eth.api.onfinality.io/public';
 const BLOCK_CONFIRMATIONS = 20;
 // const HTTP_ENDPOINT = 'https://eth-mainnet.g.alchemy.com/v2/demo';
 // const HTTP_ENDPOINT = 'https://eth.api.onfinality.io/public';
-// const HTTP_ENDPOINT = 'https://eth.api.onfinality.io/rpc?apikey=448c9af4-db9f-47a9-b498-94e1945d7983'
 
 const ds: SubqlRuntimeDatasource = {
   mapping: {
