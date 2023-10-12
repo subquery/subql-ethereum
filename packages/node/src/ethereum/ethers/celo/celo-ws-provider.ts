@@ -3,11 +3,7 @@
 
 // import { WebSocketProvider } from '@ethersproject/providers';
 import { getLogger } from '@subql/node-core';
-import {
-  Networkish,
-  WebSocketLike,
-  WebSocketProvider,
-} from 'ethers/lib.commonjs/providers';
+import { Networkish, WebSocketLike, WebSocketProvider } from 'ethers';
 
 const logger = getLogger('celo-ws-provider');
 

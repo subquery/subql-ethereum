@@ -4,8 +4,8 @@
 // import { BigNumber, BigNumberish } from 'ethers/lib.commonjs/';
 // import type { Network } from 'ethers/lib.commonjs/';
 import { getLogger } from '@subql/node-core';
-import { AddressLike } from 'ethers';
 import {
+  AddressLike,
   Block,
   BlockTag,
   // BlockWithTransactions,
@@ -19,8 +19,8 @@ import {
   Provider,
   ProviderEvent,
   FeeData,
-} from 'ethers/lib.commonjs/providers';
-import { Listener } from 'ethers/lib.commonjs/utils';
+  Listener,
+} from 'ethers';
 // import type { Deferrable } from 'ethers';
 
 const logger = getLogger('safe.api.ethereum');

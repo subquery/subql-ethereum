@@ -1,7 +1,7 @@
 // Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
-import { toQuantity } from 'ethers/lib.commonjs/utils';
+import { toQuantity } from 'ethers';
 import { formatBlock } from '../../utils.ethereum';
 import { CeloJsonRpcProvider } from './celo-json-rpc-provider';
 

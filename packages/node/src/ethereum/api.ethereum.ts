@@ -17,24 +17,26 @@ import {
   LightEthereumLog,
 } from '@subql/types-ethereum';
 import CacheableLookup from 'cacheable-lookup';
-import { Interface } from 'ethers';
-import { hashMessage } from 'ethers/lib.commonjs/hash';
 import {
   BlockTag,
   Provider,
   Block,
+  hashMessage,
+  Interface,
   TransactionReceipt,
   WebSocketProvider,
   JsonRpcProvider as BaseJsonRpcProvider,
-} from 'ethers/lib.commonjs/providers';
-import { dataSlice, FetchRequest, toQuantity } from 'ethers/lib.commonjs/utils';
+  dataSlice,
+  FetchRequest,
+  toQuantity,
+  JsonRpcApiProviderOptions,
+  Network,
+} from 'ethers';
 import { retryOnFailEth } from '../utils/project';
 import { CeloJsonRpcBatchProvider } from './ethers/celo/celo-json-rpc-batch-provider';
 import { CeloJsonRpcProvider } from './ethers/celo/celo-json-rpc-provider';
 import { CeloWsProvider } from './ethers/celo/celo-ws-provider';
-import { JsonRpcBatchProvider } from './ethers/json-rpc-batch-provider';
 import { JsonRpcProvider } from './ethers/json-rpc-provider';
-// import { ConnectionInfo } from './ethers/web';
 import SafeEthProvider from './safe-api';
 import {
   formatBlock,
@@ -93,15 +95,27 @@ export class EthereumApi implements ApiWrapper {
     private client: BaseJsonRpcProvider | WebSocketProvider;
 
   // This is used within the sandbox when HTTP is used
-  private nonBatchClient?: JsonRpcProvider;
+  private nonBatchClient?: BaseJsonRpcProvider;
   private genesisBlock: Record<string, any>;
   private contractInterfaces: Record<string, Interface> = {};
   private chainId: number;
   private name: string;
+  private isCelo: boolean = null;
 
   // Ethereum POS
   private supportsFinalization = true;
-
+    // Default providerConfigs
+    /*
+    const defaultOptions = {
+        polling: false,
+        staticNetwork: null,
+        batchStallTime: 10,
+        batchMaxSize: (1 << 20),
+        batchMaxCount: 100,
+        cacheTimeout: 250,
+        pollingInterval: 4000
+      };
+     */
   /**
    * @param {string} endpoint - The endpoint of the RPC provider
    * @param {number} blockConfirmations - Used to determine how many blocks behind the head a block is considered finalized. Not used if the network has a concrete finalization mechanism.
@@ -113,7 +127,11 @@ export class EthereumApi implements ApiWrapper {
     private eventEmitter: EventEmitter2,
   ) {
     const { hostname, protocol, searchParams } = new URL(endpoint);
+    this.createClient();
+  }
 
+  private async createClient(options?: JsonRpcApiProviderOptions) {
+    const { protocol, searchParams } = new URL(this.endpoint);
     const protocolStr = protocol.replace(':', '');
 
     logger.info(`Api host: ${hostname}, method: ${protocolStr}`);
@@ -122,48 +140,63 @@ export class EthereumApi implements ApiWrapper {
       connection.setHeader('User-Agent', `Subquery-Node ${packageVersion}`);
       connection.setThrottleParams({ maxAttempts: 5, slotInterval: 1 });
       connection.allowGzip = true;
-      // not sure where agents go ?
-      // const connection  = {
-      //   url: this.endpoint.split('?')[0],
-      //   headers: {
-      //     'User-Agent': `Subquery-Node ${packageVersion}`,
-      //   },
-      //   allowGzip: true,
-      //   // throttleLimit: 5,
-      //   // throttleSlotInterval: 1,
-      //   agents: getHttpAgents(),
-      // };
-      searchParams.forEach((value, name, searchParams) => {
+
+      searchParams.forEach((value, name) => {
         (connection.headers as any)[name] = value;
       });
-      this.client = new JsonRpcBatchProvider(connection);
-      this.nonBatchClient = new JsonRpcProvider(connection);
+
+      this.client = new JsonRpcProvider(
+        connection,
+        undefined,
+        options,
+        this.handleRpcError.bind(this),
+      );
+      this.nonBatchClient = new JsonRpcProvider(
+        connection,
+        undefined,
+        { batchMaxCount: 1 },
+        this.handleRpcError.bind(this),
+      );
     } else if (protocolStr === 'ws' || protocolStr === 'wss') {
       this.client = new WebSocketProvider(this.endpoint);
     } else {
       throw new Error(`Unsupported protocol: ${protocol}`);
     }
+
+    // Now that we have a basic client established, check if it's for Celo
+
+    // If the client is for Celo, reinitialize it with the specific Celo logic
+    if (this.isCelo === null) {
+      // Check the network's chainId only if isCelo isn't already determined.
+      const network = await this.client.getNetwork();
+      this.isCelo = network.chainId === BigInt(42220);
+    }
+
+    if (this.isCelo) {
+      if (this.client instanceof WebSocketProvider) {
+        this.client = new CeloWsProvider(this.endpoint);
+      } else {
+        const connectionUrl = this.client._getConnection().url;
+        this.client = new CeloJsonRpcProvider(
+          connectionUrl,
+          undefined,
+          options,
+          // this.handleRpcError.bind(this)
+        );
+        this.nonBatchClient = new CeloJsonRpcProvider(
+          connectionUrl,
+          undefined,
+          { batchMaxCount: 1 },
+          // this.handleRpcError.bind(this)
+        );
+      }
+    }
   }
 
   async init(): Promise<void> {
     this.injectClient();
-
     const network = await this.client.getNetwork();
-
-    //celo
-    if (network.chainId === BigInt(42220)) {
-      if (this.client instanceof WebSocketProvider) {
-        // TODO ensure this is the correct practice
-        this.client = new CeloWsProvider(this.endpoint);
-      } else {
-        this.client = new CeloJsonRpcBatchProvider(
-          this.client._getConnection().url,
-        );
-        this.nonBatchClient = new CeloJsonRpcProvider(
-          this.client._getConnection().url,
-        );
-      }
-    }
+    this.isCelo = network.chainId === BigInt(42220);
 
     try {
       const [genesisBlock, supportsFinalization, supportsSafe] =
@@ -260,6 +293,61 @@ export class EthereumApi implements ApiWrapper {
       heightOrHash = toQuantity(heightOrHash);
     }
     return this.client.getBlock(heightOrHash);
+  }
+
+  private batchSize = 500;
+  private successfulBatchCount = 0;
+  private failedBatchCount = 0;
+  private batchSizeAdjustmentInterval = 10; // Adjust batch size after every 10 batches
+
+  private adjustBatchSize(success: boolean) {
+    success ? this.successfulBatchCount++ : this.failedBatchCount++;
+    const totalBatches = this.successfulBatchCount + this.failedBatchCount;
+
+    if (totalBatches % this.batchSizeAdjustmentInterval === 0) {
+      const successRate = this.successfulBatchCount / totalBatches;
+
+      // Adjust the batch size based on the success rate.
+      if (successRate < 0.9 && this.batchSize > 1) {
+        this.batchSize--;
+      } else if (successRate > 0.95 && this.batchSize < 10) {
+        this.batchSize++;
+      }
+
+      // Reset the counters
+      this.successfulBatchCount = 0;
+      this.failedBatchCount = 0;
+    }
+  }
+  // private stashedPayloads:JsonRpcPayload[] = []
+
+  private async handleRpcError(e: any): Promise<void> {
+    // I think ethers is swallowing the error, hence it is returning SERVER_ERROR instead of Batch related errors
+    //         id: p.id,
+    //         jsonrpc: '2.0',
+    //         error: { code: -32603, message: 'Batch size limit exceeded' },
+
+    console.log('handle error ', e);
+    if (
+      e.error?.message === 'Batch size limit exceeded' ||
+      e.error?.message === 'exceeded project rate limit' || // infura
+      e.error?.message.includes('Failed to buffer the request body') ||
+      e.error?.message.includes('Too Many Requests') ||
+      e.error?.message.includes('Request Entity Too Large') ||
+      e?.code === 'SERVER_ERROR' // this is hard to detect
+      // error.error?.message === 'Batch size is too large' // why is this on different condition
+    ) {
+      // this.client.pause()
+      // this.stashedPayloads.push(e.error.payload)
+      console.log('recreating cilent');
+      /*
+      if current batch has not been re
+       */
+      this.adjustBatchSize(false);
+      await this.createClient({ batchMaxCount: this.batchSize });
+    } else {
+      throw e;
+    }
   }
 
   private async getBlockPromise(num: number, includeTx = true): Promise<any> {

@@ -2,16 +2,19 @@
 // SPDX-License-Identifier: GPL-3.0
 
 import { getLogger } from '@subql/node-core';
-import { Networkish } from 'ethers/lib.commonjs/providers';
-import { FetchRequest } from 'ethers/lib.commonjs/utils';
+import { FetchRequest, Networkish, JsonRpcApiProviderOptions } from 'ethers';
 import { JsonRpcProvider } from '../json-rpc-provider';
 
 const logger = getLogger('celo-provider');
 
 export class CeloJsonRpcProvider extends JsonRpcProvider {
   private flanHardForkBlock = BigInt('16068685');
-  constructor(url?: FetchRequest | string, network?: Networkish) {
-    super(url, network);
+  constructor(
+    url?: FetchRequest | string,
+    network?: Networkish,
+    options?: JsonRpcApiProviderOptions,
+  ) {
+    super(url, network, options);
 
     const originalBlockFormatter = super._wrapBlock;
     super._wrapBlock = (value, network) => {

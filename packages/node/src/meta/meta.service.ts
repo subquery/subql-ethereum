@@ -12,9 +12,9 @@ import {
 } from '@subql/node-core';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const {
-  version: ethersSdkVersion,
-} = require('ethers/lib.commonjs/package.json');
+// const {
+//   version: ethersSdkVersion,
+// } = require('ethers/package.json');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { version: packageVersion } = require('../../package.json');
 const logger = getLogger('profiler');
@@ -40,7 +40,7 @@ export class MetaService extends BaseMetaService {
 
   protected packageVersion = packageVersion;
   protected sdkVersion(): { name: string; version: string } {
-    return { name: 'ethersSdkVersion', version: ethersSdkVersion };
+    return { name: 'ethersSdkVersion', version: '6.7.1' };
   }
 
   @OnEvent('enqueueBlocks')

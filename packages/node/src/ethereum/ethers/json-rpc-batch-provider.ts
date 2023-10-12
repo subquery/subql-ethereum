@@ -5,12 +5,13 @@
 import {
   JsonRpcApiProviderOptions,
   JsonRpcPayload,
+  JsonRpcProvider,
+  FetchRequest,
   Networkish,
-} from 'ethers/lib.commonjs/providers';
-import { FetchRequest } from 'ethers/lib.commonjs/utils';
+} from 'ethers';
 import { cloneDeep } from 'lodash';
-import { JsonRpcProvider } from './json-rpc-provider';
-import { ConnectionInfo, fetchJson } from './web';
+// import { JsonRpcProvider } from './json-rpc-provider';
+// import { ConnectionInfo, fetchJson } from './web';
 import { getLogger } from '@subql/node-core';
 
 const logger = getLogger('JsonRpcBatchProvider');
@@ -46,12 +47,12 @@ export class JsonRpcBatchProvider extends JsonRpcProvider {
   constructor(
     url: string | FetchRequest,
     network?: Networkish,
-    options?: JsonRpcApiProviderOptions,
+    // options?: JsonRpcApiProviderOptions,
   ) {
+    const options: JsonRpcApiProviderOptions = {
+      batchMaxCount: 10,
+    };
     super(url, network, options);
-
-    // options.batchMaxSize = this.batchSize;
-    // options.
   }
 
   setBatchSize(batchSize: number) {
@@ -112,6 +113,12 @@ export class JsonRpcBatchProvider extends JsonRpcProvider {
       request: cloneDeep(request),
       provider: this,
     });
+
+    async function fetchJson(fetchRequest: FetchRequest, s: string) {
+      return new Promise((resolve) => {
+        resolve('d');
+      });
+    }
 
     return fetchJson(super._getConnection(), JSON.stringify(request))
       .then((result: RpcResult[]) => {

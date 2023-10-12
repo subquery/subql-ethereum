@@ -9,7 +9,7 @@ import {
   EthereumResult,
   EthereumTransaction,
 } from '@subql/types-ethereum';
-import { getAddress } from 'ethers/lib.commonjs/address';
+import { getAddress } from 'ethers';
 import { omit } from 'lodash';
 
 export function calcInterval(api: ApiWrapper): number {

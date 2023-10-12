@@ -10,15 +10,21 @@ import {
   EthereumLogFilter,
   SubqlRuntimeDatasource,
 } from '@subql/types-ethereum';
+import { range } from 'lodash';
 import { EthereumApi } from './api.ethereum';
 import {
   filterLogsProcessor,
   filterTransactionsProcessor,
 } from './block.ethereum';
+import { EthereumBlockWrapped } from './block.ethereum';
+import { JsonRpcProvider } from './ethers/json-rpc-provider';
 
 // Add api key to work
 const HTTP_ENDPOINT = 'https://eth.api.onfinality.io/public';
 const BLOCK_CONFIRMATIONS = 20;
+// const HTTP_ENDPOINT = 'https://eth-mainnet.g.alchemy.com/v2/demo';
+// const HTTP_ENDPOINT = 'https://eth.api.onfinality.io/public';
+// const HTTP_ENDPOINT = 'https://eth.api.onfinality.io/rpc?apikey=448c9af4-db9f-47a9-b498-94e1945d7983'
 
 const ds: SubqlRuntimeDatasource = {
   mapping: {
@@ -51,12 +57,29 @@ describe('Api.ethereum', () => {
     return block as EthereumBlock;
   };
 
+  // let blockData: EthereumBlockWrapped;
+  // let connectionUrl: string;
   beforeEach(async () => {
     ethApi = new EthereumApi(HTTP_ENDPOINT, BLOCK_CONFIRMATIONS, eventEmitter);
     await ethApi.init();
     blockData = await fetchBlock(16258633);
   });
+  it('re initialize class given fail response', async () => {
+    //  'https://eth-mainnet.g.alchemy.com/v2/demo' fails on 1000+ batch Size
+    await (ethApi as any).createClient({ batchMaxCount: 1001 });
 
+    const blocks = range(2841000, 2842100);
+    try {
+      await ethApi.fetchBlocks(blocks);
+      expect((ethApi as any).batchSize).toBe(1001);
+    } catch (e) {
+      // ignore
+    }
+    // const secondReq = await ethApi.fetchBlocks(blocks)
+    // console.log('final length', secondReq.length)
+    // expect(secondReq.length).toBe(blocks.length)
+    // expect((ethApi as any).batchSize).toBeLessThan(1001)
+  });
   it('Should format transaction in logs, and the transaction gas should be bigInt type', () => {
     expect(typeof blockData.logs[0].transaction.gas).toBe('bigint');
     expect(typeof blockData.logs[0].transaction.blockNumber).toBe('number');

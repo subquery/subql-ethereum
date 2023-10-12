@@ -25,6 +25,8 @@ import {
   CustomDatasourceTemplate,
 } from '@subql/types-ethereum';
 import { buildSchemaFromString } from '@subql/utils';
+import Cron from 'cron-converter';
+import { Block } from 'ethers';
 import { GraphQLSchema } from 'graphql';
 import { updateDatasourcesFlare } from '../utils/project';
 

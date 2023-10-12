@@ -1,13 +1,14 @@
 // Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
-import { EventFragment, FunctionFragment } from 'ethers';
-import { id } from 'ethers/lib.commonjs/hash';
 import {
   isHexString,
   stripZerosLeft,
   dataSlice,
-} from 'ethers/lib.commonjs/utils';
+  EventFragment,
+  FunctionFragment,
+  id,
+} from 'ethers';
 
 export function stringNormalizedEq(a: string, b: string): boolean {
   return a.toLowerCase() === b?.toLowerCase();
