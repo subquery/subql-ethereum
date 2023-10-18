@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [3.0.5] - 2023-10-17
 ### Fixed
-- Update 
+- Update `@subql/node-core` to fix:
   - Dictionary validation error causing application exit (#2101)
   - Auto queue flush getting the queue into a bad state (#2103)
   - Fix getCache could not been cleared after reindex, and could have been re-used and lead to error, such as syncPoi
