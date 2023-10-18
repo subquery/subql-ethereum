@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [3.0.6] - 2023-10-18
 ### Fixed
-- Update node-core, fix store bulk methods failing with workers
+- Update node-core, additional fix for store bulk methods failing with workers
 
 ## [3.0.5] - 2023-10-17
 ### Fixed
