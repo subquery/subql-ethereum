@@ -18,13 +18,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Fix getCache could not been cleared after reindex, and could have been re-used and lead to error, such as syncPoi
 
 ## [3.0.4] - 2023-10-12
-### Fixed
-- Update `@subql/node-core` to fix issues with using object destructing for store interface and workers
 ### Changed
 - debug has changed from a boolean to a string to allow scoping debug log level (#2077)
-
 ### Fixed
 - Sync with node-core.
+  - Fix issues with using object destructing for store interface and workers
   - Fixed Poi migration performance issue.
   - Fixed AutoQueue timeout issue.
   - Fixed Poi sync could block DB IO and drop connection issue.
