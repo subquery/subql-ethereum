@@ -3168,7 +3168,25 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@subql/common-ethereum@workspace:*, @subql/common-ethereum@workspace:packages/common-ethereum":
+"@subql/common-ethereum@npm:latest":
+  version: 3.0.5
+  resolution: "@subql/common-ethereum@npm:3.0.5"
+  dependencies:
+    "@subql/common": 3.1.3
+    "@subql/types-ethereum": 3.1.0
+    "@typechain/ethers-v5": ^11.1.1
+    js-yaml: ^4.1.0
+    pino: ^6.13.3
+    reflect-metadata: ^0.1.13
+    typechain: ^8.3.1
+  peerDependencies:
+    class-transformer: "*"
+    class-validator: "*"
+  checksum: 5be9182ac5b3f7a266a5db7109423b4795a27e6ae2fd730d0bbe372a3c706289a6a471c7444f6eeb4ea27a582aa02bb7636b7ff26593f3e69e1c08dadd8927ea
+  languageName: node
+  linkType: hard
+
+"@subql/common-ethereum@workspace:packages/common-ethereum":
   version: 0.0.0-use.local
   resolution: "@subql/common-ethereum@workspace:packages/common-ethereum"
   dependencies:
@@ -3192,7 +3210,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@subql/common@npm:3.1.3":
+"@subql/common@npm:3.1.3, @subql/common@npm:latest":
   version: 3.1.3
   resolution: "@subql/common@npm:3.1.3"
   dependencies:
@@ -3210,19 +3228,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@subql/node-core@npm:^6.1.0":
-  version: 6.1.0
-  resolution: "@subql/node-core@npm:6.1.0"
+"@subql/node-core@npm:6.1.0-poi-logs":
+  version: 6.1.0-poi-logs
+  resolution: "@subql/node-core@npm:6.1.0-poi-logs"
   dependencies:
     "@apollo/client": ^3.7.16
     "@nestjs/common": ^9.4.0
     "@nestjs/event-emitter": ^2.0.0
     "@nestjs/schedule": ^3.0.1
     "@subql/apollo-links": ^1.0.2
-    "@subql/common": 3.1.3
-    "@subql/testing": 2.1.0
-    "@subql/types": 3.2.0
-    "@subql/utils": 2.4.5-0
+    "@subql/common": latest
+    "@subql/testing": latest
+    "@subql/types": latest
+    "@subql/utils": latest
     "@subql/x-sequelize": 6.32.0-0.0.2
     "@willsoto/nestjs-prometheus": ^5.4.0
     async-lock: ^1.4.0
@@ -3237,7 +3255,7 @@ __metadata:
     tar: ^6.1.11
     vm2: ^3.9.19
     yargs: ^16.2.0
-  checksum: 935abc9b53644eb7f2b87ae93764e07e03c3bfee00f90b922fc33224ce76c720d163b30d36b3f71f25ee62d085287b4df361d43744c4e682dc7a3ef29032343e
+  checksum: e5d22a9416516ce832e2891120a3681e12e242b2cb345f81ee459d929e87d7ead046be75e6761a3f0c1d5aac82610dd619db5d6bb603e8b2251959bffc18def6
   languageName: node
   linkType: hard
 
@@ -3254,10 +3272,10 @@ __metadata:
     "@nestjs/schematics": ^9.2.0
     "@nestjs/testing": ^9.4.0
     "@subql/common": 3.1.3
-    "@subql/common-ethereum": "workspace:*"
-    "@subql/node-core": ^6.1.0
+    "@subql/common-ethereum": latest
+    "@subql/node-core": 6.1.0-poi-logs
     "@subql/testing": ^2.0.2
-    "@subql/types-ethereum": "workspace:*"
+    "@subql/types-ethereum": latest
     "@types/express": ^4.17.13
     "@types/jest": ^27.4.0
     "@types/lodash": ^4.14.178
@@ -3286,21 +3304,21 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@subql/testing@npm:2.1.0":
-  version: 2.1.0
-  resolution: "@subql/testing@npm:2.1.0"
-  dependencies:
-    "@subql/types-core": ^0.1.2-0
-  checksum: 42885519277ec48d079accbc68ca600da64e1c960930d506dcd4a207188ad399ff42f81dfeb5d447f235f3bf7ef61ea55d332d47cb10e6d89c4fafda61fe8bac
-  languageName: node
-  linkType: hard
-
 "@subql/testing@npm:^2.0.2":
   version: 2.0.2
   resolution: "@subql/testing@npm:2.0.2"
   dependencies:
     "@subql/types": ^2.1.3
   checksum: c564a80d226509c5343b2ffb8f10f6836a16ace8767bd8805db68ae0b01f000ec5e66b889049d1ff3fc401b5e343d447a5407f14515dc572e5695e15c862a37a
+  languageName: node
+  linkType: hard
+
+"@subql/testing@npm:latest":
+  version: 2.1.0
+  resolution: "@subql/testing@npm:2.1.0"
+  dependencies:
+    "@subql/types-core": ^0.1.2-0
+  checksum: 42885519277ec48d079accbc68ca600da64e1c960930d506dcd4a207188ad399ff42f81dfeb5d447f235f3bf7ef61ea55d332d47cb10e6d89c4fafda61fe8bac
   languageName: node
   linkType: hard
 
@@ -3322,7 +3340,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@subql/types-ethereum@workspace:*, @subql/types-ethereum@workspace:packages/types":
+"@subql/types-ethereum@3.1.0, @subql/types-ethereum@workspace:*, @subql/types-ethereum@workspace:packages/types":
   version: 0.0.0-use.local
   resolution: "@subql/types-ethereum@workspace:packages/types"
   dependencies:
@@ -3331,14 +3349,13 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@subql/types@npm:3.2.0":
-  version: 3.2.0
-  resolution: "@subql/types@npm:3.2.0"
+"@subql/types-ethereum@npm:latest":
+  version: 3.1.0
+  resolution: "@subql/types-ethereum@npm:3.1.0"
   dependencies:
+    "@ethersproject/abstract-provider": ^5.6.1
     "@subql/types-core": 0.2.0
-  peerDependencies:
-    "@polkadot/api": ^10
-  checksum: dbd592a2b7322bcea301bbcd320e1706f0af67330f8a0bf7893f5de5d7df58e139a635a69b4d0a1fc14b7b54972d898ebe54c8303ae3a139db892d673f74cc02
+  checksum: 0c9b541883a5709125ff323b15971fdbba781d89bfaa59e09458bdcb88c897a6e7d49c4a3e9171b84708e5dab543b35980161cabb2eeb3e93ddfb6577db9d59c
   languageName: node
   linkType: hard
 
@@ -3351,9 +3368,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@subql/utils@npm:2.4.5-0":
-  version: 2.4.5-0
-  resolution: "@subql/utils@npm:2.4.5-0"
+"@subql/types@npm:latest":
+  version: 3.2.0
+  resolution: "@subql/types@npm:3.2.0"
+  dependencies:
+    "@subql/types-core": 0.2.0
+  peerDependencies:
+    "@polkadot/api": ^10
+  checksum: dbd592a2b7322bcea301bbcd320e1706f0af67330f8a0bf7893f5de5d7df58e139a635a69b4d0a1fc14b7b54972d898ebe54c8303ae3a139db892d673f74cc02
+  languageName: node
+  linkType: hard
+
+"@subql/utils@npm:latest":
+  version: 2.4.4
+  resolution: "@subql/utils@npm:2.4.4"
   dependencies:
     "@polkadot/util": ^12.2.1
     "@polkadot/util-crypto": ^12.2.1
@@ -3370,7 +3398,7 @@ __metadata:
     rotating-file-stream: ^3.0.2
     semver: ^7.5.2
     tar: ^6.1.11
-  checksum: 7d76203fcb25251225ce7a2a56bf3de8e2a98caed4f1598ca50dea4bf96511bec71b7d4bdbec8648a7b76b654259a94dbdf2c66105961e8aebe780c318ad2ae0
+  checksum: 1b0a4a4435bddc2bb058283a4417611be5b8c0248a99dc9f5ea32a1255b60beb64217e49e6bf1c99fef14625e9fa561bdf5a481e3208229093cdca8dfd59a71f
   languageName: node
   linkType: hard
 
