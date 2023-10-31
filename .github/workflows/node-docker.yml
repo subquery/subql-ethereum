@@ -8,7 +8,7 @@ on:
         required: true
 
 jobs:
-  node-build-push-docker:
+  node-build-push-docker-onfinality:
 
     runs-on: ubuntu-latest
     steps:
@@ -58,7 +58,7 @@ jobs:
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
 
-  node-flare-build-push-docker:
+  node-flare-build-push-docker-onfinality:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
