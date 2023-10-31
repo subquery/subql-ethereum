@@ -257,7 +257,7 @@ describe('Api.ethereum', () => {
 
     // Polygon
     ethApi = new EthereumApi(
-      'https://polygon.api.onfinality.io/public',
+      'https://polygon.llamarpc.com',
       BLOCK_CONFIRMATIONS,
       eventEmitter,
     );
