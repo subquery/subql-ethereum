@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [3.2.0] - 2023-11-06
+## [3.3.0] - 2023-11-06
 ### Added
 - With `dictionary-query-size` now dictionary can config the query block range
 
@@ -311,8 +311,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Init release
 
-[Unreleased]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/3.2.0...HEAD
-[3.2.0]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/3.1.2...node-ethereum/3.2.0
+[Unreleased]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/3.3.0...HEAD
+[3.3.0]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/3.1.2...node-ethereum/3.3.0
 [3.1.2]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/3.1.1...node-ethereum/3.1.2
 [3.1.1]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/3.1.0...node-ethereum/3.1.1
 [3.1.0]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/3.0.6...node-ethereum/3.1.0
