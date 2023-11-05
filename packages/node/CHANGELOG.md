@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [3.2.0] - 2023-11-06
 ### Added
-- With `dictionary-query-size` now dictionary can config the query block range(#2139)
+- With `dictionary-query-size` now dictionary can config the query block range
 
 ### Fixed
 - Sync with node-core 6.3.0 with various fixes
