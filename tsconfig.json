@@ -21,7 +21,7 @@
       "@subql/common-ethereum": ["packages/common-ethereum/src"],
       "@subql/common-ethereum/*": ["packages/common-ethereum/src/*"],
       "@subql/types-ethereum": ["packages/types/src"],
-      "@subql/types-ethereum/*": ["packages/types/src/*"],
+      "@subql/types-ethereum/*": ["packages/types/src/*"]
     },
     "skipLibCheck": true
   },
