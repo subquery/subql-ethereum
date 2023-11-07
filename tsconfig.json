@@ -28,7 +28,7 @@
   "references": [
     {"path": "packages/common-ethereum"},
     {"path": "packages/node"},
-    {"path": "packages/types"},
+    {"path": "packages/types"}
   ],
   "include": ["packages/**/*"],
   "exclude": ["**/node_modules/**"],
