@@ -11,7 +11,7 @@
     "experimentalDecorators": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "lib": ["ES2017", "ES2020"],
+    "lib": ["ES2017", "ES2020", "ES2021"],
     "emitDecoratorMetadata": true,
     "declaration": true,
     "sourceMap": true,
@@ -21,12 +21,15 @@
       "@subql/common-ethereum": ["packages/common-ethereum/src"],
       "@subql/common-ethereum/*": ["packages/common-ethereum/src/*"],
       "@subql/types-ethereum": ["packages/types/src"],
-      "@subql/types-ethereum/*": ["packages/types/src/*"]
+      "@subql/types-ethereum/*": ["packages/types/src/*"],
+      "@subql/node-core": ["packages/node-core/src"],
+      "@subql/node-core/*": ["packages/node-core/src/*"]
     },
     "skipLibCheck": true
   },
   "references": [
     {"path": "packages/common-ethereum"},
+    {"path": "packages/node-core"},
     {"path": "packages/node"},
     {"path": "packages/types"}
   ],
