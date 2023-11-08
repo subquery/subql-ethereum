@@ -25,8 +25,10 @@ COPY --from=builder /app/packages/node/app.tgz /app.tgz
 # Install production dependencies
 RUN apk add --no-cache tini curl git &&  \
     apk add --no-cache python3 make g++ &&  \
-    npm install -g node-gyp &&  \
-    npm i -g app.tgz
+    npm install -g node-gyp
+
+# Install the app
+RUN npm i -g app.tgz
 
 # Clean up unused deps
 RUN rm /app.tgz && \
