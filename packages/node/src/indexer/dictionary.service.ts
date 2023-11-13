@@ -49,7 +49,7 @@ export class DictionaryService extends CoreDictionaryService {
       project.network.dictionary ??
       (await CoreDictionaryService.resolveDictionary(
         NETWORK_FAMILY.ethereum,
-        project.network.chainId,
+        chainAlias,
         nodeConfig.dictionaryRegistry,
       ));
 
