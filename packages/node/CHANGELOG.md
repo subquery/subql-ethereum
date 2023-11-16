@@ -5,14 +5,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-
-## [3.3.4] - 2023-11-16
 ### Fixed
 - Sync with `node-core` 6.4.2, Fix incorrect enqueuedBlocks, dictionaries timing out by updating `@subql/apollo-links`
 
 ## [3.3.3] - 2023-11-13
 ### Changed
-- Updates to match changes in
+- Updates to match changes in 
   - Dictionary service to use dictionary registry
   - Use yargs from node core
 
@@ -330,8 +328,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Init release
 
-[Unreleased]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/3.3.4...HEAD
-[3.3.4]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/3.3.3...node-ethereum/3.3.4
+[Unreleased]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/3.3.3...HEAD
 [3.3.3]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/3.3.2...node-ethereum/3.3.3
 [3.3.2]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/3.3.1...node-ethereum/3.3.2
 [3.3.1]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/3.3.0...node-ethereum/3.3.1
