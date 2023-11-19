@@ -29,9 +29,10 @@ type BatchBlockFetcher<B> = (heights: number[]) => Promise<B[]>;
  * @description Intended to behave the same as WorkerBlockDispatcherService but doesn't use worker threads or any parallel processing
  */
 export abstract class BlockDispatcher<B, DS>
-  extends BaseBlockDispatcher<Queue<number>, DS>
+  extends BaseBlockDispatcher<Queue<number>, DS, B>
   implements OnApplicationShutdown
 {
+  private fatBlocksQueue: Queue<B>;
   private fetchQueue: AutoQueue<B>;
   private processQueue: AutoQueue<void>;
 
@@ -71,9 +72,9 @@ export abstract class BlockDispatcher<B, DS>
       poiSyncService,
       dynamicDsService
     );
+    this.fatBlocksQueue = new Queue(nodeConfig.batchSize * 3);
     this.processQueue = new AutoQueue(nodeConfig.batchSize * 3, 1, nodeConfig.timeout, 'Process');
     this.fetchQueue = new AutoQueue(nodeConfig.batchSize * 3, nodeConfig.batchSize, nodeConfig.timeout, 'Fetch');
-
     if (this.nodeConfig.profiler) {
       this.fetchBlocksBatches = profilerWrap(fetchBlocksBatches, 'BlockDispatcher', 'fetchBlocksBatches');
     } else {
@@ -84,6 +85,13 @@ export abstract class BlockDispatcher<B, DS>
   onApplicationShutdown(): void {
     this.isShutdown = true;
     this.processQueue.abort();
+  }
+  enqueueFatBlocks(fatBlocks: B[], start: number, end: number): void | Promise<void> {
+    logger.info(`Enqueueing fat blocks ${start}...${end}, total ${fatBlocks.length} blocks`);
+    // Still update this number, so loop can continue
+    this.latestBufferedHeight = end;
+    this.fatBlocksQueue.putMany(fatBlocks);
+    void this.processFatBlocksFromQueue();
   }
 
   enqueueBlocks(heights: number[], latestBufferHeight?: number): void {
@@ -118,6 +126,42 @@ export abstract class BlockDispatcher<B, DS>
     logger.debug(
       `QUEUE INFO ${stat}: Block numbers: ${this.queue[stat]}, fetch: ${this.fetchQueue[stat]}, process: ${this.processQueue[stat]}`
     );
+  }
+
+  // eslint-disable-next-line @typescript-eslint/require-await
+  private async processFatBlocksFromQueue(): Promise<void> {
+    if (this.fetching || this.isShutdown) return;
+    this.fetching = true;
+    try {
+      while (!this.isShutdown) {
+        if (
+          !this.fatBlocksQueue.size ||
+          !this.fatBlocksQueue.freeSpace! ||
+          this.fatBlocksQueue.size >= this.processQueue.freeSpace!
+        ) {
+          await delay(1);
+          continue;
+        }
+        const block = this.fatBlocksQueue.take();
+        // This shouldn't happen but if it does it whould get caught above
+        if (!block) {
+          continue;
+        }
+        const height = this.getBlockHeight(block);
+        await this.preProcessBlock(height);
+        // Inject runtimeVersion here to enhance api.at preparation
+        const processBlockResponse = await this.indexBlock(block);
+        await this.postProcessBlock(height, processBlockResponse);
+      }
+    } catch (e) {
+      // @ts-ignore
+      logger.error(e, `Failed to process block from fat dictionary`);
+      if (!this.isShutdown) {
+        process.exit(1);
+      }
+    } finally {
+      this.fetching = false;
+    }
   }
 
   private async fetchBlocksFromQueue(): Promise<void> {
@@ -176,7 +220,6 @@ export abstract class BlockDispatcher<B, DS>
                   await this.preProcessBlock(height);
                   // Inject runtimeVersion here to enhance api.at preparation
                   const processBlockResponse = await this.indexBlock(block);
-
                   await this.postProcessBlock(height, processBlockResponse);
 
                   //set block to null for garbage collection

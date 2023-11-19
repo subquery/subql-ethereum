@@ -9,6 +9,7 @@ import {dictHttpLink} from '@subql/apollo-links';
 import {NETWORK_FAMILY} from '@subql/common';
 import {DictionaryQueryCondition, DictionaryQueryEntry, BaseDataSource} from '@subql/types-core';
 import {buildQuery, GqlNode, GqlQuery, GqlVar, MetaData} from '@subql/utils';
+import axios, {AxiosInstance, AxiosResponse} from 'axios';
 import fetch from 'cross-fetch';
 import {NodeConfig} from '../configure';
 import {IndexerEvent} from '../events';
@@ -163,6 +164,7 @@ export class DictionaryService {
   protected _genesisHash?: string;
 
   private metadataValid?: boolean;
+  private dictionaryApi: AxiosInstance;
 
   constructor(
     readonly dictionaryEndpoint: string | undefined,
@@ -198,6 +200,10 @@ export class DictionaryService {
           fetchPolicy: 'no-cache',
         },
       },
+    });
+
+    this.dictionaryApi = axios.create({
+      baseURL: `http://localhost:3000/rpc`,
     });
   }
 

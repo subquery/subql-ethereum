@@ -41,8 +41,8 @@ function initAutoQueue<T>(
   return new AutoQueue(workers * batchSize * 2, 1, timeout, name);
 }
 
-export abstract class WorkerBlockDispatcher<DS, W extends Worker>
-  extends BaseBlockDispatcher<AutoQueue<void>, DS>
+export abstract class WorkerBlockDispatcher<DS, W extends Worker, B>
+  extends BaseBlockDispatcher<AutoQueue<void>, DS, B>
   implements OnApplicationShutdown
 {
   protected workers: W[] = [];
@@ -100,6 +100,11 @@ export abstract class WorkerBlockDispatcher<DS, W extends Worker>
     if (this.workers) {
       await Promise.all(this.workers.map((w) => w.terminate()));
     }
+  }
+
+  enqueueFatBlocks(fatBlocks: B[], start: number, end: number): void | Promise<void> {
+    // Todo, need better logic, we can switch to v1 dictionary
+    throw new Error(`Workers not support fat dictionary`);
   }
 
   async enqueueBlocks(heights: number[], latestBufferHeight?: number): Promise<void> {

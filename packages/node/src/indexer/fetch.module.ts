@@ -28,6 +28,7 @@ import {
 import { DictionaryService } from './dictionary.service';
 import { DsProcessorService } from './ds-processor.service';
 import { DynamicDsService } from './dynamic-ds.service';
+import { EthFatDictionaryService } from './fatDictionary/eth-fat-dictionary.service';
 import { FetchService } from './fetch.service';
 import { IndexerManager } from './indexer.manager';
 import { ProjectService } from './project.service';
@@ -155,6 +156,21 @@ import { UnfinalizedBlocksService } from './unfinalizedBlocks.service';
     ConnectionPoolService,
     IndexingBenchmarkService,
     PoiBenchmarkService,
+    EthFatDictionaryService,
+    // {
+    //   provide: FatDictionaryService,
+    //   useFactory: async (
+    //     project: SubqueryProject,
+    //     nodeConfig: NodeConfig,
+    //     eventEmitter: EventEmitter2,
+    //   ) => {
+    //     const fatDictionaryService = await FatDictionaryService.create(
+    //       nodeConfig
+    //     );
+    //     return fatDictionaryService;
+    //   },
+    //   inject: ['ISubqueryProject', NodeConfig, EventEmitter2],
+    // },
     {
       provide: DictionaryService,
       useFactory: async (

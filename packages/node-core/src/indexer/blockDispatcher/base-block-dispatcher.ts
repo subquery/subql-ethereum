@@ -25,9 +25,9 @@ export type ProcessBlockResponse = {
   reindexBlockHeight: number | null;
 };
 
-export interface IBlockDispatcher {
+export interface IBlockDispatcher<B> {
   enqueueBlocks(heights: number[], latestBufferHeight?: number): void | Promise<void>;
-
+  enqueueFatBlocks(blocks: B[], start: number, end: number): void | Promise<void>;
   queueSize: number;
   freeSize: number;
   latestBufferedHeight: number;
@@ -44,7 +44,7 @@ function isNullMerkelRoot(operationHash: Uint8Array): boolean {
   return u8aEq(operationHash, NULL_MERKEL_ROOT);
 }
 
-export abstract class BaseBlockDispatcher<Q extends IQueue, DS> implements IBlockDispatcher {
+export abstract class BaseBlockDispatcher<Q extends IQueue, DS, B> implements IBlockDispatcher<B> {
   protected _latestBufferedHeight = 0;
   protected _processedBlockCount = 0;
   protected _latestProcessedHeight = 0;
@@ -67,6 +67,8 @@ export abstract class BaseBlockDispatcher<Q extends IQueue, DS> implements IBloc
   ) {}
 
   abstract enqueueBlocks(heights: number[], latestBufferHeight?: number): void | Promise<void>;
+
+  abstract enqueueFatBlocks(fatBlock: B[], start: number, end: number): void | Promise<void>;
 
   async init(onDynamicDsCreated: (height: number) => Promise<void>): Promise<void> {
     this._onDynamicDsCreated = onDynamicDsCreated;

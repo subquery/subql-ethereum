@@ -65,6 +65,10 @@ export class BlockDispatcherService
     );
   }
 
+  onApplicationShutdown(signal?: string) {
+    throw new Error('Method not implemented.');
+  }
+
   protected getBlockHeight(block: BlockContent): number {
     return block.number;
   }

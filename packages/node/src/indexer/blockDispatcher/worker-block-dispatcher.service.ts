@@ -18,6 +18,7 @@ import {
   InMemoryCacheService,
   createIndexerWorker,
 } from '@subql/node-core';
+import { EthereumBlock } from '@subql/types-ethereum';
 import {
   EthereumProjectDs,
   SubqueryProject,
@@ -34,9 +35,15 @@ type IndexerWorker = IIndexerWorker & {
 
 @Injectable()
 export class WorkerBlockDispatcherService
-  extends WorkerBlockDispatcher<EthereumProjectDs, IndexerWorker>
+  extends WorkerBlockDispatcher<EthereumProjectDs, IndexerWorker, EthereumBlock>
   implements OnApplicationShutdown
 {
+  enqueueFatBlocks<B>(
+    fatBlock: B[],
+    latestBufferHeight?: number,
+  ): void | Promise<void> {
+    throw new Error('Method not implemented.');
+  }
   constructor(
     nodeConfig: NodeConfig,
     eventEmitter: EventEmitter2,

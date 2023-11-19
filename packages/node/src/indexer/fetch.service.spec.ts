@@ -401,6 +401,7 @@ describe('Dictionary queries', () => {
         null,
         null,
         null,
+        null,
       );
 
       const queryEntry = (fetchService as any).buildDictionaryQueryEntries(

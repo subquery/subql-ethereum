@@ -24,6 +24,7 @@ export interface IConfig {
   readonly networkEndpoint?: string[];
   readonly primaryNetworkEndpoint?: string;
   readonly networkDictionary?: string;
+  readonly fatDictionary?: string;
   readonly dictionaryResolver?: string | false;
   readonly dictionaryRegistry: string;
   readonly outputFmt?: 'json';
@@ -143,6 +144,10 @@ export class NodeConfig<C extends IConfig = IConfig> implements IConfig {
 
   get networkDictionary(): string | undefined {
     return this._config.networkDictionary;
+  }
+
+  get fatDictionary(): string | undefined {
+    return this._config.fatDictionary;
   }
 
   get storeCacheThreshold(): number {

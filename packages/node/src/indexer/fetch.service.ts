@@ -23,7 +23,7 @@ import {
   DictionaryQueryCondition,
   DictionaryQueryEntry,
 } from '@subql/types-core';
-import { SubqlDatasource } from '@subql/types-ethereum';
+import { EthereumBlock, SubqlDatasource } from '@subql/types-ethereum';
 import { groupBy, partition, sortBy, uniqBy } from 'lodash';
 import { SubqueryProject } from '../configure/SubqueryProject';
 import { EthereumApi } from '../ethereum';
@@ -33,6 +33,8 @@ import { yargsOptions } from '../yargs';
 import { IEthereumBlockDispatcher } from './blockDispatcher';
 import { DictionaryService } from './dictionary.service';
 import { DynamicDsService } from './dynamic-ds.service';
+import { EthFatDictionaryService } from './fatDictionary/eth-fat-dictionary.service';
+import { RawEthFatBlock } from './fatDictionary/types';
 import { ProjectService } from './project.service';
 import {
   blockToHeader,
@@ -225,7 +227,9 @@ export function buildDictionaryQueryEntries(
 export class FetchService extends BaseFetchService<
   SubqlDatasource,
   IEthereumBlockDispatcher,
-  DictionaryService
+  DictionaryService,
+  EthereumBlock,
+  RawEthFatBlock
 > {
   constructor(
     private apiService: ApiService,
@@ -239,6 +243,7 @@ export class FetchService extends BaseFetchService<
     private unfinalizedBlocksService: UnfinalizedBlocksService,
     eventEmitter: EventEmitter2,
     schedulerRegistry: SchedulerRegistry,
+    fatDictionaryService: EthFatDictionaryService,
   ) {
     super(
       nodeConfig,
@@ -249,6 +254,7 @@ export class FetchService extends BaseFetchService<
       dynamicDsService,
       eventEmitter,
       schedulerRegistry,
+      fatDictionaryService,
     );
   }
 

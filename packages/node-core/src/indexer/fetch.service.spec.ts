@@ -13,6 +13,7 @@ import {
   IBlockDispatcher,
   IProjectService,
   NodeConfig,
+  FatDictionaryService,
 } from '..';
 import {BlockHeightMap} from '../utils/blockHeightMap';
 import {BaseFetchService} from './fetch.service';
@@ -20,7 +21,7 @@ import {BaseFetchService} from './fetch.service';
 const CHAIN_INTERVAL = 100; // 100ms
 const genesisHash = '0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3';
 
-class TestFetchService extends BaseFetchService<BaseDataSource, IBlockDispatcher, DictionaryService> {
+class TestFetchService extends BaseFetchService<BaseDataSource, IBlockDispatcher<any>, DictionaryService, any, any> {
   finalizedHeight = 1000;
   bestHeight = 20;
   modulos: number[] = [];
@@ -105,6 +106,18 @@ const getDictionaryService = () =>
     },
   } as any as DictionaryService);
 
+const getFatDictionaryService = () =>
+  ({
+    useDictionary: true,
+    buildDictionaryEntryMap: () => {
+      /* TODO*/
+    },
+    startHeight: 0,
+    scopedDictionaryEntries: () => {
+      /* TODO */
+    },
+  } as any as FatDictionaryService<any, any>);
+
 const getBlockDispatcher = () => {
   const inst = {
     latestBufferedHeight: 0,
@@ -125,8 +138,9 @@ const getBlockDispatcher = () => {
 
 describe('Fetch Service', () => {
   let fetchService: TestFetchService;
-  let blockDispatcher: IBlockDispatcher;
+  let blockDispatcher: IBlockDispatcher<any>;
   let dictionaryService: DictionaryService;
+  let fatDictionaryService: FatDictionaryService<any, any>;
   let networkConfig: IProjectNetworkConfig;
 
   beforeEach(() => {
@@ -135,6 +149,7 @@ describe('Fetch Service', () => {
 
     blockDispatcher = getBlockDispatcher();
     dictionaryService = getDictionaryService();
+    fatDictionaryService = getFatDictionaryService();
     networkConfig = getNetworkConfig();
 
     fetchService = new TestFetchService(
@@ -145,7 +160,8 @@ describe('Fetch Service', () => {
       dictionaryService,
       dynamicDsService,
       eventEmitter,
-      schedulerRegistry
+      schedulerRegistry,
+      fatDictionaryService
     );
 
     (fetchService as any).projectService.getDataSourcesMap = jest.fn(

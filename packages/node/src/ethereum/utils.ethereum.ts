@@ -26,7 +26,7 @@ function handleAddress(value: string): string | null {
   return getAddress(value);
 }
 
-function handleNumber(value: string | number): BigNumber {
+export function handleNumber(value: string | number): BigNumber {
   if (value === undefined) {
     return Zero;
   }
