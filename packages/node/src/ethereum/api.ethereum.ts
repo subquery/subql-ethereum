@@ -110,7 +110,7 @@ export class EthereumApi implements ApiWrapper {
     private endpoint: string,
     private blockConfirmations: number,
     private eventEmitter: EventEmitter2,
-    private unfinalizedBlocks: boolean,
+    private unfinalizedBlocks = false,
   ) {
     const { hostname, protocol, searchParams } = new URL(endpoint);
 
