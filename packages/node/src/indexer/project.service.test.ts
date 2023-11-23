@@ -8,7 +8,7 @@ import { ProjectService } from './project.service';
 const HTTP_ENDPOINT = 'https://eth.llamarpc.com';
 
 const mockApiService = (): EthereumApiService => {
-  const ethApi = new EthereumApi(HTTP_ENDPOINT, 20, new EventEmitter2());
+  const ethApi = new EthereumApi(HTTP_ENDPOINT, 20, new EventEmitter2(), false);
 
   // await ethApi.init();
 
