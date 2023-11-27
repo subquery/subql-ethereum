@@ -53,8 +53,10 @@ export class UnfinalizedBlocksService extends BaseUnfinalizedBlocksService<Ether
     this.supportsFinalization = supportsFinalisation;
     return super.init(reindex);
   }
-
-  // Detect a fork by walking back through unfinalized blocks
+  /**
+   * Checks if a fork has happened, this doesn't find the start of the fork just where it was detected
+   * @returns (Header | undefined) - The header may be the forked header but will most likely be the main header. Either way it should be used just for the block height
+   * */
   @profiler()
   protected async hasForked(): Promise<Header | undefined> {
     if (this.supportsFinalization) {
@@ -96,6 +98,10 @@ export class UnfinalizedBlocksService extends BaseUnfinalizedBlocksService<Ether
     return;
   }
 
+  /**
+   * Finds the height before the fork occurred based on the result of hasForked
+   * @return (number | undefined) - The block height to rewind to to remove forked data
+   **/
   protected async getLastCorrectFinalizedBlock(
     forkedHeader: Header,
   ): Promise<number | undefined> {
@@ -124,15 +130,9 @@ export class UnfinalizedBlocksService extends BaseUnfinalizedBlocksService<Ether
 
     try {
       const poiHeader = await this.findFinalizedUsingPOI(checkingHeader);
-      logger.info(`Using POI to rewind to ${JSON.stringify(poiHeader)}`);
       return poiHeader.blockHeight;
     } catch (e) {
       if (e.message === POI_NOT_ENABLED_ERROR_MESSAGE) {
-        console.log(
-          'HERE',
-          (this.nodeConfig as EthereumNodeConfig).blockForkReindex,
-          forkedHeader.blockHeight,
-        );
         return Math.max(
           0,
           forkedHeader.blockHeight -
