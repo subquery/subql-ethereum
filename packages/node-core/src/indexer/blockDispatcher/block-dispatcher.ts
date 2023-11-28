@@ -29,7 +29,7 @@ type BatchBlockFetcher<B> = (heights: number[]) => Promise<B[]>;
  * @description Intended to behave the same as WorkerBlockDispatcherService but doesn't use worker threads or any parallel processing
  */
 export abstract class BlockDispatcher<B, DS>
-  extends BaseBlockDispatcher<Queue<number>, DS, B>
+  extends BaseBlockDispatcher<Queue<B | number>, DS, B>
   implements OnApplicationShutdown
 {
   private fatBlocksQueue: Queue<B>;
@@ -86,27 +86,33 @@ export abstract class BlockDispatcher<B, DS>
     this.isShutdown = true;
     this.processQueue.abort();
   }
-  enqueueFatBlocks(fatBlocks: B[], start: number, end: number): void | Promise<void> {
-    logger.info(`Enqueueing fat blocks ${start}...${end}, total ${fatBlocks.length} blocks`);
-    // Still update this number, so loop can continue
-    this.latestBufferedHeight = end;
-    this.fatBlocksQueue.putMany(fatBlocks);
-    void this.processFatBlocksFromQueue();
-  }
 
-  enqueueBlocks(heights: number[], latestBufferHeight?: number): void {
+  enqueueBlocks(heightsBlocks: (B | number)[], latestBufferHeight?: number): void {
     // In the case where factors of batchSize is equal to bypassBlock or when heights is []
     // to ensure block is bypassed, we set the latestBufferHeight to the heights
     // make sure lastProcessedHeight in metadata is updated
-    if (!!latestBufferHeight && !heights.length) {
-      heights = [latestBufferHeight];
+    if (!!latestBufferHeight && !heightsBlocks.length) {
+      heightsBlocks = [latestBufferHeight];
     }
-    logger.info(`Enqueueing blocks ${heights[0]}...${last(heights)}, total ${heights.length} blocks`);
-
-    // Those blocks will still be filtered in the handler
-    this.queue.putMany(heights);
-
-    this.latestBufferedHeight = latestBufferHeight ?? last(heights) ?? this.latestBufferedHeight;
+    let startBlockHeight: number;
+    let endBlockHeight: number | undefined;
+    try {
+      if (isArrayOfType<number>(heightsBlocks, 'number')) {
+        startBlockHeight = heightsBlocks[0];
+        endBlockHeight = last(heightsBlocks);
+        logger.info(`Enqueueing blocks ${startBlockHeight}...${endBlockHeight}, total ${heightsBlocks.length} blocks`);
+      } else if (isArrayOfType<B>(heightsBlocks, 'block')) {
+        startBlockHeight = this.getBlockHeight(heightsBlocks[0]);
+        endBlockHeight = this.getBlockHeight(heightsBlocks[heightsBlocks.length - 1]);
+        logger.info(
+          `Enqueueing fat blocks ${startBlockHeight}...${endBlockHeight}, total ${heightsBlocks.length} blocks`
+        );
+      }
+    } catch (e) {
+      throw new Error(`Enqueue blocks failed, ${e}`);
+    }
+    this.queue.putMany(heightsBlocks);
+    this.latestBufferedHeight = latestBufferHeight ?? endBlockHeight ?? this.latestBufferedHeight;
     void this.fetchBlocksFromQueue();
   }
 
@@ -127,43 +133,6 @@ export abstract class BlockDispatcher<B, DS>
       `QUEUE INFO ${stat}: Block numbers: ${this.queue[stat]}, fetch: ${this.fetchQueue[stat]}, process: ${this.processQueue[stat]}`
     );
   }
-
-  // eslint-disable-next-line @typescript-eslint/require-await
-  private async processFatBlocksFromQueue(): Promise<void> {
-    if (this.fetching || this.isShutdown) return;
-    this.fetching = true;
-    try {
-      while (!this.isShutdown) {
-        if (
-          !this.fatBlocksQueue.size ||
-          !this.fatBlocksQueue.freeSpace! ||
-          this.fatBlocksQueue.size >= this.processQueue.freeSpace!
-        ) {
-          await delay(1);
-          continue;
-        }
-        const block = this.fatBlocksQueue.take();
-        // This shouldn't happen but if it does it whould get caught above
-        if (!block) {
-          continue;
-        }
-        const height = this.getBlockHeight(block);
-        await this.preProcessBlock(height);
-        // Inject runtimeVersion here to enhance api.at preparation
-        const processBlockResponse = await this.indexBlock(block);
-        await this.postProcessBlock(height, processBlockResponse);
-      }
-    } catch (e) {
-      // @ts-ignore
-      logger.error(e, `Failed to process block from fat dictionary`);
-      if (!this.isShutdown) {
-        process.exit(1);
-      }
-    } finally {
-      this.fetching = false;
-    }
-  }
-
   private async fetchBlocksFromQueue(): Promise<void> {
     if (this.fetching || this.isShutdown) return;
 
@@ -177,14 +146,11 @@ export abstract class BlockDispatcher<B, DS>
           await delay(1);
           continue;
         }
-
-        const blockNum = this.queue.take();
-
+        const blockOrNum = this.queue.take();
         // This shouldn't happen but if it does it whould get caught above
-        if (!blockNum) {
+        if (!blockOrNum) {
           continue;
         }
-
         // Used to compare before and after as a way to check if queue was flushed
         const bufferedHeight = this._latestBufferedHeight;
 
@@ -198,10 +164,14 @@ export abstract class BlockDispatcher<B, DS>
             if (memoryLock.isLocked()) {
               await memoryLock.waitForUnlock();
             }
-            const [block] = await this.fetchBlocksBatches([blockNum]);
-
-            this.smartBatchService.addToSizeBuffer([block]);
-            return block;
+            if (typeof blockOrNum === 'number') {
+              const [block] = await this.fetchBlocksBatches([blockOrNum]);
+              this.smartBatchService.addToSizeBuffer([block]);
+              return block;
+            } else {
+              // return block
+              return blockOrNum;
+            }
           })
           .then(
             (block) => {
@@ -211,7 +181,9 @@ export abstract class BlockDispatcher<B, DS>
                 // Check if the queues have been flushed between queue.takeMany and fetchBlocksBatches resolving
                 // Peeking the queue is because the latestBufferedHeight could have regrown since fetching block
                 const peeked = this.queue.peek();
-                if (bufferedHeight > this._latestBufferedHeight || (peeked && peeked < blockNum)) {
+
+                // TODO, check peeked height vs fat block/ height
+                if (bufferedHeight > this._latestBufferedHeight || (peeked && peeked < blockOrNum)) {
                   logger.info(`Queue was reset for new DS, discarding fetched blocks`);
                   return;
                 }
@@ -242,7 +214,7 @@ export abstract class BlockDispatcher<B, DS>
                 // Do nothing, fetching the block was flushed, this could be caused by forked blocks or dynamic datasources
                 return;
               }
-              logger.error(e, `Failed to fetch block ${blockNum}.`);
+              logger.error(e, `Failed to fetch block ${blockOrNum}.`);
               throw e;
             }
           )
@@ -263,5 +235,16 @@ export abstract class BlockDispatcher<B, DS>
     } finally {
       this.fetching = false;
     }
+  }
+}
+
+// Used to assert enqueued items array is blocks/ number types
+function isArrayOfType<T>(arr: unknown[], type: 'number' | 'block'): arr is T[] {
+  if (type === 'number') {
+    return arr.every((item) => typeof item === 'number');
+  } else if (type === 'block') {
+    return arr.every((item) => typeof item !== 'number');
+  } else {
+    throw new Error('Invalid type in array');
   }
 }

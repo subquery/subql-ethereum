@@ -25,9 +25,8 @@ export type ProcessBlockResponse = {
   reindexBlockHeight: number | null;
 };
 
-export interface IBlockDispatcher<B> {
-  enqueueBlocks(heights: number[], latestBufferHeight?: number): void | Promise<void>;
-  enqueueFatBlocks(blocks: B[], start: number, end: number): void | Promise<void>;
+export interface IBlockDispatcher<B = number> {
+  enqueueBlocks(heights: B[], latestBufferHeight?: number): void | Promise<void>;
   queueSize: number;
   freeSize: number;
   latestBufferedHeight: number;
@@ -66,9 +65,7 @@ export abstract class BaseBlockDispatcher<Q extends IQueue, DS, B> implements IB
     protected dynamicDsService: DynamicDsService<any>
   ) {}
 
-  abstract enqueueBlocks(heights: number[], latestBufferHeight?: number): void | Promise<void>;
-
-  abstract enqueueFatBlocks(fatBlock: B[], start: number, end: number): void | Promise<void>;
+  abstract enqueueBlocks(heights: (B | number)[], latestBufferHeight?: number): void | Promise<void>;
 
   async init(onDynamicDsCreated: (height: number) => Promise<void>): Promise<void> {
     this._onDynamicDsCreated = onDynamicDsCreated;

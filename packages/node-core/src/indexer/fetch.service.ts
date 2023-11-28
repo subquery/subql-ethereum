@@ -22,7 +22,7 @@ const CHECK_MEMORY_INTERVAL = 60000;
 
 export abstract class BaseFetchService<
   DS extends BaseDataSource,
-  B extends IBlockDispatcher<FB>,
+  B extends IBlockDispatcher<number | FB>,
   D extends DictionaryService,
   FB,
   RFB
@@ -380,7 +380,7 @@ export abstract class BaseFetchService<
   }
 
   private async enqueueFatBlocks(response: FatDictionaryResponse<FB>): Promise<void> {
-    await this.blockDispatcher.enqueueFatBlocks(response.blocks, response.start, response.end);
+    await this.blockDispatcher.enqueueBlocks(response.blocks, response.end);
   }
 
   /**
