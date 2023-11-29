@@ -14,6 +14,7 @@ import {
   IProjectService,
   NodeConfig,
   FatDictionaryService,
+  FatDictionaryQueryEntry,
 } from '..';
 import {BlockHeightMap} from '../utils/blockHeightMap';
 import {BaseFetchService} from './fetch.service';
@@ -51,6 +52,10 @@ class TestFetchService extends BaseFetchService<BaseDataSource, IBlockDispatcher
   }
   async preLoopHook(data: {startHeight: number}): Promise<void> {
     return Promise.resolve();
+  }
+
+  protected buildFatDictionaryQueryEntries(dataSources: BaseDataSource[]): FatDictionaryQueryEntry {
+    return {};
   }
 }
 

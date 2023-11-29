@@ -22,3 +22,5 @@ export interface FatDictionaryMetadata {
   filters: any[];
   supported: string[];
 }
+
+export type FatDictionaryQueryEntry = Record<string, object>;

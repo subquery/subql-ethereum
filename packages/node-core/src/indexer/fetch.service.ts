@@ -14,7 +14,7 @@ import {checkMemoryUsage, cleanedBatchBlocks, delay, transformBypassBlocks, wait
 import {IBlockDispatcher} from './blockDispatcher';
 import {DictionaryService} from './dictionary.service';
 import {DynamicDsService} from './dynamic-ds.service';
-import {FatDictionaryResponse, FatDictionaryService} from './fatDictionary';
+import {FatDictionaryQueryEntry, FatDictionaryResponse, FatDictionaryService} from './fatDictionary';
 import {IProjectService} from './types';
 
 const logger = getLogger('FetchService');
@@ -35,6 +35,7 @@ export abstract class BaseFetchService<
   private bypassBlocks: number[] = [];
 
   protected abstract buildDictionaryQueryEntries(dataSources: DS[]): DictionaryQueryEntry[];
+  protected abstract buildFatDictionaryQueryEntries(dataSources: DS[]): FatDictionaryQueryEntry;
 
   // If the chain doesn't have a distinction between the 2 it should return the same value for finalized and best
   protected abstract getFinalizedHeight(): Promise<number>;
@@ -93,9 +94,9 @@ export abstract class BaseFetchService<
   }
 
   private updateFatDictionary(): void {
-    return this.fatDictionaryService.buildDictionaryEntryMap<DS>(
+    return this.fatDictionaryService.buildFatDictionaryQueryMap<DS>(
       this.projectService.getDataSourcesMap(),
-      this.buildDictionaryQueryEntries.bind(this)
+      this.buildFatDictionaryQueryEntries.bind(this)
     );
   }
 
@@ -165,7 +166,7 @@ export abstract class BaseFetchService<
     }
 
     if (this.nodeConfig.fatDictionary) {
-      await this.fatDictionaryService.initDictionary();
+      await this.fatDictionaryService.initDictionary(this.getGenesisHash());
       this.updateFatDictionary();
     }
 

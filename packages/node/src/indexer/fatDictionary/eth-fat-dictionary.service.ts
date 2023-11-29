@@ -9,14 +9,9 @@ import {
   FatDictionaryService,
   RawFatDictionaryResponseData,
 } from '@subql/node-core';
-import { DictionaryQueryEntry } from '@subql/types-core';
 import { EthereumBlock } from '@subql/types-ethereum';
-import { RawEthFatBlock, EthFatDictionaryConditions } from './types';
-import {
-  entryToLogConditions,
-  entryToTxConditions,
-  rawFatBlockToEthBlock,
-} from './utils';
+import { RawEthFatBlock, EthFatDictionaryQueryEntry } from './types';
+import { rawFatBlockToEthBlock } from './utils';
 
 const MIN_FAT_FETCH_LIMIT = 200;
 const FAT_BLOCKS_QUERY_METHOD = `subql_filterBlocks`;
@@ -46,12 +41,11 @@ export class EthFatDictionaryService extends FatDictionaryService<
     startBlock: number,
     queryEndBlock: number,
     limit = MIN_FAT_FETCH_LIMIT,
-    conditions?: DictionaryQueryEntry[],
+    conditions?: EthFatDictionaryQueryEntry,
   ): Promise<RawFatDictionaryResponseData<RawEthFatBlock> | undefined> {
     if (!conditions) {
       return undefined;
     }
-    const requestConditions = this.dictionaryFatQuery(conditions);
     const requestData = {
       jsonrpc: '2.0',
       method: FAT_BLOCKS_QUERY_METHOD,
@@ -60,7 +54,7 @@ export class EthFatDictionaryService extends FatDictionaryService<
         startBlock,
         queryEndBlock,
         limit,
-        requestConditions,
+        conditions,
         { blockHeader: true, logs: true, transactions: { data: true } },
       ],
     };
@@ -81,26 +75,6 @@ export class EthFatDictionaryService extends FatDictionaryService<
       // Handle the error as needed
       throw new Error(`Fat dictionary get capacity failed ${error}`);
     }
-  }
-
-  dictionaryFatQuery(
-    dictionaryQueryEntries: DictionaryQueryEntry[],
-  ): EthFatDictionaryConditions {
-    const queryConditions: EthFatDictionaryConditions = {
-      logs: [],
-      transactions: [],
-    };
-    for (const entry of dictionaryQueryEntries) {
-      if (entry.entity === 'evmTransactions') {
-        queryConditions.transactions.push(
-          entryToTxConditions(entry.conditions),
-        );
-      }
-      if (entry.entity === 'evmLogs') {
-        queryConditions.logs.push(entryToLogConditions(entry.conditions));
-      }
-    }
-    return queryConditions;
   }
 
   convertResponseBlocks(
