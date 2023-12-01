@@ -88,33 +88,10 @@ export async function updateDatasourcesFlare(
       return handler;
     });
 
-    // if (dataSource.assets) {
-    //   for (const [, asset] of dataSource.assets.entries()) {
-    //     if (reader instanceof LocalReader) {
-    //       asset.file = path.resolve(root, asset.file);
-    //     } else {
-    //       const res = await reader.getFile(asset.file);
-    //       const outputPath = path.resolve(
-    //         root,
-    //         asset.file.replace('ipfs://', ''),
-    //       );
-    //       await fs.promises.writeFile(outputPath, res as string);
-    //       asset.file = outputPath;
-    //     }
-    //   }
-    // }
-
     return dataSource;
   });
 
-  const ds = await updateDataSourcesV1_0_0(
-    partialUpdate,
-    reader,
-    root,
-    isCustomDs,
-  );
-
-  return ds;
+  return updateDataSourcesV1_0_0(partialUpdate, reader, root, isCustomDs);
 }
 
 function dsContainsNonEventHandlers(ds: EthereumProjectDs): boolean {
