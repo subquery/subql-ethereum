@@ -15,7 +15,7 @@ export interface FatDictionaryResponse<FB> {
   end: number;
 }
 
-export interface FatDictionaryMetadata {
+export interface DictionaryV2Metadata {
   start: number;
   end: number;
   genesisHash: string;
@@ -23,4 +23,4 @@ export interface FatDictionaryMetadata {
   supported: string[];
 }
 
-export type FatDictionaryQueryEntry = Record<string, object>;
+export type DictionaryV2QueryEntry = Record<string, object>;

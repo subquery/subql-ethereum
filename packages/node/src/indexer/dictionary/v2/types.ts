@@ -1,7 +1,7 @@
 // Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
-import { FatDictionaryQueryEntry } from '@subql/node-core';
+import { DictionaryV2QueryEntry } from '@subql/node-core';
 
 export interface RawEthFatBlock {
   Header: {
@@ -64,7 +64,7 @@ export interface RawEthFatLog {
 /**
  * Eth Fat dictionary RPC request filter conditions
  */
-export interface EthFatDictionaryQueryEntry extends FatDictionaryQueryEntry {
+export interface EthDictionaryV2QueryEntry extends DictionaryV2QueryEntry {
   logs: EthFatDictionaryLogConditions[];
   transactions: EthFatDictionaryTxConditions[];
 }

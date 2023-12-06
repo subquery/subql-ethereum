@@ -18,6 +18,7 @@ import {
   PoiSyncService,
   InMemoryCacheService,
 } from '@subql/node-core';
+import { DictionaryService } from '@subql/node-core/indexer/dictionary/core-dictionary.service';
 import { SubqueryProject } from '../configure/SubqueryProject';
 import { EthereumApiConnection } from '../ethereum/api.connection';
 import { EthereumApiService } from '../ethereum/api.service.ethereum';
@@ -25,10 +26,9 @@ import {
   BlockDispatcherService,
   WorkerBlockDispatcherService,
 } from './blockDispatcher';
-import { DictionaryService } from './dictionary.service';
+import { EthDictionaryService } from './dictionary/ethDictionary.service';
 import { DsProcessorService } from './ds-processor.service';
 import { DynamicDsService } from './dynamic-ds.service';
-import { EthFatDictionaryService } from './fatDictionary/eth-fat-dictionary.service';
 import { FetchService } from './fetch.service';
 import { IndexerManager } from './indexer.manager';
 import { ProjectService } from './project.service';
@@ -156,7 +156,6 @@ import { UnfinalizedBlocksService } from './unfinalizedBlocks.service';
     ConnectionPoolService,
     IndexingBenchmarkService,
     PoiBenchmarkService,
-    EthFatDictionaryService,
     // {
     //   provide: FatDictionaryService,
     //   useFactory: async (
@@ -172,13 +171,14 @@ import { UnfinalizedBlocksService } from './unfinalizedBlocks.service';
     //   inject: ['ISubqueryProject', NodeConfig, EventEmitter2],
     // },
     {
-      provide: DictionaryService,
+      provide: EthDictionaryService,
       useFactory: async (
         project: SubqueryProject,
         nodeConfig: NodeConfig,
         eventEmitter: EventEmitter2,
+        // eslint-disable-next-line @typescript-eslint/require-await
       ) => {
-        const dictionaryService = await DictionaryService.create(
+        const dictionaryService = new EthDictionaryService(
           project,
           nodeConfig,
           eventEmitter,

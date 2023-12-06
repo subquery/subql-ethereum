@@ -7,7 +7,7 @@ import {
   EthereumLog,
   EthereumTransaction,
 } from '@subql/types-ethereum';
-import { formatLog, formatTransaction } from '../../ethereum/utils.ethereum';
+import { formatLog, formatTransaction } from '../../../ethereum/utils.ethereum';
 import {
   EthFatDictionaryLogConditions,
   EthFatDictionaryTxConditions,

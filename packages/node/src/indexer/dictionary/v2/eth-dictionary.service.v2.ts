@@ -2,32 +2,39 @@
 // SPDX-License-Identifier: GPL-3.0
 
 import assert from 'assert';
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import {
   NodeConfig,
   FatDictionaryResponse,
-  FatDictionaryService,
+  DictionaryServiceV2,
   RawFatDictionaryResponseData,
 } from '@subql/node-core';
 import { EthereumBlock } from '@subql/types-ethereum';
-import { RawEthFatBlock, EthFatDictionaryQueryEntry } from './types';
+import { SubqueryProject } from '../../../configure/SubqueryProject';
+import { RawEthFatBlock, EthDictionaryV2QueryEntry } from './types';
 import { rawFatBlockToEthBlock } from './utils';
 
 const MIN_FAT_FETCH_LIMIT = 200;
 const FAT_BLOCKS_QUERY_METHOD = `subql_filterBlocks`;
 
 @Injectable()
-export class EthFatDictionaryService extends FatDictionaryService<
+export class EthDictionaryServiceV2 extends DictionaryServiceV2<
   RawEthFatBlock,
   EthereumBlock
 > {
-  constructor(nodeConfig: NodeConfig) {
-    super(nodeConfig);
-  }
-
-  get dictionaryEndpoint(): string {
-    assert(this.nodeConfig.fatDictionary, 'fat dictionary not in node config');
-    return this.nodeConfig.fatDictionary;
+  constructor(
+    @Inject('ISubqueryProject') protected project: SubqueryProject,
+    nodeConfig: NodeConfig,
+    eventEmitter: EventEmitter2,
+    chainId?: string,
+  ) {
+    super(
+      project.network.dictionary,
+      chainId ?? project.network.chainId,
+      nodeConfig,
+      eventEmitter,
+    );
   }
 
   /**
@@ -41,7 +48,7 @@ export class EthFatDictionaryService extends FatDictionaryService<
     startBlock: number,
     queryEndBlock: number,
     limit = MIN_FAT_FETCH_LIMIT,
-    conditions?: EthFatDictionaryQueryEntry,
+    conditions?: EthDictionaryV2QueryEntry,
   ): Promise<RawFatDictionaryResponseData<RawEthFatBlock> | undefined> {
     if (!conditions) {
       return undefined;

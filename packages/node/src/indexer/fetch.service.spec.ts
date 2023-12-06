@@ -11,7 +11,8 @@ import {
   EthereumProjectDsTemplate,
   SubqueryProject,
 } from '../configure/SubqueryProject';
-import { buildDictionaryQueryEntries, FetchService } from './fetch.service';
+import { buildDictionaryV1QueryEntries } from './dictionary/ethDictionary.service';
+import { FetchService } from './fetch.service';
 
 // const HTTP_ENDPOINT = 'https://eth.api.onfinality.io/public';
 const HTTP_ENDPOINT = 'https://eth.llamarpc.com';
@@ -103,7 +104,7 @@ describe('Dictionary queries', () => {
           ],
         },
       };
-      const result = buildDictionaryQueryEntries([ds]);
+      const result = buildDictionaryV1QueryEntries([ds]);
 
       expect(result).toEqual([
         {
@@ -151,7 +152,7 @@ describe('Dictionary queries', () => {
         },
       };
 
-      const result = buildDictionaryQueryEntries([ds]);
+      const result = buildDictionaryV1QueryEntries([ds]);
 
       expect(result).toEqual([
         {
@@ -184,7 +185,7 @@ describe('Dictionary queries', () => {
         },
       };
 
-      const result = buildDictionaryQueryEntries([ds]);
+      const result = buildDictionaryV1QueryEntries([ds]);
       expect(result).toEqual([
         {
           entity: 'evmTransactions',
@@ -224,7 +225,7 @@ describe('Dictionary queries', () => {
         },
       };
 
-      const result = buildDictionaryQueryEntries([ds]);
+      const result = buildDictionaryV1QueryEntries([ds]);
       expect(result).toEqual([
         {
           entity: 'evmTransactions',
@@ -263,7 +264,7 @@ describe('Dictionary queries', () => {
         },
       };
 
-      const result = buildDictionaryQueryEntries([ds]);
+      const result = buildDictionaryV1QueryEntries([ds]);
       expect(result).toEqual([
         {
           entity: 'evmTransactions',
@@ -302,7 +303,7 @@ describe('Dictionary queries', () => {
         },
       };
 
-      const result = buildDictionaryQueryEntries([ds]);
+      const result = buildDictionaryV1QueryEntries([ds]);
       expect(result).toEqual([
         {
           entity: 'evmTransactions',
@@ -339,7 +340,7 @@ describe('Dictionary queries', () => {
           ],
         },
       };
-      const result = buildDictionaryQueryEntries([ds]);
+      const result = buildDictionaryV1QueryEntries([ds]);
       expect(result).toEqual([
         {
           entity: 'evmLogs',
@@ -395,7 +396,6 @@ describe('Dictionary queries', () => {
         null,
         null,
         project,
-        null,
         null,
         null,
         null,

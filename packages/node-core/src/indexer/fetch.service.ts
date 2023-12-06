@@ -5,16 +5,16 @@ import assert from 'assert';
 import {OnApplicationShutdown} from '@nestjs/common';
 import {EventEmitter2} from '@nestjs/event-emitter';
 import {Interval, SchedulerRegistry} from '@nestjs/schedule';
-import {DictionaryQueryEntry, BaseDataSource, IProjectNetworkConfig} from '@subql/types-core';
+import {BaseDataSource, IProjectNetworkConfig} from '@subql/types-core';
 import {range, uniq, without} from 'lodash';
 import {NodeConfig} from '../configure';
 import {IndexerEvent} from '../events';
 import {getLogger} from '../logger';
 import {checkMemoryUsage, cleanedBatchBlocks, delay, transformBypassBlocks, waitForBatchSize} from '../utils';
 import {IBlockDispatcher} from './blockDispatcher';
-import {DictionaryService} from './dictionary.service';
+import {DictionaryService} from './dictionary/core-dictionary.service';
+import {DictionaryServiceV1} from './dictionary/v1/dictionaryService.v1';
 import {DynamicDsService} from './dynamic-ds.service';
-import {FatDictionaryQueryEntry, FatDictionaryResponse, FatDictionaryService} from './fatDictionary';
 import {IProjectService} from './types';
 
 const logger = getLogger('FetchService');
@@ -23,7 +23,7 @@ const CHECK_MEMORY_INTERVAL = 60000;
 export abstract class BaseFetchService<
   DS extends BaseDataSource,
   B extends IBlockDispatcher<number | FB>,
-  D extends DictionaryService,
+  D extends DictionaryServiceV1,
   FB,
   RFB
 > implements OnApplicationShutdown
@@ -33,9 +33,6 @@ export abstract class BaseFetchService<
   private isShutdown = false;
   private batchSizeScale = 1;
   private bypassBlocks: number[] = [];
-
-  protected abstract buildDictionaryQueryEntries(dataSources: DS[]): DictionaryQueryEntry[];
-  protected abstract buildFatDictionaryQueryEntries(dataSources: DS[]): FatDictionaryQueryEntry;
 
   // If the chain doesn't have a distinction between the 2 it should return the same value for finalized and best
   protected abstract getFinalizedHeight(): Promise<number>;
@@ -59,11 +56,10 @@ export abstract class BaseFetchService<
     protected projectService: IProjectService<DS>,
     protected networkConfig: IProjectNetworkConfig,
     protected blockDispatcher: B,
-    protected dictionaryService: D,
+    protected dictionaryService: DictionaryService<RFB, FB, D>,
     private dynamicDsService: DynamicDsService<DS>,
     private eventEmitter: EventEmitter2,
-    private schedulerRegistry: SchedulerRegistry,
-    private fatDictionaryService: FatDictionaryService<RFB, FB>
+    private schedulerRegistry: SchedulerRegistry
   ) {}
 
   private get latestBestHeight(): number {
@@ -86,37 +82,18 @@ export abstract class BaseFetchService<
     this.isShutdown = true;
   }
 
-  private updateDictionary(): void {
-    return this.dictionaryService.buildDictionaryEntryMap<DS>(
-      this.projectService.getDataSourcesMap(),
-      this.buildDictionaryQueryEntries.bind(this)
-    );
-  }
-
-  private updateFatDictionary(): void {
-    return this.fatDictionaryService.buildFatDictionaryQueryMap<DS>(
-      this.projectService.getDataSourcesMap(),
-      this.buildFatDictionaryQueryEntries.bind(this)
-    );
-  }
-
   private get useDictionary(): boolean {
-    return (
-      this.dictionaryService.useDictionary &&
-      !!this.dictionaryService.queriesMap?.get(
+    let queryMapValid: boolean;
+    if (this.dictionaryService.isV1Dictionary()) {
+      queryMapValid = !!this.dictionaryService.queriesMap?.get(
         this.blockDispatcher.latestBufferedHeight || this.projectService.getStartBlockFromDataSources()
-      )?.length
-    );
-  }
-
-  private get useFatDictionary(): boolean {
-    if (this.nodeConfig.fatDictionary) {
-      return this.fatDictionaryService.useFatDictionary(
+      )?.length;
+    } else {
+      queryMapValid = !!this.dictionaryService.queriesMap?.get(
         this.blockDispatcher.latestBufferedHeight || this.projectService.getStartBlockFromDataSources()
       );
-    } else {
-      return false;
     }
+    return this.dictionaryService.useDictionary && queryMapValid;
   }
 
   private updateBypassBlocksFromDatasources(): void {
@@ -158,16 +135,12 @@ export abstract class BaseFetchService<
     );
 
     if (this.networkConfig.dictionary || this.nodeConfig.dictionaryResolver) {
-      this.updateDictionary();
       //  We pass in genesis hash in order validate dictionary metadata, genesisHash should always exist in apiService.
       //  Call metadata here, other network should align with this
       //  For substrate, we might use the specVersion metadata in future if we have same error handling as in node-core
-      await this.dictionaryService.initValidation(this.getGenesisHash());
-    }
-
-    if (this.nodeConfig.fatDictionary) {
-      await this.fatDictionaryService.initDictionary(this.getGenesisHash());
-      this.updateFatDictionary();
+      await this.dictionaryService.initDictionary(this.getGenesisHash());
+      // Update dictionary now need execute after dictionary initialized, as it require to have dictionary version before buildDictionaryEntryMap
+      this.updateDictionary();
     }
 
     await this.preLoopHook({startHeight});
@@ -178,6 +151,10 @@ export abstract class BaseFetchService<
 
   getLatestFinalizedHeight(): number {
     return this.latestFinalizedHeight;
+  }
+
+  private updateDictionary(): void {
+    return this.dictionaryService.buildDictionaryEntryMap<DS>(this.projectService.getDataSourcesMap());
   }
 
   @Interval(CHECK_MEMORY_INTERVAL)
@@ -266,7 +243,7 @@ export abstract class BaseFetchService<
         : initBlockHeight;
     };
 
-    if (this.useFatDictionary && this.useDictionary && this.dictionaryService.startHeight > getStartBlockHeight()) {
+    if (this.useDictionary && this.dictionaryService.startHeight > getStartBlockHeight()) {
       logger.warn(
         `Dictionary start height ${
           this.dictionaryService.startHeight
@@ -291,17 +268,19 @@ export abstract class BaseFetchService<
         continue;
       }
 
-      if (this.useFatDictionary) {
-        const fatBlocksResponse = await this.fatDictionaryService.scopedQueryFatDictionary(
-          startBlockHeight,
-          scaledBatchSize
-        );
-        if (fatBlocksResponse === undefined) {
-          return;
-        }
-        await this.enqueueFatBlocks(fatBlocksResponse);
-        continue;
-      } else if (
+      // if (this.useFatDictionary) {
+      //   const fatBlocksResponse = await this.fatDictionaryService.scopedQueryFatDictionary(
+      //     startBlockHeight,
+      //     scaledBatchSize
+      //   );
+      //   if (fatBlocksResponse === undefined) {
+      //     return;
+      //   }
+      //   await this.enqueueFatBlocks(fatBlocksResponse);
+      //   continue;
+      // }
+
+      if (
         this.useDictionary &&
         startBlockHeight >= this.dictionaryService.startHeight &&
         startBlockHeight < this.latestFinalizedHeight
@@ -325,26 +304,27 @@ export abstract class BaseFetchService<
             logger.debug(`Queue was reset for new DS, discarding dictionary query result`);
             continue;
           }
-
           if (dictionary) {
-            let {batchBlocks} = dictionary;
-
-            const moduloBlocks = this.getModuloBlocks(
-              startBlockHeight,
-              // If the results fill the batch size then use the last block in the reesults
-              batchBlocks.length >= scaledBatchSize ? Math.max(...batchBlocks) : queryEndBlock
-            );
-            batchBlocks = uniq(batchBlocks.concat(moduloBlocks)).sort((a, b) => a - b);
+            const {batchBlocks} = dictionary;
+            // TODO, bring back modulo blocks sort with fat blocks
+            // const moduloBlocks = this.getModuloBlocks(
+            //   startBlockHeight,
+            //   // If the results fill the batch size then use the last block in the reesults
+            //   batchBlocks.length >= scaledBatchSize ? Math.max(...batchBlocks) : queryEndBlock
+            // );
+            // batchBlocks = uniq(batchBlocks.concat(moduloBlocks)).sort((a, b) => a - b);
             if (batchBlocks.length === 0) {
               // There we're no blocks in this query range, we can set a new height we're up to
               await this.blockDispatcher.enqueueBlocks(
                 [],
-                Math.min(dictionary.queryEndBlock, dictionary._metadata.lastProcessedHeight)
+                dictionary.queryEndBlock
+                // TODO, query endBlock now should return ->
+                // Math.min(dictionary.queryEndBlock, dictionary._metadata.lastProcessedHeight)
               );
             } else {
               const maxBlockSize = Math.min(batchBlocks.length, this.blockDispatcher.freeSize);
               const enqueueBlocks = batchBlocks.slice(0, maxBlockSize);
-              await this.enqueueBlocks(enqueueBlocks, latestHeight);
+              // await this.enqueueBlocks(enqueueBlocks, latestHeight);
             }
             continue; // skip nextBlockRange() way
           }
@@ -361,7 +341,7 @@ export abstract class BaseFetchService<
             ? this.getEnqueuedModuloBlocks(startBlockHeight, latestHeight)
             : range(startBlockHeight, endHeight + 1);
 
-        await this.enqueueBlocks(enqueuingBlocks, latestHeight);
+        // await this.enqueueBlocks(enqueuingBlocks, latestHeight);
       }
     }
   }
@@ -372,17 +352,15 @@ export abstract class BaseFetchService<
    * @param latestHeight ensure LatestBufferHeight get updated if enqueuingBlocks is empty
    * @private
    */
-  private async enqueueBlocks(enqueuingBlocks: number[], latestHeight: number): Promise<void> {
-    const cleanedBatchBlocks = this.filteredBlockBatch(enqueuingBlocks);
-    await this.blockDispatcher.enqueueBlocks(
-      cleanedBatchBlocks,
-      this.getLatestBufferHeight(cleanedBatchBlocks, enqueuingBlocks, latestHeight)
-    );
-  }
-
-  private async enqueueFatBlocks(response: FatDictionaryResponse<FB>): Promise<void> {
-    await this.blockDispatcher.enqueueBlocks(response.blocks, response.end);
-  }
+  // private async enqueueBlocks(enqueuingBlocks: number[]|RFB[], latestHeight: number): Promise<void> {
+  //   // TODO, bring back clean blocks
+  //   // const cleanedBatchBlocks = this.filteredBlockBatch(enqueuingBlocks);
+  //   await this.blockDispatcher.enqueueBlocks(
+  //     enqueuingBlocks,
+  //     // TODO, last height of this
+  //     // this.getLatestBufferHeight(cleanedBatchBlocks, enqueuingBlocks, latestHeight)
+  //   );
+  // }
 
   /**
    *
@@ -431,12 +409,12 @@ export abstract class BaseFetchService<
 
   resetForNewDs(blockHeight: number): void {
     this.dynamicDsService.deleteTempDsRecords(blockHeight);
-    this.updateDictionary();
+    // this.updateDictionary();
     this.blockDispatcher.flushQueue(blockHeight);
   }
 
   resetForIncorrectBestBlock(blockHeight: number): void {
-    this.updateDictionary();
+    // this.updateDictionary();
     this.blockDispatcher.flushQueue(blockHeight);
   }
 }

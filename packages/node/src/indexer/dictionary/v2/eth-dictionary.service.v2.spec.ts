@@ -6,9 +6,12 @@ import {
   EthereumDatasourceKind,
   EthereumHandlerKind,
 } from '@subql/types-ethereum';
-import { EthereumProjectDs } from '../../configure/SubqueryProject';
-import { buildDictionaryQueryEntries } from '../fetch.service';
-import { EthFatDictionaryService } from './eth-fat-dictionary.service';
+import {
+  EthereumProjectDs,
+  SubqueryProject,
+} from '../../../configure/SubqueryProject';
+import { buildDictionaryV2QueryEntry } from '../ethDictionary.service';
+import { EthDictionaryServiceV2 } from './eth-dictionary.service.v2';
 
 const HTTP_ENDPOINT = 'https://polygon.api.onfinality.io/public';
 const mockDs: EthereumProjectDs[] = [
@@ -45,13 +48,17 @@ const nodeConfig = new NodeConfig({
   subquery: 'polygon-starter',
   subqueryName: 'polygon-starter',
   dictionaryTimeout: 10,
-  fatDictionary: 'http://127.0.0.1:3000/rpc', // Change to any fat dictionary rpc
   networkEndpoint: [HTTP_ENDPOINT],
 });
 
-const fatDictionaryService = new EthFatDictionaryService(nodeConfig);
+const fatDictionaryService = new EthDictionaryServiceV2(
+  {} as SubqueryProject,
+  nodeConfig,
+  undefined,
+  '',
+);
 
-const dictionaryQueryEntries = buildDictionaryQueryEntries(mockDs);
+const dictionaryQueryEntries = buildDictionaryV2QueryEntry(mockDs);
 
 let fatDictionaryQueryEntries;
 // beforeAll(async () => {

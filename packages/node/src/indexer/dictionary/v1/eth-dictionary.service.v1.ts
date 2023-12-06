@@ -3,20 +3,19 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import {
-  NodeConfig,
-  DictionaryService as CoreDictionaryService,
-} from '@subql/node-core';
+import { NodeConfig, DictionaryServiceV1 } from '@subql/node-core';
 import { MetaData } from '@subql/utils';
 import JSON5 from 'json5';
 import fetch from 'node-fetch';
-import { SubqueryProject } from '../configure/SubqueryProject';
+import { SubqueryProject } from '../../../configure/SubqueryProject';
 
 const CHAIN_ALIASES_URL =
   'https://raw.githubusercontent.com/subquery/templates/main/chainAliases.json5';
 
 @Injectable()
-export class DictionaryService extends CoreDictionaryService {
+export class EthDictionaryServiceV1 extends DictionaryServiceV1 {
+  private apiGenesisHash: string;
+
   private constructor(
     @Inject('ISubqueryProject') protected project: SubqueryProject,
     nodeConfig: NodeConfig,
@@ -35,7 +34,7 @@ export class DictionaryService extends CoreDictionaryService {
     project: SubqueryProject,
     nodeConfig: NodeConfig,
     eventEmitter: EventEmitter2,
-  ): Promise<DictionaryService> {
+  ): Promise<EthDictionaryServiceV1> {
     /*Some dictionarys for EVM are built with other SDKs as they are chains with an EVM runtime
      * we maintain a list of aliases so we can map the evmChainId to the genesis hash of the other SDKs
      * e.g moonbeam is built with Substrate SDK but can be used as an EVM dictionary
@@ -43,7 +42,12 @@ export class DictionaryService extends CoreDictionaryService {
     const chainAliases = await this.getEvmChainId();
     const chainAlias = chainAliases[project.network.chainId];
 
-    return new DictionaryService(project, nodeConfig, eventEmitter, chainAlias);
+    return new EthDictionaryServiceV1(
+      project,
+      nodeConfig,
+      eventEmitter,
+      chainAlias,
+    );
   }
 
   protected validateChainMeta(metaData: MetaData): boolean {

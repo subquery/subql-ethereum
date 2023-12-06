@@ -98,11 +98,6 @@ export const yargsOptions = yargs(hideBin(process.argv))
       describe: 'Use SubQuery Network dictionary resolver',
       type: 'string',
     },
-    'fat-dictionary': {
-      demandOption: false,
-      describe: 'Fat dictionary api',
-      type: 'string',
-    },
     'dictionary-timeout': {
       demandOption: false,
       describe: 'Max timeout for dictionary query',
