@@ -6,14 +6,14 @@ import {OnApplicationShutdown} from '@nestjs/common';
 import {EventEmitter2} from '@nestjs/event-emitter';
 import {Interval, SchedulerRegistry} from '@nestjs/schedule';
 import {BaseDataSource, IProjectNetworkConfig} from '@subql/types-core';
-import {range, uniq, without} from 'lodash';
+import {range, without} from 'lodash';
 import {NodeConfig} from '../configure';
 import {IndexerEvent} from '../events';
 import {getLogger} from '../logger';
 import {checkMemoryUsage, cleanedBatchBlocks, delay, transformBypassBlocks, waitForBatchSize} from '../utils';
 import {IBlockDispatcher} from './blockDispatcher';
-import {DictionaryService} from './dictionary/core-dictionary.service';
-import {DictionaryServiceV1} from './dictionary/v1/dictionaryService.v1';
+import {DictionaryServiceV1} from './dictionary';
+import {DictionaryService} from './dictionary/dictionary.service';
 import {DynamicDsService} from './dynamic-ds.service';
 import {IProjectService} from './types';
 
@@ -23,7 +23,7 @@ const CHECK_MEMORY_INTERVAL = 60000;
 export abstract class BaseFetchService<
   DS extends BaseDataSource,
   B extends IBlockDispatcher<number | FB>,
-  D extends DictionaryServiceV1,
+  D extends DictionaryServiceV1<DS>,
   FB,
   RFB
 > implements OnApplicationShutdown
@@ -56,7 +56,7 @@ export abstract class BaseFetchService<
     protected projectService: IProjectService<DS>,
     protected networkConfig: IProjectNetworkConfig,
     protected blockDispatcher: B,
-    protected dictionaryService: DictionaryService<RFB, FB, D>,
+    protected dictionaryService: DictionaryService<RFB, FB, DS, D>,
     private dynamicDsService: DynamicDsService<DS>,
     private eventEmitter: EventEmitter2,
     private schedulerRegistry: SchedulerRegistry
@@ -83,17 +83,12 @@ export abstract class BaseFetchService<
   }
 
   private get useDictionary(): boolean {
-    let queryMapValid: boolean;
-    if (this.dictionaryService.isV1Dictionary()) {
-      queryMapValid = !!this.dictionaryService.queriesMap?.get(
+    return (
+      this.dictionaryService.useDictionary &&
+      this.dictionaryService.dictionary.queryMapValidByHeight(
         this.blockDispatcher.latestBufferedHeight || this.projectService.getStartBlockFromDataSources()
-      )?.length;
-    } else {
-      queryMapValid = !!this.dictionaryService.queriesMap?.get(
-        this.blockDispatcher.latestBufferedHeight || this.projectService.getStartBlockFromDataSources()
-      );
-    }
-    return this.dictionaryService.useDictionary && queryMapValid;
+      )
+    );
   }
 
   private updateBypassBlocksFromDatasources(): void {
@@ -138,7 +133,8 @@ export abstract class BaseFetchService<
       //  We pass in genesis hash in order validate dictionary metadata, genesisHash should always exist in apiService.
       //  Call metadata here, other network should align with this
       //  For substrate, we might use the specVersion metadata in future if we have same error handling as in node-core
-      await this.dictionaryService.initDictionary(this.getGenesisHash());
+      await this.dictionaryService.initDictionary();
+      await this.dictionaryService.initValidation(this.getGenesisHash());
       // Update dictionary now need execute after dictionary initialized, as it require to have dictionary version before buildDictionaryEntryMap
       this.updateDictionary();
     }
@@ -149,12 +145,8 @@ export abstract class BaseFetchService<
     void this.startLoop(startHeight);
   }
 
-  getLatestFinalizedHeight(): number {
-    return this.latestFinalizedHeight;
-  }
-
   private updateDictionary(): void {
-    return this.dictionaryService.buildDictionaryEntryMap<DS>(this.projectService.getDataSourcesMap());
+    return this.dictionaryService.buildDictionaryEntryMap(this.projectService.getDataSourcesMap());
   }
 
   @Interval(CHECK_MEMORY_INTERVAL)
@@ -243,10 +235,10 @@ export abstract class BaseFetchService<
         : initBlockHeight;
     };
 
-    if (this.useDictionary && this.dictionaryService.startHeight > getStartBlockHeight()) {
+    if (this.useDictionary && this.dictionaryService.dictionary.startHeight > getStartBlockHeight()) {
       logger.warn(
         `Dictionary start height ${
-          this.dictionaryService.startHeight
+          this.dictionaryService.dictionary.startHeight
         } is beyond indexing height ${getStartBlockHeight()}, skipping dictionary for now`
       );
     }
@@ -268,35 +260,18 @@ export abstract class BaseFetchService<
         continue;
       }
 
-      // if (this.useFatDictionary) {
-      //   const fatBlocksResponse = await this.fatDictionaryService.scopedQueryFatDictionary(
-      //     startBlockHeight,
-      //     scaledBatchSize
-      //   );
-      //   if (fatBlocksResponse === undefined) {
-      //     return;
-      //   }
-      //   await this.enqueueFatBlocks(fatBlocksResponse);
-      //   continue;
-      // }
-
       if (
         this.useDictionary &&
-        startBlockHeight >= this.dictionaryService.startHeight &&
+        startBlockHeight >= this.dictionaryService.dictionary.startHeight &&
         startBlockHeight < this.latestFinalizedHeight
       ) {
         /* queryEndBlock needs to be limited by the latest height or the maximum value of endBlock in datasources.
          * Dictionaries could be in the future depending on if they index unfinalized blocks or the node is using an RPC endpoint that is behind.
          */
-        const queryEndBlock = Math.min(
-          startBlockHeight + this.nodeConfig.dictionaryQuerySize,
-          this.latestFinalizedHeight
-        );
-
         try {
           const dictionary = await this.dictionaryService.scopedDictionaryEntries(
             startBlockHeight,
-            queryEndBlock,
+            this.dictionaryService.dictionary.getQueryEndBlock(startBlockHeight, this.latestFinalizedHeight),
             scaledBatchSize
           );
 
@@ -318,7 +293,7 @@ export abstract class BaseFetchService<
               await this.blockDispatcher.enqueueBlocks(
                 [],
                 dictionary.queryEndBlock
-                // TODO, query endBlock now should return ->
+                // TODO, query endBlock now should return include->
                 // Math.min(dictionary.queryEndBlock, dictionary._metadata.lastProcessedHeight)
               );
             } else {

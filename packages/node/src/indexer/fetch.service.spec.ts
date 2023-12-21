@@ -11,7 +11,7 @@ import {
   EthereumProjectDsTemplate,
   SubqueryProject,
 } from '../configure/SubqueryProject';
-import { buildDictionaryV1QueryEntries } from './dictionary/ethDictionary.service';
+import { buildDictionaryV1QueryEntries } from './dictionary/v1';
 import { FetchService } from './fetch.service';
 
 // const HTTP_ENDPOINT = 'https://eth.api.onfinality.io/public';

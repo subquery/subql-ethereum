@@ -18,7 +18,6 @@ import {
   PoiSyncService,
   InMemoryCacheService,
 } from '@subql/node-core';
-import { DictionaryService } from '@subql/node-core/indexer/dictionary/core-dictionary.service';
 import { SubqueryProject } from '../configure/SubqueryProject';
 import { EthereumApiConnection } from '../ethereum/api.connection';
 import { EthereumApiService } from '../ethereum/api.service.ethereum';
@@ -156,20 +155,6 @@ import { UnfinalizedBlocksService } from './unfinalizedBlocks.service';
     ConnectionPoolService,
     IndexingBenchmarkService,
     PoiBenchmarkService,
-    // {
-    //   provide: FatDictionaryService,
-    //   useFactory: async (
-    //     project: SubqueryProject,
-    //     nodeConfig: NodeConfig,
-    //     eventEmitter: EventEmitter2,
-    //   ) => {
-    //     const fatDictionaryService = await FatDictionaryService.create(
-    //       nodeConfig
-    //     );
-    //     return fatDictionaryService;
-    //   },
-    //   inject: ['ISubqueryProject', NodeConfig, EventEmitter2],
-    // },
     {
       provide: EthDictionaryService,
       useFactory: async (

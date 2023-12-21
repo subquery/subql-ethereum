@@ -10,7 +10,7 @@ import {
   EthereumProjectDs,
   SubqueryProject,
 } from '../../../configure/SubqueryProject';
-import { buildDictionaryV2QueryEntry } from '../ethDictionary.service';
+import { buildDictionaryV2QueryEntry } from '../v2';
 import { EthDictionaryServiceV2 } from './eth-dictionary.service.v2';
 
 const HTTP_ENDPOINT = 'https://polygon.api.onfinality.io/public';
