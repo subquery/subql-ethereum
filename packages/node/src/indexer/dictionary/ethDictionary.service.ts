@@ -7,6 +7,7 @@ import { NETWORK_FAMILY } from '@subql/common';
 import { DictionaryVersion, NodeConfig } from '@subql/node-core';
 import { DictionaryService } from '@subql/node-core/indexer/dictionary/dictionary.service';
 import { EthereumBlock, SubqlDatasource } from '@subql/types-ethereum';
+import { logger } from 'ethers';
 import { SubqueryProject } from '../../configure/SubqueryProject';
 import { EthDictionaryServiceV1 } from './v1/eth-dictionary.service.v1';
 import { EthDictionaryServiceV2, RawEthFatBlock } from './v2';

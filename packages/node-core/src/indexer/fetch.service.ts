@@ -290,16 +290,11 @@ export abstract class BaseFetchService<
             // batchBlocks = uniq(batchBlocks.concat(moduloBlocks)).sort((a, b) => a - b);
             if (batchBlocks.length === 0) {
               // There we're no blocks in this query range, we can set a new height we're up to
-              await this.blockDispatcher.enqueueBlocks(
-                [],
-                dictionary.queryEndBlock
-                // TODO, query endBlock now should return include->
-                // Math.min(dictionary.queryEndBlock, dictionary._metadata.lastProcessedHeight)
-              );
+              await this.blockDispatcher.enqueueBlocks([], dictionary.queryEndBlock);
             } else {
               const maxBlockSize = Math.min(batchBlocks.length, this.blockDispatcher.freeSize);
               const enqueueBlocks = batchBlocks.slice(0, maxBlockSize);
-              // await this.enqueueBlocks(enqueueBlocks, latestHeight);
+              await this.blockDispatcher.enqueueBlocks(enqueueBlocks, latestHeight);
             }
             continue; // skip nextBlockRange() way
           }

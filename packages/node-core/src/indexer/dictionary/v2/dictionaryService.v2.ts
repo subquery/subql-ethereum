@@ -53,7 +53,7 @@ export abstract class DictionaryServiceV2<
   abstract getDictionary(startBlock: number, queryEndBlock: number, limit: number): Promise<Dictionary<FB> | undefined>;
 
   queryMapValidByHeight(height: number): boolean {
-    return !!this.queriesMap?.get(height)?.length;
+    return !!this.queriesMap?.get(height);
   }
 
   dictionaryValidation(metaData?: DictionaryV2Metadata, startBlockHeight?: number): boolean {

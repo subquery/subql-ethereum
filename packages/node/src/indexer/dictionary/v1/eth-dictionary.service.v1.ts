@@ -27,8 +27,6 @@ const CHAIN_ALIASES_URL =
 
 const logger = getLogger('eth-dictionary v1');
 
-console.log('XXXXX', DictionaryServiceV1);
-
 export function appendDsOptions(
   dsOptions: SubqlEthereumProcessorOptions | SubqlEthereumProcessorOptions[],
   conditions: DictionaryQueryCondition[],

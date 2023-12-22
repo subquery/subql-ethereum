@@ -101,7 +101,11 @@ export abstract class DictionaryServiceV1<DS> extends CoreDictionaryService<DS> 
   }
 
   getQueryEndBlock(startBlockHeight: number, apiFinalizedHeight: number): number {
-    return Math.min(startBlockHeight + this.nodeConfig.dictionaryQuerySize, apiFinalizedHeight);
+    return Math.min(
+      startBlockHeight + this.nodeConfig.dictionaryQuerySize,
+      apiFinalizedHeight,
+      this.metadata.lastProcessedHeight
+    );
   }
 
   protected get client(): ApolloClient<NormalizedCacheObject> {
@@ -189,7 +193,7 @@ export abstract class DictionaryServiceV1<DS> extends CoreDictionaryService<DS> 
   }
 
   queryMapValidByHeight(height: number): boolean {
-    return !!this.queriesMap?.get(height);
+    return !!this.queriesMap?.get(height)?.length;
   }
 
   // Base validation is required, and specific validation for each network should be implemented accordingly
