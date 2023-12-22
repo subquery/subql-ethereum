@@ -1,7 +1,6 @@
 // Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
-import { Inject } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { NodeConfig, DictionaryServiceV1, getLogger } from '@subql/node-core';
 import {
@@ -205,8 +204,8 @@ export function buildDictionaryV1QueryEntries(
 }
 
 export class EthDictionaryServiceV1 extends DictionaryServiceV1<EthDsInterface> {
-  private constructor(
-    @Inject('ISubqueryProject') protected project: SubqueryProject,
+  constructor(
+    project: SubqueryProject,
     nodeConfig: NodeConfig,
     eventEmitter: EventEmitter2,
     chainId?: string,

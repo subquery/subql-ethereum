@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: GPL-3.0
 
 import {EventEmitter2} from '@nestjs/event-emitter';
-import {BaseDataSource} from '@subql/types-core';
 import axios, {AxiosInstance} from 'axios';
 import {NodeConfig} from '../../../configure';
 import {BlockHeightMap} from '../../../utils/blockHeightMap';
@@ -20,7 +19,7 @@ export abstract class DictionaryServiceV2<
   protected _metadata: DictionaryV2Metadata | undefined;
   protected dictionaryApi: AxiosInstance;
 
-  protected constructor(
+  constructor(
     readonly dictionaryEndpoint: string,
     protected chainId: string,
     protected readonly nodeConfig: NodeConfig,

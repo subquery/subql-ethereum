@@ -16,7 +16,6 @@ import {DictionaryV2Metadata, DictionaryVersion} from './';
 
 const logger = getLogger('DictionaryService');
 
-@Injectable()
 export abstract class DictionaryService<RFB, FB, DS, D extends DictionaryServiceV1<DS>> {
   protected _dictionary: DictionaryServiceV2<RFB, FB, DS> | D | undefined;
   private _dictionaryVersion: DictionaryVersion | undefined;

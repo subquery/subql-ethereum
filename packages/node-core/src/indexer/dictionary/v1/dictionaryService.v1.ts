@@ -4,11 +4,7 @@
 import {ApolloClient, HttpLink, ApolloLink, InMemoryCache, NormalizedCacheObject, gql} from '@apollo/client/core';
 import {EventEmitter2} from '@nestjs/event-emitter';
 import {dictHttpLink} from '@subql/apollo-links';
-import {
-  BaseDataSource,
-  DictionaryQueryCondition,
-  DictionaryQueryEntry as DictionaryV1QueryEntry,
-} from '@subql/types-core';
+import {DictionaryQueryCondition, DictionaryQueryEntry as DictionaryV1QueryEntry} from '@subql/types-core';
 import {buildQuery, GqlNode, GqlQuery, GqlVar, MetaData, MetaData as DictionaryV1Metadata} from '@subql/utils';
 import fetch from 'cross-fetch';
 import {NodeConfig} from '../../../configure';
