@@ -7,18 +7,15 @@ import {dictHttpLink} from '@subql/apollo-links';
 import {DictionaryQueryCondition, DictionaryQueryEntry as DictionaryV1QueryEntry} from '@subql/types-core';
 import {buildQuery, GqlNode, GqlQuery, GqlVar, MetaData, MetaData as DictionaryV1Metadata} from '@subql/utils';
 import fetch from 'cross-fetch';
+import {buildDictQueryFragment, distinctErrorEscaped, startHeightEscaped} from '..';
 import {NodeConfig} from '../../../configure';
 import {IndexerEvent} from '../../../events';
 import {getLogger} from '../../../logger';
 import {profiler} from '../../../profiler';
 import {timeout} from '../../../utils';
 import {BlockHeightMap} from '../../../utils/blockHeightMap';
-import {
-  buildDictQueryFragment,
-  CoreDictionaryService,
-  distinctErrorEscaped,
-  startHeightEscaped,
-} from '../../dictionary';
+import {CoreDictionaryService} from '../coreDictionary.service';
+
 import {Dictionary} from '../types';
 
 const logger = getLogger('dictionary v1');

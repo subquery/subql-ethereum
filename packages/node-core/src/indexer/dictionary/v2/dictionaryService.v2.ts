@@ -3,9 +3,10 @@
 
 import {EventEmitter2} from '@nestjs/event-emitter';
 import axios, {AxiosInstance} from 'axios';
+import {Dictionary} from '..';
 import {NodeConfig} from '../../../configure';
 import {BlockHeightMap} from '../../../utils/blockHeightMap';
-import {CoreDictionaryService, Dictionary} from '../../dictionary';
+import {CoreDictionaryService} from '../coreDictionary.service';
 import {subqlFilterBlocksCapabilities} from '../utils';
 import {DictionaryV2Metadata, DictionaryV2QueryEntry} from './types';
 

@@ -4,4 +4,4 @@
 export * from './v1';
 export * from './v2';
 export * from './types';
-export * from './coreDictionary.service';
+// export * from './coreDictionary.service';
