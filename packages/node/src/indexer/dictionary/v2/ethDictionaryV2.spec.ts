@@ -11,7 +11,7 @@ import {
   SubqueryProject,
 } from '../../../configure/SubqueryProject';
 import { buildDictionaryV2QueryEntry } from '../v2';
-import { EthDictionaryServiceV2 } from './eth-dictionary.service.v2';
+import { EthDictionaryV2 } from './ethDictionaryV2';
 
 const HTTP_ENDPOINT = 'https://polygon.api.onfinality.io/public';
 const mockDs: EthereumProjectDs[] = [
@@ -51,7 +51,7 @@ const nodeConfig = new NodeConfig({
   networkEndpoint: [HTTP_ENDPOINT],
 });
 
-const fatDictionaryService = new EthDictionaryServiceV2(
+const fatDictionaryService = new EthDictionaryV2(
   {} as SubqueryProject,
   nodeConfig,
   undefined,

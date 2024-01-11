@@ -8,12 +8,12 @@
 // import {
 //   BlockDispatcher,
 //   delay,
-//   DictionaryServiceV1,
+//   DictionaryV1,
 //   DynamicDsService,
 //   IBlockDispatcher,
 //   IProjectService,
 //   NodeConfig,
-//   DictionaryServiceV2,
+//   DictionaryV2,
 //   FatDictionaryQueryEntry,
 // } from '..';
 // import {BlockHeightMap} from '../utils/blockHeightMap';
@@ -22,7 +22,7 @@
 // const CHAIN_INTERVAL = 100; // 100ms
 // const genesisHash = '0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3';
 //
-// class TestFetchService extends BaseFetchService<BaseDataSource, IBlockDispatcher<any>, DictionaryServiceV1, any, any> {
+// class TestFetchService extends BaseFetchService<BaseDataSource, IBlockDispatcher<any>, DictionaryV1, any, any> {
 //   finalizedHeight = 1000;
 //   bestHeight = 20;
 //   modulos: number[] = [];
@@ -109,7 +109,7 @@
 //     scopedDictionaryEntries: () => {
 //       /* TODO */
 //     },
-//   } as any as DictionaryServiceV1);
+//   } as any as DictionaryV1);
 //
 // const getFatDictionaryService = () =>
 //   ({
@@ -121,7 +121,7 @@
 //     scopedDictionaryEntries: () => {
 //       /* TODO */
 //     },
-//   } as any as DictionaryServiceV2<any, any>);
+//   } as any as DictionaryV2<any, any>);
 //
 // const getBlockDispatcher = () => {
 //   const inst = {
@@ -144,8 +144,8 @@
 // describe('Fetch Service', () => {
 //   let fetchService: TestFetchService;
 //   let blockDispatcher: IBlockDispatcher<any>;
-//   let dictionaryService: DictionaryServiceV1;
-//   let fatDictionaryService: DictionaryServiceV2<any, any>;
+//   let dictionaryService: DictionaryV1;
+//   let fatDictionaryService: DictionaryV2<any, any>;
 //   let networkConfig: IProjectNetworkConfig;
 //
 //   beforeEach(() => {

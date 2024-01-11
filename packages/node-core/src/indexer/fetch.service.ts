@@ -12,7 +12,7 @@ import {IndexerEvent} from '../events';
 import {getLogger} from '../logger';
 import {checkMemoryUsage, cleanedBatchBlocks, delay, transformBypassBlocks, waitForBatchSize} from '../utils';
 import {IBlockDispatcher} from './blockDispatcher';
-import {DictionaryServiceV1} from './dictionary';
+import {DictionaryV1} from './dictionary';
 import {DictionaryService} from './dictionary/dictionary.service';
 import {DynamicDsService} from './dynamic-ds.service';
 import {IProjectService} from './types';
@@ -23,7 +23,7 @@ const CHECK_MEMORY_INTERVAL = 60000;
 export abstract class BaseFetchService<
   DS extends BaseDataSource,
   B extends IBlockDispatcher<number | FB>,
-  D extends DictionaryServiceV1<DS>,
+  D extends DictionaryV1<DS>,
   FB,
   RFB
 > implements OnApplicationShutdown
@@ -133,8 +133,9 @@ export abstract class BaseFetchService<
       //  We pass in genesis hash in order validate dictionary metadata, genesisHash should always exist in apiService.
       //  Call metadata here, other network should align with this
       //  For substrate, we might use the specVersion metadata in future if we have same error handling as in node-core
-      await this.dictionaryService.initDictionary();
-      await this.dictionaryService.initValidation(this.getGenesisHash());
+      await this.dictionaryService.initDictionaries(this.getGenesisHash());
+      // Find one usable dictionary at start
+      await this.dictionaryService.findDictionary(startHeight);
       // Update dictionary now need execute after dictionary initialized, as it require to have dictionary version before buildDictionaryEntryMap
       this.updateDictionary();
     }
@@ -234,6 +235,13 @@ export abstract class BaseFetchService<
         ? this.blockDispatcher.latestBufferedHeight + 1
         : initBlockHeight;
     };
+
+    // If currently there is a dictionary but metadata is not valid
+    // to find next dictionary
+    if (this.dictionaryService.useDictionary && !this.dictionaryService.dictionary.metadataValid) {
+      await this.dictionaryService.findDictionary(getStartBlockHeight());
+      this.updateDictionary();
+    }
 
     if (this.useDictionary && this.dictionaryService.dictionary.startHeight > getStartBlockHeight()) {
       logger.warn(

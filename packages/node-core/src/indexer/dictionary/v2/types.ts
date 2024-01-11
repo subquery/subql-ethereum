@@ -16,6 +16,7 @@ export interface FatDictionaryResponse<FB> {
 }
 
 export interface DictionaryV2Metadata {
+  chain: string;
   start: number;
   end: number;
   genesisHash: string;

@@ -28,6 +28,7 @@ export async function subqlFilterBlocksCapabilities(
       },
     });
     const metadata: DictionaryV2Metadata = {
+      chain: '', //TODO, need chain for v2 meta
       start: response.data.result.availableBlocks[0].startHeight,
       end: response.data.result.availableBlocks[0].endHeight,
       genesisHash: response.data.result.genesisHash,

@@ -9,7 +9,7 @@
 // import {range} from 'lodash';
 // import {NodeConfig} from '../../../configure';
 // import {BlockHeightMap} from '../../../utils/blockHeightMap';
-// import {DictionaryServiceV1, getGqlType} from './dictionaryService.v1';
+// import {DictionaryV1, getGqlType} from './dictionaryService.v1';
 //
 // const mockDS = [
 //   {
@@ -136,12 +136,12 @@
 // });
 //
 // describe('DictionaryService', () => {
-//   let dictionaryService: DictionaryServiceV1;
+//   let dictionaryService: DictionaryV1;
 //
 //   let dsMap: BlockHeightMap<any>;
 //
 //   beforeEach(() => {
-//     dictionaryService = new DictionaryServiceV1(DICTIONARY_ENDPOINT, DICTIONARY_CHAINID, nodeConfig, new EventEmitter2());
+//     dictionaryService = new DictionaryV1(DICTIONARY_ENDPOINT, DICTIONARY_CHAINID, nodeConfig, new EventEmitter2());
 //
 //     const m = new Map<number, any>();
 //
@@ -166,14 +166,14 @@
 //       dictionaryService.initValidation('0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3')
 //     ).resolves.toBe(true);
 //
-//     dictionaryService = new DictionaryServiceV1(DICTIONARY_ENDPOINT, 'INAVLID CHAIN ID', nodeConfig, new EventEmitter2());
+//     dictionaryService = new DictionaryV1(DICTIONARY_ENDPOINT, 'INAVLID CHAIN ID', nodeConfig, new EventEmitter2());
 //     await expect(dictionaryService.initValidation('INAVLID CHAIN GENESIS HASH')).resolves.toBe(false);
 //     expect(dictionaryService.useDictionary).toBeFalsy();
 //   });
 //
 //   // SubQuery managed service is no longer running Polkadot/Kusama dictionaries
 //   it.skip('works when `dictionaryResolver` is not defined', async () => {
-//     dictionaryService = new DictionaryServiceV1(
+//     dictionaryService = new DictionaryV1(
 //       DICTIONARY_ENDPOINT,
 //       DICTIONARY_CHAINID,
 //       {dictionaryTimeout: 10} as NodeConfig,
@@ -189,7 +189,7 @@
 //   });
 //
 //   it('return undefined when dictionary api failed', async () => {
-//     dictionaryService = new DictionaryServiceV1(
+//     dictionaryService = new DictionaryV1(
 //       'https://api.subquery.network/sq/subquery/dictionary-not-exist',
 //       '0x21121',
 //       nodeConfig,
@@ -357,7 +357,7 @@
 //   // TODO write a test that queries over 2 block ranges in case DS has been removed
 //
 //   it('can use the dictionary registry to resolve a url', async () => {
-//     const dictUrl: string = await (DictionaryServiceV1 as any).resolveDictionary(
+//     const dictUrl: string = await (DictionaryV1 as any).resolveDictionary(
 //       NETWORK_FAMILY.ethereum,
 //       1,
 //       'https://github.com/subquery/templates/raw/main/dictionary.json'

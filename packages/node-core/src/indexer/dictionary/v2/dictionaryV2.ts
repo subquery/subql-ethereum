@@ -3,19 +3,19 @@
 
 import {EventEmitter2} from '@nestjs/event-emitter';
 import axios, {AxiosInstance} from 'axios';
-import {Dictionary} from '..';
+import {DictionaryResponse, DictionaryVersion} from '..';
 import {NodeConfig} from '../../../configure';
 import {BlockHeightMap} from '../../../utils/blockHeightMap';
-import {CoreDictionaryService} from '../coreDictionary.service';
+import {CoreDictionary} from '../coreDictionary';
 import {subqlFilterBlocksCapabilities} from '../utils';
 import {DictionaryV2Metadata, DictionaryV2QueryEntry} from './types';
 
-export abstract class DictionaryServiceV2<
+export abstract class DictionaryV2<
   RFB,
   FB,
   DS,
   QE extends DictionaryV2QueryEntry = DictionaryV2QueryEntry
-> extends CoreDictionaryService<DS> {
+> extends CoreDictionary<DS, FB> {
   queriesMap?: BlockHeightMap<QE>;
   protected _metadata: DictionaryV2Metadata | undefined;
   protected dictionaryApi: AxiosInstance;
@@ -30,6 +30,7 @@ export abstract class DictionaryServiceV2<
     this.dictionaryApi = axios.create({
       baseURL: dictionaryEndpoint,
     });
+    this._dictionaryVersion = DictionaryVersion.v2Complete;
   }
 
   abstract buildDictionaryQueryEntries(dataSources: DS[]): DictionaryV2QueryEntry;
@@ -37,6 +38,7 @@ export abstract class DictionaryServiceV2<
   async initMetadata(): Promise<void> {
     this._metadata = await subqlFilterBlocksCapabilities(this.dictionaryEndpoint);
     this.setDictionaryStartHeight(this._metadata.start);
+    this.metadata.supported;
   }
 
   get metadata(): DictionaryV2Metadata {
@@ -50,16 +52,24 @@ export abstract class DictionaryServiceV2<
     return this.metadata.end;
   }
 
-  abstract getDictionary(startBlock: number, queryEndBlock: number, limit: number): Promise<Dictionary<FB> | undefined>;
+  abstract getData(
+    startBlock: number,
+    queryEndBlock: number,
+    limit: number
+  ): Promise<DictionaryResponse<FB> | undefined>;
 
   queryMapValidByHeight(height: number): boolean {
     return !!this.queriesMap?.get(height);
   }
 
   dictionaryValidation(metaData?: DictionaryV2Metadata, startBlockHeight?: number): boolean {
-    // return this._validDictionary && currentHeight >= this.metadata.start && currentHeight < this.metadata.end;
-    // TODO
-    this.metadataValid = true;
-    return true;
+    if (metaData === undefined || startBlockHeight === undefined) {
+      return false;
+    }
+    this.metadataValid =
+      this.validateChainMeta(metaData) &&
+      startBlockHeight >= this.metadata.start &&
+      startBlockHeight < this.metadata.end;
+    return this.metadataValid;
   }
 }

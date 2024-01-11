@@ -5,9 +5,9 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import {
   NodeConfig,
   FatDictionaryResponse,
-  DictionaryServiceV2,
+  DictionaryV2,
   RawFatDictionaryResponseData,
-  Dictionary,
+  DictionaryResponse,
   getLogger,
   DictionaryV2QueryEntry,
 } from '@subql/node-core';
@@ -192,7 +192,7 @@ export function buildDictionaryV2QueryEntry(
   // );
 }
 
-export class EthDictionaryServiceV2 extends DictionaryServiceV2<
+export class EthDictionaryV2 extends DictionaryV2<
   RawEthFatBlock,
   EthereumBlock,
   SubqlDatasource,
@@ -226,11 +226,11 @@ export class EthDictionaryServiceV2 extends DictionaryServiceV2<
    * @param batchSize
    * @param conditions
    */
-  async getDictionary(
+  async getData(
     startBlock: number,
     queryEndBlock: number,
     limit = MIN_FAT_FETCH_LIMIT,
-  ): Promise<Dictionary<EthereumBlock> | undefined> {
+  ): Promise<DictionaryResponse<EthereumBlock> | undefined> {
     const queryDetails = this.queriesMap?.getDetails(startBlock);
     const conditions = queryDetails?.value;
     queryEndBlock = this.metadata.end;

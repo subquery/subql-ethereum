@@ -23,7 +23,7 @@ export interface IConfig {
   readonly preferRange: boolean;
   readonly networkEndpoint?: string[];
   readonly primaryNetworkEndpoint?: string;
-  readonly networkDictionary?: string;
+  readonly networkDictionary?: string[];
   readonly dictionaryResolver?: string | false;
   readonly dictionaryRegistry: string;
   readonly outputFmt?: 'json';
@@ -141,8 +141,10 @@ export class NodeConfig<C extends IConfig = IConfig> implements IConfig {
     return this._config.primaryNetworkEndpoint;
   }
 
-  get networkDictionary(): string | undefined {
-    return this._config.networkDictionary;
+  get networkDictionaries(): string[] | undefined {
+    return typeof this._config.networkDictionary === 'string'
+      ? [this._config.networkDictionary]
+      : this._config.networkDictionary;
   }
 
   get storeCacheThreshold(): number {
@@ -177,7 +179,7 @@ export class NodeConfig<C extends IConfig = IConfig> implements IConfig {
       return this._config.dictionaryRegistry;
     }
 
-    return 'https://github.com/subquery/templates/raw/main/dictionary.json';
+    return 'https://github.com/subquery/templates/raw/main/dist/dictionary.json';
   }
 
   get timeout(): number {

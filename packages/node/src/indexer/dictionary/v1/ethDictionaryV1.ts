@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0
 
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { NodeConfig, DictionaryServiceV1, getLogger } from '@subql/node-core';
+import { NodeConfig, DictionaryV1, getLogger } from '@subql/node-core';
 import {
   DictionaryQueryCondition,
   DictionaryQueryEntry as DictionaryV1QueryEntry,
@@ -22,6 +22,7 @@ import { SubqueryProject } from '../../../configure/SubqueryProject';
 import { eventToTopic, functionToSighash } from '../../../utils/string';
 import { yargsOptions } from '../../../yargs';
 import { EthDsInterface, ethFilterDs } from '../utils';
+
 const CHAIN_ALIASES_URL =
   'https://raw.githubusercontent.com/subquery/templates/main/chainAliases.json5';
 
@@ -150,6 +151,7 @@ function callFilterToQueryEntry(
 export type GroupedEthereumProjectDs = SubqlDatasource & {
   groupedOptions?: SubqlEthereumProcessorOptions[];
 };
+
 export function buildDictionaryV1QueryEntries(
   dataSources: GroupedEthereumProjectDs[],
 ): DictionaryV1QueryEntry[] {
@@ -203,7 +205,7 @@ export function buildDictionaryV1QueryEntries(
   );
 }
 
-export class EthDictionaryServiceV1 extends DictionaryServiceV1<EthDsInterface> {
+export class EthDictionaryV1 extends DictionaryV1<EthDsInterface> {
   constructor(
     project: SubqueryProject,
     nodeConfig: NodeConfig,
@@ -224,7 +226,7 @@ export class EthDictionaryServiceV1 extends DictionaryServiceV1<EthDsInterface> 
     nodeConfig: NodeConfig,
     eventEmitter: EventEmitter2,
     dictionaryUrl?: string,
-  ): Promise<EthDictionaryServiceV1> {
+  ): Promise<EthDictionaryV1> {
     /*Some dictionarys for EVM are built with other SDKs as they are chains with an EVM runtime
      * we maintain a list of aliases so we can map the evmChainId to the genesis hash of the other SDKs
      * e.g moonbeam is built with Substrate SDK but can be used as an EVM dictionary
@@ -232,7 +234,7 @@ export class EthDictionaryServiceV1 extends DictionaryServiceV1<EthDsInterface> 
     const chainAliases = await this.getEvmChainId();
     const chainAlias = chainAliases[project.network.chainId];
 
-    return new EthDictionaryServiceV1(
+    return new EthDictionaryV1(
       project,
       nodeConfig,
       eventEmitter,

@@ -1,26 +1,26 @@
 // Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
-import {ApolloClient, HttpLink, ApolloLink, InMemoryCache, NormalizedCacheObject, gql} from '@apollo/client/core';
+import {ApolloClient, ApolloLink, gql, HttpLink, InMemoryCache, NormalizedCacheObject} from '@apollo/client/core';
 import {EventEmitter2} from '@nestjs/event-emitter';
 import {dictHttpLink} from '@subql/apollo-links';
 import {DictionaryQueryCondition, DictionaryQueryEntry as DictionaryV1QueryEntry} from '@subql/types-core';
-import {buildQuery, GqlNode, GqlQuery, GqlVar, MetaData, MetaData as DictionaryV1Metadata} from '@subql/utils';
+import {buildQuery, GqlNode, GqlQuery, GqlVar, MetaData as DictionaryV1Metadata} from '@subql/utils';
 import fetch from 'cross-fetch';
-import {buildDictQueryFragment, distinctErrorEscaped, startHeightEscaped} from '..';
+import {buildDictQueryFragment, DictionaryVersion, distinctErrorEscaped, startHeightEscaped} from '..';
 import {NodeConfig} from '../../../configure';
 import {IndexerEvent} from '../../../events';
 import {getLogger} from '../../../logger';
 import {profiler} from '../../../profiler';
 import {timeout} from '../../../utils';
 import {BlockHeightMap} from '../../../utils/blockHeightMap';
-import {CoreDictionaryService} from '../coreDictionary.service';
+import {CoreDictionary} from '../coreDictionary';
 
-import {Dictionary} from '../types';
+import {DictionaryResponse} from '../types';
 
 const logger = getLogger('dictionary v1');
 
-export abstract class DictionaryServiceV1<DS> extends CoreDictionaryService<DS> {
+export abstract class DictionaryV1<DS> extends CoreDictionary<DS, number> {
   queriesMap?: BlockHeightMap<DictionaryV1QueryEntry[]>;
   protected _metadata: DictionaryV1Metadata | undefined;
   private _client: ApolloClient<NormalizedCacheObject>;
@@ -63,6 +63,7 @@ export abstract class DictionaryServiceV1<DS> extends CoreDictionaryService<DS> 
         },
       },
     });
+    this._dictionaryVersion = DictionaryVersion.v1;
   }
 
   abstract buildDictionaryQueryEntries(dataSources: DS[]): DictionaryV1QueryEntry[];
@@ -124,11 +125,11 @@ export abstract class DictionaryServiceV1<DS> extends CoreDictionaryService<DS> 
    */
 
   @profiler()
-  async getDictionary(
+  async getData(
     startBlock: number,
     queryEndBlock: number,
     batchSize: number
-  ): Promise<Dictionary<number> | undefined> {
+  ): Promise<DictionaryResponse<number> | undefined> {
     const queryDetails = this.queriesMap?.getDetails(startBlock);
     const conditions = queryDetails?.value ?? [];
     queryEndBlock =
@@ -185,7 +186,7 @@ export abstract class DictionaryServiceV1<DS> extends CoreDictionaryService<DS> 
         this.useDistinct = false;
         logger.warn(`Dictionary doesn't support distinct query.`);
         // Rerun the qeury now with distinct disabled
-        return this.getDictionary(startBlock, queryEndBlock, batchSize);
+        return this.getData(startBlock, queryEndBlock, batchSize);
       }
       logger.warn(err, `failed to fetch dictionary result`);
       return undefined;
@@ -194,15 +195,6 @@ export abstract class DictionaryServiceV1<DS> extends CoreDictionaryService<DS> 
 
   queryMapValidByHeight(height: number): boolean {
     return !!this.queriesMap?.get(height)?.length;
-  }
-
-  // Base validation is required, and specific validation for each network should be implemented accordingly
-  protected validateChainMeta(metaData: MetaData): boolean {
-    return (
-      metaData.chain === this.chainId ||
-      metaData.genesisHash === this.chainId ||
-      this.apiGenesisHash === metaData.genesisHash
-    );
   }
 
   dictionaryValidation(metaData?: DictionaryV1Metadata, startBlockHeight?: number): boolean {
