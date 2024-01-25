@@ -24,24 +24,17 @@ export interface IDictionary<DS, FB> {
     limit: number
   ): Promise<DictionaryResponse<FB | number> | undefined>;
   initMetadata(): Promise<void>;
-  metadata: DictionaryV1Metadata | DictionaryV2Metadata;
-  dictionaryValidation(metaData?: DictionaryV1Metadata | DictionaryV2Metadata, startBlockHeight?: number): boolean;
-  buildDictionaryQueryEntries(dataSources: DS[]): DictionaryV1QueryEntry[] | DictionaryV2QueryEntry;
   queryMapValidByHeight(height: number): boolean;
   getQueryEndBlock(startHeight: number, apiFinalizedHeight: number): number;
 
   setApiGenesisHash(genesisHash: string): void;
-  setDictionaryStartHeight(start: number | undefined): void;
   version: DictionaryVersion;
   startHeight: number;
-  useDictionary: boolean;
   heightValidation(height: number): boolean;
   updateQueriesMap(dataSources: BlockHeightMap<DS[]>): void;
 }
 
 export interface IDictionaryCtrl<DS, FB, D extends IDictionary<DS, FB>> {
-  initDictionariesV1(): Promise<D[]>;
-  initDictionariesV2(): Promise<D[]> | D[];
   initDictionaries(apiGenesisHash: string): Promise<void>;
   dictionary: D;
   useDictionary: boolean;

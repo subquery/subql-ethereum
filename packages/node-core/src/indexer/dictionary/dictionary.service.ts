@@ -44,8 +44,7 @@ export abstract class DictionaryService<RFB, FB, DS, D extends DictionaryV1<DS>>
   constructor(
     protected chainId: string,
     protected readonly nodeConfig: NodeConfig,
-    protected readonly eventEmitter: EventEmitter2,
-    protected readonly metadataKeys = ['lastProcessedHeight', 'genesisHash'] // Cosmos uses chain instead of genesisHash
+    protected readonly eventEmitter: EventEmitter2
   ) {}
 
   abstract initDictionariesV1(): Promise<D[]>;

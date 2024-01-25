@@ -38,10 +38,9 @@ export abstract class DictionaryV2<
   async initMetadata(): Promise<void> {
     this._metadata = await subqlFilterBlocksCapabilities(this.dictionaryEndpoint);
     this.setDictionaryStartHeight(this._metadata.start);
-    this.metadata.supported;
   }
 
-  get metadata(): DictionaryV2Metadata {
+  private get metadata(): DictionaryV2Metadata {
     if (!this._metadata) {
       throw new Error(`Fat dictionary _metadata haven't init yet`);
     }
@@ -62,7 +61,7 @@ export abstract class DictionaryV2<
     return !!this.queriesMap?.get(height);
   }
 
-  dictionaryValidation(metaData?: DictionaryV2Metadata, startBlockHeight?: number): boolean {
+  protected dictionaryValidation(metaData?: DictionaryV2Metadata, startBlockHeight?: number): boolean {
     if (metaData === undefined || startBlockHeight === undefined) {
       return false;
     }

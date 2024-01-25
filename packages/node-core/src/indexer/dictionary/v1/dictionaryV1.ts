@@ -94,7 +94,7 @@ export abstract class DictionaryV1<DS> extends CoreDictionary<DS, number> {
     }
   }
 
-  get metadata(): DictionaryV1Metadata {
+  private get metadata(): DictionaryV1Metadata {
     if (!this._metadata) {
       throw new Error(`dictionary _metadata haven't init yet`);
     }
@@ -197,7 +197,7 @@ export abstract class DictionaryV1<DS> extends CoreDictionary<DS, number> {
     return !!this.queriesMap?.get(height)?.length;
   }
 
-  dictionaryValidation(metaData?: DictionaryV1Metadata, startBlockHeight?: number): boolean {
+  protected dictionaryValidation(metaData?: DictionaryV1Metadata, startBlockHeight?: number): boolean {
     const validate = (): boolean => {
       try {
         if (!metaData) {

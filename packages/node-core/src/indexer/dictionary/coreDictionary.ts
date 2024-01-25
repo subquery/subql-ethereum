@@ -30,12 +30,11 @@ export abstract class CoreDictionary<DS, FB> implements IDictionary<DS, FB> {
     limit: number
   ): Promise<DictionaryResponse<FB> | undefined>;
   abstract initMetadata(): Promise<void>;
-  abstract get metadata(): DictionaryV1Metadata | DictionaryV2Metadata;
-  abstract dictionaryValidation(
+  protected abstract dictionaryValidation(
     metaData?: DictionaryV1Metadata | DictionaryV2Metadata,
     startBlockHeight?: number
   ): boolean;
-  abstract buildDictionaryQueryEntries(dataSources: DS[]): DictionaryV1QueryEntry[] | DictionaryV2QueryEntry;
+  protected abstract buildDictionaryQueryEntries(dataSources: DS[]): DictionaryV1QueryEntry[] | DictionaryV2QueryEntry;
   abstract queryMapValidByHeight(height: number): boolean;
   abstract getQueryEndBlock(startHeight: number, apiFinalizedHeight: number): number;
 
@@ -53,7 +52,7 @@ export abstract class CoreDictionary<DS, FB> implements IDictionary<DS, FB> {
     return this._startHeight;
   }
 
-  get useDictionary(): boolean {
+  protected get useDictionary(): boolean {
     return (!!this.dictionaryEndpoint || !!this.nodeConfig.dictionaryResolver) && !!this.metadataValid;
   }
 
@@ -66,7 +65,7 @@ export abstract class CoreDictionary<DS, FB> implements IDictionary<DS, FB> {
     return this._genesisHash;
   }
 
-  setDictionaryStartHeight(start: number | undefined): void {
+  protected setDictionaryStartHeight(start: number | undefined): void {
     // Since not all dictionary has adopted start height, if it is not set, we just consider it is 1.
     if (this._startHeight !== undefined) {
       return;
