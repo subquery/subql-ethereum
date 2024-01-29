@@ -26,8 +26,6 @@ export interface IDictionary<DS, FB> {
   initMetadata(): Promise<void>;
   queryMapValidByHeight(height: number): boolean;
   getQueryEndBlock(startHeight: number, apiFinalizedHeight: number): number;
-
-  setApiGenesisHash(genesisHash: string): void;
   version: DictionaryVersion;
   startHeight: number;
   heightValidation(height: number): boolean;

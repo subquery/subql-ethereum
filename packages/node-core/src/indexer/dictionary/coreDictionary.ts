@@ -56,15 +56,6 @@ export abstract class CoreDictionary<DS, FB> implements IDictionary<DS, FB> {
     return (!!this.dictionaryEndpoint || !!this.nodeConfig.dictionaryResolver) && !!this.metadataValid;
   }
 
-  setApiGenesisHash(genesisHash: string): void {
-    this._genesisHash = genesisHash;
-  }
-
-  get apiGenesisHash(): string {
-    assert(this._genesisHash, new Error('Endpoint genesis hash is not set in dictionary'));
-    return this._genesisHash;
-  }
-
   protected setDictionaryStartHeight(start: number | undefined): void {
     // Since not all dictionary has adopted start height, if it is not set, we just consider it is 1.
     if (this._startHeight !== undefined) {
@@ -84,10 +75,6 @@ export abstract class CoreDictionary<DS, FB> implements IDictionary<DS, FB> {
 
   // Base validation is required, and specific validation for each network should be implemented accordingly
   protected validateChainMeta(metaData: DictionaryV1Metadata | DictionaryV2Metadata): boolean {
-    return (
-      metaData.chain === this.chainId ||
-      metaData.genesisHash === this.chainId ||
-      this.apiGenesisHash === metaData.genesisHash
-    );
+    return metaData.chain === this.chainId || metaData.genesisHash === this.chainId;
   }
 }

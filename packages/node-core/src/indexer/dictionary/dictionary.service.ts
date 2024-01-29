@@ -64,9 +64,6 @@ export abstract class DictionaryService<RFB, FB, DS, D extends DictionaryV1<DS>>
     }
     this._dictionaries.push(...(await this.initDictionariesV1()));
     this._dictionaries.push(...(await this.initDictionariesV2()));
-    for (const dictionary of this._dictionaries) {
-      dictionary.setApiGenesisHash(apiGenesisHash);
-    }
   }
 
   get dictionary(): DictionaryV2<RFB, FB, DS> | D {
