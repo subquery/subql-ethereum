@@ -243,11 +243,6 @@ export class EthDictionaryV1 extends DictionaryV1<EthDsInterface> {
     );
   }
 
-  protected validateChainMeta(metaData: MetaData): boolean {
-    // Due to dictionary metadata doesn't include chainId, in here we only validate endpoint genesisHash with metadata
-    return this.apiGenesisHash === metaData.genesisHash;
-  }
-
   private static async getEvmChainId(): Promise<Record<string, string>> {
     const response = await fetch(CHAIN_ALIASES_URL);
 

@@ -319,7 +319,7 @@ export abstract class BaseFetchService<
             ? this.getEnqueuedModuloBlocks(startBlockHeight, latestHeight)
             : range(startBlockHeight, endHeight + 1);
 
-        // await this.enqueueBlocks(enqueuingBlocks, latestHeight);
+        await this.blockDispatcher.enqueueBlocks(enqueuingBlocks, latestHeight);
       }
     }
   }

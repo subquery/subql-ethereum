@@ -18,7 +18,7 @@ export class EthDictionaryService extends DictionaryService<
   SubqlDatasource,
   EthDictionaryV1
 > {
-  async initDictionariesV1(): Promise<EthDictionaryV1[]> {
+  protected async initDictionariesV1(): Promise<EthDictionaryV1[]> {
     if (!this.project) {
       throw new Error(`Project in Dictionary service not initialized `);
     }
@@ -58,7 +58,7 @@ export class EthDictionaryService extends DictionaryService<
     return dictionaries;
   }
 
-  initDictionariesV2(): EthDictionaryV2[] {
+  protected initDictionariesV2(): EthDictionaryV2[] {
     if (!this.project) {
       throw new Error(`Project in Dictionary service not initialized `);
     }

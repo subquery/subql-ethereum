@@ -1,71 +1,76 @@
 // Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
-import { NodeConfig } from '@subql/node-core';
-import {
-  EthereumDatasourceKind,
-  EthereumHandlerKind,
-} from '@subql/types-ethereum';
-import {
-  EthereumProjectDs,
-  SubqueryProject,
-} from '../../../configure/SubqueryProject';
-import { buildDictionaryV2QueryEntry } from '../v2';
-import { EthDictionaryV2 } from './ethDictionaryV2';
-
-const HTTP_ENDPOINT = 'https://polygon.api.onfinality.io/public';
-const mockDs: EthereumProjectDs[] = [
-  {
-    kind: EthereumDatasourceKind.Runtime,
-    assets: new Map(),
-    startBlock: 3678215,
-    mapping: {
-      entryScript: '',
-      file: './dist/index.js',
-      handlers: [
-        {
-          handler: 'handleTransaction',
-          kind: EthereumHandlerKind.Call,
-          filter: {
-            function: 'approve(address spender, uint256 rawAmount)',
-          },
-        },
-        {
-          handler: 'handleLog',
-          kind: EthereumHandlerKind.Event,
-          filter: {
-            topics: [
-              'Transfer(address indexed from, address indexed to, uint256 amount)',
-            ],
-          },
-        },
-      ],
-    },
-  },
-];
-
-const nodeConfig = new NodeConfig({
-  subquery: 'polygon-starter',
-  subqueryName: 'polygon-starter',
-  dictionaryTimeout: 10,
-  networkEndpoint: [HTTP_ENDPOINT],
-});
-
-const fatDictionaryService = new EthDictionaryV2(
-  {} as SubqueryProject,
-  nodeConfig,
-  undefined,
-  '',
-);
-
-const dictionaryQueryEntries = buildDictionaryV2QueryEntry(mockDs);
-
-let fatDictionaryQueryEntries;
-// beforeAll(async () => {
-//   await fatDictionaryService.initDictionary();
-//   // manually set up dictionary entry map
-//   fatDictionaryQueryEntries = fatDictionaryService.dictionaryFatQuery(
-//     dictionaryQueryEntries,
+// TODO
+// import { NodeConfig } from '@subql/node-core';
+// import {BlockHeightMap} from '@subql/node-core/utils/blockHeightMap';
+// import {
+//   EthereumDatasourceKind,
+//   EthereumHandlerKind,
+// } from '@subql/types-ethereum';
+// import {
+//   EthereumProjectDs,
+//   SubqueryProject,
+// } from '../../../configure/SubqueryProject';
+// import { buildDictionaryV2QueryEntry } from '../v2';
+// import { EthDictionaryV2 } from './ethDictionaryV2';
+//
+// const HTTP_ENDPOINT = 'https://polygon.api.onfinality.io/public';
+// const mockDs: EthereumProjectDs[] = [
+//   {
+//     kind: EthereumDatasourceKind.Runtime,
+//     assets: new Map(),
+//     startBlock: 3678215,
+//     mapping: {
+//       entryScript: '',
+//       file: './dist/index.js',
+//       handlers: [
+//         {
+//           handler: 'handleTransaction',
+//           kind: EthereumHandlerKind.Call,
+//           filter: {
+//             function: 'approve(address spender, uint256 rawAmount)',
+//           },
+//         },
+//         {
+//           handler: 'handleLog',
+//           kind: EthereumHandlerKind.Event,
+//           filter: {
+//             topics: [
+//               'Transfer(address indexed from, address indexed to, uint256 amount)',
+//             ],
+//           },
+//         },
+//       ],
+//     },
+//   },
+// ];
+//
+// const nodeConfig = new NodeConfig({
+//   subquery: 'polygon-starter',
+//   subqueryName: 'polygon-starter',
+//   dictionaryTimeout: 10,
+//   networkEndpoint: [HTTP_ENDPOINT],
+//   networkDictionary: []
+// });
+//
+// const ethDictionaryV2= new EthDictionaryV2(
+//   {} as SubqueryProject,
+//   nodeConfig,
+//   undefined,
+//   '',
+// );
+//
+// const m = new Map<number, any>();
+// mockDs.forEach((ds, index, dataSources) => {
+//   m.set(ds.startBlock, dataSources.slice(0, index + 1));
+// });
+// const dsMap = new BlockHeightMap(m);
+//
+// let fatDictionaryQueryEntries;
+// beforeAll(() => {
+//   fatDictionaryQueryEntries = ethDictionaryV2.updateQueriesMap(
+//     dsMap,
 //   );
 // });
 //
@@ -81,17 +86,16 @@ let fatDictionaryQueryEntries;
 //
 // it('query fat dictionary should return response fat blocks', async () => {
 //   //Polygon
-//   const fatBlocks = await fatDictionaryService.queryFatDictionary(
+//   const fatBlocks = await ethDictionaryV2.getData(
 //     3678215,
-//     (fatDictionaryService as any)._metadata.end,
+//     (ethDictionaryV2 as any)._metadata.end,
 //     2,
-//     dictionaryQueryEntries,
 //   );
 //
-//   expect(fatBlocks.BlockRange).toStrictEqual([3678215, 3678250]);
+//   expect(fatBlocks.batchBlocks).toStrictEqual([3678215, 3678250]);
 //
-//   fatBlock3678215 = fatBlocks.Blocks[0];
-//   fatBlock3678250 = fatBlocks.Blocks[1];
+//   fatBlock3678215 = fatBlocks.batchBlocks[0];
+//   fatBlock3678250 = fatBlocks.batchBlocks[1];
 //
 //   expect(Number(fatBlock3678215.Header.number)).toBe(3678215);
 //   expect(Number(fatBlock3678250.Header.number)).toBe(3678250);
@@ -106,20 +110,17 @@ let fatDictionaryQueryEntries;
 //   );
 // }, 5000000);
 //
-// it('able to convert raw fatBlocks into eth blocks', async () => {
+// it('able to convert raw fatBlocks into eth blocks when getData', async () => {
 //   //Polygon
-//   const fatBlocks = await fatDictionaryService.queryFatDictionary(
+//   const ethBlocks = await ethDictionaryV2.getData(
 //     3678215,
-//     (fatDictionaryService as any)._metadata.end,
+//     (ethDictionaryV2 as any)._metadata.end,
 //     2,
-//     dictionaryQueryEntries,
 //   );
 //
-//   expect(fatBlocks.BlockRange).toStrictEqual([3678215, 3678250]);
+//   expect(ethBlocks.batchBlocks[0]).toStrictEqual(3678215);
+//   expect(ethBlocks.lastBufferedHeight).toStrictEqual(3678250);
 //
-//   const ethBlocks =
-//     fatDictionaryService.convertResponseBlocks(fatBlocks).blocks;
-//   console.log(ethBlocks);
 //
 //   // Can include input and hash
 //   // https://polygonscan.com/tx/0xb1b5f7882fa8d62d3650948c08066e928b7b5c9d607d2fe8c7e6ce57caf06774

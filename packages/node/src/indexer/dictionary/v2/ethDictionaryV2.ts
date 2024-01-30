@@ -198,7 +198,7 @@ export class EthDictionaryV2 extends DictionaryV2<
   SubqlDatasource,
   EthDictionaryV2QueryEntry
 > {
-  buildDictionaryQueryEntries(
+  protected buildDictionaryQueryEntries(
     dataSources: SubqlDatasource[],
   ): DictionaryV2QueryEntry {
     const filteredDs = ethFilterDs(dataSources);

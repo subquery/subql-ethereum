@@ -33,14 +33,14 @@ export abstract class DictionaryV2<
     this._dictionaryVersion = DictionaryVersion.v2Complete;
   }
 
-  abstract buildDictionaryQueryEntries(dataSources: DS[]): DictionaryV2QueryEntry;
+  protected abstract buildDictionaryQueryEntries(dataSources: DS[]): DictionaryV2QueryEntry;
 
   async initMetadata(): Promise<void> {
     this._metadata = await subqlFilterBlocksCapabilities(this.dictionaryEndpoint);
     this.setDictionaryStartHeight(this._metadata.start);
   }
 
-  private get metadata(): DictionaryV2Metadata {
+  protected get metadata(): DictionaryV2Metadata {
     if (!this._metadata) {
       throw new Error(`Fat dictionary _metadata haven't init yet`);
     }

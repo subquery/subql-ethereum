@@ -12,7 +12,6 @@ import {BlockHeightMap} from '../../utils/blockHeightMap';
 export abstract class CoreDictionary<DS, FB> implements IDictionary<DS, FB> {
   queriesMap?: BlockHeightMap<DictionaryV1QueryEntry[] | DictionaryV2QueryEntry>;
   protected _startHeight?: number;
-  protected _genesisHash?: string;
   protected _metadata: DictionaryV1Metadata | DictionaryV2Metadata | undefined;
   metadataValid: boolean | undefined;
   protected _dictionaryVersion: DictionaryVersion | undefined;

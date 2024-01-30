@@ -101,13 +101,18 @@ export abstract class WorkerBlockDispatcher<DS, W extends Worker, B>
       await Promise.all(this.workers.map((w) => w.terminate()));
     }
   }
-
-  enqueueFatBlocks(fatBlocks: B[], start: number, end: number): void | Promise<void> {
-    // Todo, need better logic, we can switch to v1 dictionary
-    throw new Error(`Workers not support fat dictionary`);
+  async enqueueBlocks(heights: (B | number)[], latestBufferHeight?: number): Promise<void> {
+    const numberHeights: number[] = [];
+    for (const height of heights) {
+      if (typeof height !== 'number') {
+        throw new Error('When worker enqueue block, heights must be of type number');
+      }
+      numberHeights.push(height);
+    }
+    await this._enqueueBlocks(numberHeights, latestBufferHeight);
   }
 
-  async enqueueBlocks(heights: number[], latestBufferHeight?: number): Promise<void> {
+  async _enqueueBlocks(heights: number[], latestBufferHeight?: number): Promise<void> {
     // In the case where factors of batchSize is equal to bypassBlock or when heights is []
     // to ensure block is bypassed, we set the latestBufferHeight to the heights
     // make sure lastProcessedHeight in metadata is updated

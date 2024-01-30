@@ -47,8 +47,8 @@ export abstract class DictionaryService<RFB, FB, DS, D extends DictionaryV1<DS>>
     protected readonly eventEmitter: EventEmitter2
   ) {}
 
-  abstract initDictionariesV1(): Promise<D[]>;
-  abstract initDictionariesV2(): Promise<DictionaryV2<RFB, FB, DS>[]> | DictionaryV2<RFB, FB, DS>[];
+  protected abstract initDictionariesV1(): Promise<D[]>;
+  protected abstract initDictionariesV2(): Promise<DictionaryV2<RFB, FB, DS>[]> | DictionaryV2<RFB, FB, DS>[];
 
   async initDictionaries(apiGenesisHash: string): Promise<void> {
     // For now, treat dictionary resolver as V1

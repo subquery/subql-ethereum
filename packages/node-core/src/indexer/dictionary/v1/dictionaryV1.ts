@@ -203,13 +203,6 @@ export abstract class DictionaryV1<DS> extends CoreDictionary<DS, number> {
         if (!metaData) {
           return false;
         }
-        // Some dictionaries rely on chain others rely on genesisHash
-        if (!this.validateChainMeta(metaData)) {
-          logger.error(
-            'The dictionary that you have specified does not match the chain you are indexing, it will be ignored. Please update your project manifest to reference the correct dictionary'
-          );
-          return false;
-        }
 
         if (startBlockHeight !== undefined && metaData.lastProcessedHeight < startBlockHeight) {
           logger.warn(`Dictionary indexed block is behind current indexing block height`);
