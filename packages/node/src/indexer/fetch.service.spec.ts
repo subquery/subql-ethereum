@@ -404,55 +404,67 @@ describe('Dictionary queries', () => {
         null,
       );
 
-      const queryEntry = (fetchService as any).buildDictionaryQueryEntries(
-        dataSources,
-      );
+      const queryEntry = buildDictionaryV1QueryEntries(dataSources);
 
       expect(queryEntry).toEqual([
         {
-          entity: 'evmLogs',
           conditions: [
             {
               field: 'topics0',
+              matcher: 'equalTo',
               value:
                 '0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62',
-              matcher: 'equalTo',
             },
           ],
+          entity: 'evmLogs',
         },
         {
-          entity: 'evmLogs',
           conditions: [
             {
               field: 'address',
-              // This is what we're looking to happen with multiple instances of template
-              value: ['address1', 'address2'],
-              matcher: 'in',
+              matcher: 'equalTo',
+              value: 'address1',
             },
             {
               field: 'topics0',
+              matcher: 'equalTo',
               value:
                 '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
-              matcher: 'equalTo',
             },
           ],
+          entity: 'evmLogs',
         },
         {
-          entity: 'evmLogs',
           conditions: [
-            // This condition should not be grouped because there is a single instance of the tamplate
             {
               field: 'address',
-              value: 'address3',
               matcher: 'equalTo',
+              value: 'address2',
             },
             {
               field: 'topics0',
-              value:
-                '0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62',
               matcher: 'equalTo',
+              value:
+                '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
             },
           ],
+          entity: 'evmLogs',
+        },
+        {
+          conditions: [
+            {
+              field: 'address',
+              matcher: 'equalTo',
+              value: 'address3',
+            },
+            {
+              field: 'topics0',
+              matcher: 'equalTo',
+              value:
+                '0xc3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62',
+            },
+          ],
+          entity: 'evmLogs',
         },
       ]);
     });

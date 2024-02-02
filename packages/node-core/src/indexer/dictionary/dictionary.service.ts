@@ -9,11 +9,9 @@ import {getLogger} from '../../logger';
 import {BlockHeightMap} from '../../utils/blockHeightMap';
 import {DictionaryResponse, DictionaryVersion, IDictionary, IDictionaryCtrl} from './types';
 import {subqlFilterBlocksCapabilities} from './utils';
-import {DictionaryV1} from './v1';
-import {DictionaryV2} from './v2';
 import {DictionaryV2Metadata} from './';
 
-async function inspectDictionaryVersion(endpoint: string): Promise<DictionaryVersion> {
+export async function inspectDictionaryVersion(endpoint: string): Promise<DictionaryVersion> {
   if (endpoint.includes('/rpc')) {
     let resp: DictionaryV2Metadata;
     try {
@@ -32,10 +30,9 @@ async function inspectDictionaryVersion(endpoint: string): Promise<DictionaryVer
 }
 
 const logger = getLogger('DictionaryService');
-export abstract class DictionaryService<RFB, FB, DS, D extends DictionaryV1<DS>>
-  implements IDictionaryCtrl<DS, FB, IDictionary<DS, FB>>
-{
-  protected _dictionaries: (DictionaryV2<RFB, FB, DS> | D)[] = [];
+export abstract class DictionaryService<DS, FB, D extends IDictionary<DS, FB>> implements IDictionaryCtrl<DS, FB> {
+  protected _dictionaries: D[] = [];
+
   protected _currentDictionaryIndex: number | undefined;
   // Keep in memory in order one of dictionary failed then we can switch
   protected _dictionaryV1Endpoints: string[] = [];
@@ -47,26 +44,13 @@ export abstract class DictionaryService<RFB, FB, DS, D extends DictionaryV1<DS>>
     protected readonly eventEmitter: EventEmitter2
   ) {}
 
-  protected abstract initDictionariesV1(): Promise<D[]>;
-  protected abstract initDictionariesV2(): Promise<DictionaryV2<RFB, FB, DS>[]> | DictionaryV2<RFB, FB, DS>[];
+  abstract initDictionaries(): Promise<void>;
 
-  async initDictionaries(apiGenesisHash: string): Promise<void> {
-    // For now, treat dictionary resolver as V1
-    if (this.nodeConfig.networkDictionaries) {
-      for (const endpoint of this.nodeConfig.networkDictionaries) {
-        const version = await inspectDictionaryVersion(endpoint);
-        if (version === DictionaryVersion.v1) {
-          this._dictionaryV1Endpoints.push(endpoint);
-        } else {
-          this._dictionaryV2Endpoints.push(endpoint);
-        }
-      }
-    }
-    this._dictionaries.push(...(await this.initDictionariesV1()));
-    this._dictionaries.push(...(await this.initDictionariesV2()));
+  init(dictionaries: D[]): void {
+    this._dictionaries = dictionaries;
   }
 
-  get dictionary(): DictionaryV2<RFB, FB, DS> | D {
+  get dictionary(): D {
     if (this._dictionaries.length === 0) {
       throw new Error(`No dictionaries available to use`);
     }
@@ -92,8 +76,16 @@ export abstract class DictionaryService<RFB, FB, DS, D extends DictionaryV1<DS>>
     }
     // update dictionary metadata
     for (const dictionary of this._dictionaries) {
-      await dictionary.initMetadata();
-      dictionary.heightValidation(height);
+      try {
+        await dictionary.initMetadata();
+        dictionary.heightValidation(height);
+      } catch (e) {
+        logger.warn(
+          `When find dictionary, init metadata and height validation failed, please check ${
+            (dictionary as any).dictionaryEndpoint
+          }`
+        );
+      }
     }
     const v2Index = this._dictionaries?.findIndex((d) => d.version === DictionaryVersion.v2Complete && d.metadataValid);
     const v1Index = (this._currentDictionaryIndex = this._dictionaries?.findIndex(
@@ -109,10 +101,9 @@ export abstract class DictionaryService<RFB, FB, DS, D extends DictionaryV1<DS>>
    */
 
   buildDictionaryEntryMap(dataSources: BlockHeightMap<DS[]>): void {
-    if (this.useDictionary) {
-      this.dictionary.updateQueriesMap(dataSources);
+    for (const dict of this._dictionaries) {
+      dict.updateQueriesMap(dataSources);
     }
-    return;
   }
 
   async scopedDictionaryEntries(

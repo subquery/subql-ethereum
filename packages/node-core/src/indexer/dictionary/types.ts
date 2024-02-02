@@ -6,8 +6,8 @@ import {MetaData as DictionaryV1Metadata} from '@subql/utils';
 import {BlockHeightMap} from '../../utils/blockHeightMap';
 import {DictionaryV2Metadata, DictionaryV2QueryEntry} from './';
 
-export type DictionaryResponse<B> = {
-  batchBlocks: number[] | B[];
+export type DictionaryResponse<B = number> = {
+  batchBlocks: B[];
   lastBufferedHeight: number;
 };
 
@@ -18,6 +18,7 @@ export enum DictionaryVersion {
 }
 
 export interface IDictionary<DS, FB> {
+  metadataValid: boolean | undefined;
   getData(
     startBlock: number,
     queryEndBlock: number,
@@ -32,9 +33,8 @@ export interface IDictionary<DS, FB> {
   updateQueriesMap(dataSources: BlockHeightMap<DS[]>): void;
 }
 
-export interface IDictionaryCtrl<DS, FB, D extends IDictionary<DS, FB>> {
-  initDictionaries(apiGenesisHash: string): Promise<void>;
-  dictionary: D;
+export interface IDictionaryCtrl<DS, FB> {
+  initDictionaries(): void;
   useDictionary: boolean;
   findDictionary(height: number): Promise<void>;
   buildDictionaryEntryMap(dataSources: BlockHeightMap<DS[]>): void;

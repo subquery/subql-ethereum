@@ -3,21 +3,11 @@
 
 import {EventEmitter2} from '@nestjs/event-emitter';
 import {NETWORK_FAMILY} from '@subql/common';
-import {DictionaryQueryEntry} from '@subql/types-core';
 import {NodeConfig} from '../..';
 import {DictionaryService} from './dictionary.service';
 import {DictionaryResponse} from './types';
-import {DictionaryV1} from './v1';
 import {testDictionaryV1} from './v1/dictionaryV1.test';
 import {DictionaryV2, DictionaryV2QueryEntry} from './v2';
-
-interface testRFB {
-  Header: {
-    number: bigint;
-    gasLimit: bigint;
-    hash: string;
-  };
-}
 
 interface testFB {
   gasLimit: bigint;
@@ -25,7 +15,7 @@ interface testFB {
   hash: string;
 }
 
-class testDictionaryV2 extends DictionaryV2<testRFB, testFB, any, any> {
+class testDictionaryV2 extends DictionaryV2<testFB, any, any> {
   buildDictionaryQueryEntries(dataSources: any[]): DictionaryV2QueryEntry {
     return {};
   }
@@ -39,23 +29,24 @@ class testDictionaryV2 extends DictionaryV2<testRFB, testFB, any, any> {
   }
 }
 
-class testDictionaryService extends DictionaryService<testRFB, testFB, any, testDictionaryV1> {
-  protected async initDictionariesV1(): Promise<testDictionaryV1[]> {
-    const dictionaries = [
-      ...(await Promise.all(
-        this._dictionaryV1Endpoints.map(
-          (endpoint) => new testDictionaryV1(endpoint, 'mockChainId', this.nodeConfig, this.eventEmitter)
-        )
-      )),
+class testDictionaryService extends DictionaryService<any, testFB, any> {
+  async initDictionaries(): Promise<void> {
+    // Mock version inspection completed
+    this._dictionaryV1Endpoints = [
+      'https://gx.api.subquery.network/sq/subquery/eth-dictionary',
+      'https://dict-tyk.subquery.network/query/eth-mainnet',
     ];
-    return dictionaries;
-  }
+    this._dictionaryV2Endpoints = ['http://localhost:3000/rpc'];
 
-  protected initDictionariesV2(): DictionaryV2<testRFB, testFB, any>[] {
-    const dictionaries = this._dictionaryV2Endpoints.map(
+    const dictionariesV1 = await Promise.all(
+      this._dictionaryV1Endpoints.map(
+        (endpoint) => new testDictionaryV1(endpoint, 'mockChainId', this.nodeConfig, this.eventEmitter)
+      )
+    );
+    const dictionariesV2 = this._dictionaryV2Endpoints.map(
       (endpoint) => new testDictionaryV2(endpoint, 'mockChainId', this.nodeConfig, this.eventEmitter)
     );
-    return dictionaries;
+    this.init([...dictionariesV1, ...dictionariesV2]);
   }
 }
 
@@ -77,13 +68,14 @@ describe('Dictionary service', function () {
     });
 
     dictionaryService = new testDictionaryService('0xchainId', nodeConfig, new EventEmitter2());
-    await dictionaryService.initDictionaries('0xGenesisHash');
+    await dictionaryService.initDictionaries();
   });
+
   it('can use the dictionary registry to resolve a url', async () => {
-    const dictUrl: string = await (DictionaryV1 as any).resolveDictionary(
+    const dictUrl: string = await (dictionaryService as any).resolveDictionary(
       NETWORK_FAMILY.ethereum,
       1,
-      'https://github.com/subquery/templates/raw/main/dictionary.json'
+      'https://github.com/subquery/templates/raw/main/dist/dictionary.json'
     );
 
     expect(dictUrl).toEqual('https://dict-tyk.subquery.network/query/eth-mainnet');
@@ -114,6 +106,4 @@ describe('Dictionary service', function () {
     expect(spyDictionary).toHaveBeenCalled();
     expect(blocks).toBeTruthy();
   });
-
-  // mock dictionary end height, and switch dictionary
 });

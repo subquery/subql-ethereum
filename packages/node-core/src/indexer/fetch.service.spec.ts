@@ -9,6 +9,7 @@ import {
   BlockDispatcher,
   delay,
   DictionaryV1,
+  DictionaryV2,
   DynamicDsService,
   IBlockDispatcher,
   IProjectService,
@@ -21,7 +22,12 @@ import {BaseFetchService} from './fetch.service';
 const CHAIN_INTERVAL = 100; // 100ms
 const genesisHash = '0x91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3';
 
-class TestFetchService extends BaseFetchService<BaseDataSource, IBlockDispatcher<any>, DictionaryV1<any>, any, any> {
+class TestFetchService extends BaseFetchService<
+  BaseDataSource,
+  IBlockDispatcher<any>,
+  DictionaryV1<any> | DictionaryV2<any, any>,
+  any
+> {
   finalizedHeight = 1000;
   bestHeight = 20;
   modulos: number[] = [];
@@ -94,6 +100,9 @@ const dynamicDsService = {
 const getDictionaryService = () =>
   ({
     useDictionary: false,
+    findDictionary: () => {
+      /* TODO*/
+    },
     buildDictionaryEntryMap: () => {
       /* TODO*/
     },
@@ -104,7 +113,10 @@ const getDictionaryService = () =>
     scopedDictionaryEntries: () => {
       /* TODO */
     },
-  } as any as DictionaryService<any, any, any, any>);
+    initDictionaries: () => {
+      /* TODO */
+    },
+  } as any as DictionaryService<any, any, any>);
 
 const getBlockDispatcher = () => {
   const inst = {
@@ -127,7 +139,7 @@ const getBlockDispatcher = () => {
 describe('Fetch Service', () => {
   let fetchService: TestFetchService;
   let blockDispatcher: IBlockDispatcher<any>;
-  let dictionaryService: DictionaryService<any, any, any, any>;
+  let dictionaryService: DictionaryService<any, any, DictionaryV1<any> | DictionaryV2<any, any>>;
   let networkConfig: IProjectNetworkConfig;
 
   beforeEach(() => {

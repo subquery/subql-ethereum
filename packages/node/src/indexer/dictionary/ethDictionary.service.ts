@@ -4,19 +4,22 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { NETWORK_FAMILY } from '@subql/common';
-import { NodeConfig } from '@subql/node-core';
+import {
+  DictionaryVersion,
+  NodeConfig,
+  inspectDictionaryVersion,
+} from '@subql/node-core';
 import { DictionaryService } from '@subql/node-core/indexer/dictionary/dictionary.service';
 import { EthereumBlock, SubqlDatasource } from '@subql/types-ethereum';
 import { SubqueryProject } from '../../configure/SubqueryProject';
 import { EthDictionaryV1 } from './v1/ethDictionaryV1';
-import { EthDictionaryV2, RawEthFatBlock } from './v2';
+import { EthDictionaryV2 } from './v2';
 
 @Injectable()
 export class EthDictionaryService extends DictionaryService<
-  RawEthFatBlock,
-  EthereumBlock,
   SubqlDatasource,
-  EthDictionaryV1
+  EthereumBlock,
+  EthDictionaryV1 | EthDictionaryV2
 > {
   protected async initDictionariesV1(): Promise<EthDictionaryV1[]> {
     if (!this.project) {
@@ -65,13 +68,30 @@ export class EthDictionaryService extends DictionaryService<
     const dictionaries = this._dictionaryV2Endpoints.map(
       (endpoint) =>
         new EthDictionaryV2(
-          this.project,
+          endpoint,
           this.nodeConfig,
           this.eventEmitter,
-          endpoint,
+          this.project.network.chainId,
         ),
     );
     return dictionaries;
+  }
+
+  async initDictionaries() {
+    if (this.nodeConfig.networkDictionaries) {
+      for (const endpoint of this.nodeConfig.networkDictionaries) {
+        const version = await inspectDictionaryVersion(endpoint);
+        if (version === DictionaryVersion.v1) {
+          this._dictionaryV1Endpoints.push(endpoint);
+        } else {
+          this._dictionaryV2Endpoints.push(endpoint);
+        }
+      }
+    }
+    this.init([
+      ...(await this.initDictionariesV1()),
+      ...this.initDictionariesV2(),
+    ]);
   }
 
   constructor(

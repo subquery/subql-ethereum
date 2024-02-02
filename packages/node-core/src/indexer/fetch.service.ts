@@ -6,13 +6,13 @@ import {OnApplicationShutdown} from '@nestjs/common';
 import {EventEmitter2} from '@nestjs/event-emitter';
 import {Interval, SchedulerRegistry} from '@nestjs/schedule';
 import {BaseDataSource, IProjectNetworkConfig} from '@subql/types-core';
-import {range, without} from 'lodash';
+import {range, uniq, without} from 'lodash';
 import {NodeConfig} from '../configure';
 import {IndexerEvent} from '../events';
 import {getLogger} from '../logger';
 import {checkMemoryUsage, cleanedBatchBlocks, delay, transformBypassBlocks, waitForBatchSize} from '../utils';
 import {IBlockDispatcher} from './blockDispatcher';
-import {DictionaryV1} from './dictionary';
+import {IDictionary} from './dictionary';
 import {DictionaryService} from './dictionary/dictionary.service';
 import {DynamicDsService} from './dynamic-ds.service';
 import {IProjectService} from './types';
@@ -23,9 +23,8 @@ const CHECK_MEMORY_INTERVAL = 60000;
 export abstract class BaseFetchService<
   DS extends BaseDataSource,
   B extends IBlockDispatcher<number | FB>,
-  D extends DictionaryV1<DS>,
-  FB,
-  RFB
+  D extends IDictionary<DS, FB | number>,
+  FB
 > implements OnApplicationShutdown
 {
   private _latestBestHeight?: number;
@@ -56,7 +55,7 @@ export abstract class BaseFetchService<
     protected projectService: IProjectService<DS>,
     protected networkConfig: IProjectNetworkConfig,
     protected blockDispatcher: B,
-    protected dictionaryService: DictionaryService<RFB, FB, DS, D>,
+    protected dictionaryService: DictionaryService<DS, FB | number, D>,
     private dynamicDsService: DynamicDsService<DS>,
     private eventEmitter: EventEmitter2,
     private schedulerRegistry: SchedulerRegistry
@@ -133,11 +132,11 @@ export abstract class BaseFetchService<
       //  We pass in genesis hash in order validate dictionary metadata, genesisHash should always exist in apiService.
       //  Call metadata here, other network should align with this
       //  For substrate, we might use the specVersion metadata in future if we have same error handling as in node-core
-      await this.dictionaryService.initDictionaries(this.getGenesisHash());
+      await this.dictionaryService.initDictionaries();
+      // Update all dictionaries execute before find one usable dictionary
+      this.updateDictionary();
       // Find one usable dictionary at start
       await this.dictionaryService.findDictionary(startHeight);
-      // Update dictionary now need execute after dictionary initialized, as it require to have dictionary version before buildDictionaryEntryMap
-      this.updateDictionary();
     }
 
     await this.preLoopHook({startHeight});
@@ -217,7 +216,7 @@ export abstract class BaseFetchService<
    * @param startBlockHeight
    * @param endBlockHeight is either FinalizedHeight or BestHeight, ensure ModuloBlocks not greater than this number
    */
-  getEnqueuedModuloBlocks(startBlockHeight: number, endBlockHeight: number): number[] {
+  getEnqueuedModuloBlocks(startBlockHeight: number, endBlockHeight: number): FB[] | number[] {
     return this.getModuloBlocks(
       startBlockHeight,
       Math.min(this.nodeConfig.batchSize * Math.max(...this.getModulos()) + startBlockHeight, endBlockHeight)
@@ -323,22 +322,6 @@ export abstract class BaseFetchService<
       }
     }
   }
-
-  /**
-   *
-   * @param enqueuingBlocks
-   * @param latestHeight ensure LatestBufferHeight get updated if enqueuingBlocks is empty
-   * @private
-   */
-  // private async enqueueBlocks(enqueuingBlocks: number[]|RFB[], latestHeight: number): Promise<void> {
-  //   // TODO, bring back clean blocks
-  //   // const cleanedBatchBlocks = this.filteredBlockBatch(enqueuingBlocks);
-  //   await this.blockDispatcher.enqueueBlocks(
-  //     enqueuingBlocks,
-  //     // TODO, last height of this
-  //     // this.getLatestBufferHeight(cleanedBatchBlocks, enqueuingBlocks, latestHeight)
-  //   );
-  // }
 
   /**
    *

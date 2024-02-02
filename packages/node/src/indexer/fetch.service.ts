@@ -20,7 +20,7 @@ import { calcInterval } from '../ethereum/utils.ethereum';
 import { IEthereumBlockDispatcher } from './blockDispatcher';
 import { EthDictionaryService } from './dictionary/ethDictionary.service';
 import { EthDictionaryV1 } from './dictionary/v1';
-import { RawEthFatBlock } from './dictionary/v2';
+import { EthDictionaryV2 } from './dictionary/v2';
 import { DynamicDsService } from './dynamic-ds.service';
 import { ProjectService } from './project.service';
 import {
@@ -36,9 +36,8 @@ const INTERVAL_PERCENT = 0.9;
 export class FetchService extends BaseFetchService<
   SubqlDatasource,
   IEthereumBlockDispatcher,
-  EthDictionaryV1,
-  EthereumBlock,
-  RawEthFatBlock
+  EthDictionaryV1 | EthDictionaryV2,
+  EthereumBlock
 > {
   constructor(
     private apiService: ApiService,

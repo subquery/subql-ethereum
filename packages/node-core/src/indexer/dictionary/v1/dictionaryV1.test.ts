@@ -268,11 +268,11 @@ describe('Dictionary V1', () => {
 
   it('return dictionary query result', async () => {
     const batchSize = 30;
-    const startBlock = 1000; // first event at 1632, this will pick the correct query map
+    const startBlock = 1000; // first event at 1463, this will pick the correct query map
     const endBlock = 10001;
     const dic = await dictionary.getData(startBlock, endBlock, batchSize);
     expect(dic?.batchBlocks.length).toBeGreaterThan(1);
-    expect(dic?.batchBlocks[1]).toBe(1632);
+    expect(dic?.batchBlocks[0]).toBe(1463);
   }, 500000);
 
   it('should return undefined startblock height greater than dictionary last processed height', async () => {

@@ -193,7 +193,6 @@ export function buildDictionaryV2QueryEntry(
 }
 
 export class EthDictionaryV2 extends DictionaryV2<
-  RawEthFatBlock,
   EthereumBlock,
   SubqlDatasource,
   EthDictionaryV2QueryEntry
@@ -206,13 +205,14 @@ export class EthDictionaryV2 extends DictionaryV2<
   }
 
   constructor(
-    project: SubqueryProject,
+    endpoint: string,
     nodeConfig: NodeConfig,
     eventEmitter: EventEmitter2,
+    project: SubqueryProject,
     chainId?: string,
   ) {
     super(
-      project.network.dictionary,
+      endpoint,
       chainId ?? project.network.chainId,
       nodeConfig,
       eventEmitter,

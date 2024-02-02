@@ -11,7 +11,6 @@ import {subqlFilterBlocksCapabilities} from '../utils';
 import {DictionaryV2Metadata, DictionaryV2QueryEntry} from './types';
 
 export abstract class DictionaryV2<
-  RFB,
   FB,
   DS,
   QE extends DictionaryV2QueryEntry = DictionaryV2QueryEntry

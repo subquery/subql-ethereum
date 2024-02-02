@@ -239,7 +239,7 @@ export abstract class BlockDispatcher<B, DS>
 }
 
 // Used to assert enqueued items array is blocks/ number types
-function isArrayOfType<T>(arr: unknown[], type: 'number' | 'block'): arr is T[] {
+export function isArrayOfType<T>(arr: unknown[], type: 'number' | 'block'): arr is T[] {
   if (type === 'number') {
     return arr.every((item) => typeof item === 'number');
   } else if (type === 'block') {

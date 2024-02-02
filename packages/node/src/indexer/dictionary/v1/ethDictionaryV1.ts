@@ -210,11 +210,11 @@ export class EthDictionaryV1 extends DictionaryV1<EthDsInterface> {
     project: SubqueryProject,
     nodeConfig: NodeConfig,
     eventEmitter: EventEmitter2,
+    dictionaryUrl: string,
     chainId?: string,
-    dictionaryUrl?: string,
   ) {
     super(
-      dictionaryUrl ?? project.network.dictionary,
+      dictionaryUrl,
       chainId ?? project.network.chainId,
       nodeConfig,
       eventEmitter,
@@ -238,8 +238,8 @@ export class EthDictionaryV1 extends DictionaryV1<EthDsInterface> {
       project,
       nodeConfig,
       eventEmitter,
-      chainAlias,
       dictionaryUrl,
+      chainAlias,
     );
   }
 
