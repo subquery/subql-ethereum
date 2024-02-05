@@ -71,6 +71,7 @@ export class EthDictionaryService extends DictionaryService<
           endpoint,
           this.nodeConfig,
           this.eventEmitter,
+          this.project,
           this.project.network.chainId,
         ),
     );

@@ -87,7 +87,7 @@ export abstract class BlockDispatcher<B, DS>
     this.processQueue.abort();
   }
 
-  enqueueBlocks(heightsBlocks: B[] | number[], latestBufferHeight?: number): void {
+  enqueueBlocks(heightsBlocks: (B | number)[], latestBufferHeight?: number): void {
     // In the case where factors of batchSize is equal to bypassBlock or when heights is []
     // to ensure block is bypassed, we set the latestBufferHeight to the heights
     // make sure lastProcessedHeight in metadata is updated
@@ -95,19 +95,15 @@ export abstract class BlockDispatcher<B, DS>
       heightsBlocks = [latestBufferHeight];
     }
     let startBlockHeight: number;
-    let endBlockHeight: number | undefined;
+    let endBlockHeight: number;
     try {
-      if (isArrayOfType<number>(heightsBlocks, 'number')) {
-        startBlockHeight = heightsBlocks[0];
-        endBlockHeight = last(heightsBlocks);
-        logger.info(`Enqueueing blocks ${startBlockHeight}...${endBlockHeight}, total ${heightsBlocks.length} blocks`);
-      } else if (isArrayOfType<B>(heightsBlocks, 'block')) {
-        startBlockHeight = this.getBlockHeight(heightsBlocks[0]);
-        endBlockHeight = this.getBlockHeight(heightsBlocks[heightsBlocks.length - 1]);
-        logger.info(
-          `Enqueueing fat blocks ${startBlockHeight}...${endBlockHeight}, total ${heightsBlocks.length} blocks`
-        );
-      }
+      const startBlock = heightsBlocks[0];
+      const endBlock = heightsBlocks[heightsBlocks.length - 1];
+      startBlockHeight = typeof startBlock === 'number' ? startBlock : this.getBlockHeight(startBlock);
+      endBlockHeight = typeof endBlock === 'number' ? endBlock : this.getBlockHeight(endBlock);
+      logger.info(
+        `Enqueueing fat blocks ${startBlockHeight}...${endBlockHeight}, total ${heightsBlocks.length} blocks`
+      );
     } catch (e) {
       throw new Error(`Enqueue blocks failed, ${e}`);
     }

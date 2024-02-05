@@ -177,7 +177,7 @@ export abstract class DictionaryV1<DS> extends CoreDictionary<DS, number> {
       }
 
       return {
-        lastBufferedHeight: 0,
+        lastBufferedHeight: endBlock,
         batchBlocks,
       };
     } catch (err: any) {
