@@ -1,10 +1,10 @@
 // Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
-import {IBlockUtil} from '@subql/node-core';
 import axios, {AxiosInstance} from 'axios';
 import {uniq} from 'lodash';
 import {DictionaryV2Metadata} from '../dictionary/v2';
+import {IBlockUtil} from './types';
 
 const FAT_META_QUERY_METHOD = `subql_filterBlocksCapabilities`;
 

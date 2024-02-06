@@ -4,12 +4,12 @@
 import assert from 'assert';
 
 import {EventEmitter2} from '@nestjs/event-emitter';
-import {IBlockUtil} from '@subql/node-core/indexer';
 import {hexToU8a, u8aEq} from '@subql/utils';
 import {NodeConfig, IProjectUpgradeService} from '../../configure';
 import {IndexerEvent, PoiEvent} from '../../events';
 import {getLogger} from '../../logger';
 import {IQueue, mainThreadOnly} from '../../utils';
+import {IBlockUtil} from '../dictionary/types';
 import {DynamicDsService} from '../dynamic-ds.service';
 import {PoiBlock, PoiService, PoiSyncService} from '../poi';
 import {SmartBatchService} from '../smartBatch.service';

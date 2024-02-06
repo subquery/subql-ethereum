@@ -69,10 +69,7 @@ export class BlockDispatcherService
     throw new Error('Method not implemented.');
   }
 
-  getBlockHeight(block: BlockContent | number): number {
-    if (typeof block === 'number') {
-      return block;
-    }
+  getBlockHeight(block: BlockContent): number {
     return block.number;
   }
 

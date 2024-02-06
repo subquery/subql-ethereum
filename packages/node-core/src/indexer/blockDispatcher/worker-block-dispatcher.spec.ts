@@ -19,10 +19,6 @@ class TestWorkerBlockDispatcher extends WorkerBlockDispatcher<any, any, any> {
   enqueueFatBlocks<FB>(fatBlocks: FB[], latestBufferHeight?: number): void | Promise<void> {
     return undefined;
   }
-
-  getBlockHeight(block: any): number {
-    return 0;
-  }
 }
 describe('WorkerBlockDispatcher', () => {
   let dispatcher: WorkerBlockDispatcher<any, any, any>;
