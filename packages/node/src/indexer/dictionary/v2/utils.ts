@@ -119,6 +119,7 @@ export function rawFatBlockToEthBlock(block: RawEthFatBlock): EthereumBlock {
       transactionsRoot: block.Header.transactionRoot,
       baseFeePerGas: block.Header.baseFeePerGas,
       blockGasCost: undefined,
+      getBlockHeight: () => Number(block.Header.number),
     };
 
     if (block.Transactions !== null && block.Transactions.length) {

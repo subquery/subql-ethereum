@@ -9,7 +9,7 @@ import {last} from 'lodash';
 import {NodeConfig} from '../../configure';
 import {IProjectUpgradeService} from '../../configure/ProjectUpgrade.service';
 import {IndexerEvent} from '../../events';
-import {PoiSyncService} from '../../indexer';
+import {getBlockHeight, IBlockUtil, PoiSyncService} from '../../indexer';
 import {getLogger} from '../../logger';
 import {profilerWrap} from '../../profiler';
 import {Queue, AutoQueue, delay, memoryLock, waitForBatchSize, isTaskFlushedError} from '../../utils';
@@ -28,7 +28,7 @@ type BatchBlockFetcher<B> = (heights: number[]) => Promise<B[]>;
 /**
  * @description Intended to behave the same as WorkerBlockDispatcherService but doesn't use worker threads or any parallel processing
  */
-export abstract class BlockDispatcher<B, DS>
+export abstract class BlockDispatcher<B extends IBlockUtil, DS>
   extends BaseBlockDispatcher<Queue<B | number>, DS, B>
   implements OnApplicationShutdown
 {
@@ -42,7 +42,6 @@ export abstract class BlockDispatcher<B, DS>
   private isShutdown = false;
 
   protected abstract indexBlock(block: B): Promise<ProcessBlockResponse>;
-  protected abstract getBlockHeight(block: B): number;
 
   constructor(
     nodeConfig: NodeConfig,
@@ -99,8 +98,8 @@ export abstract class BlockDispatcher<B, DS>
     try {
       const startBlock = heightsBlocks[0];
       const endBlock = heightsBlocks[heightsBlocks.length - 1];
-      startBlockHeight = typeof startBlock === 'number' ? startBlock : this.getBlockHeight(startBlock);
-      endBlockHeight = typeof endBlock === 'number' ? endBlock : this.getBlockHeight(endBlock);
+      startBlockHeight = getBlockHeight(startBlock);
+      endBlockHeight = getBlockHeight(endBlock);
       logger.info(
         `Enqueueing fat blocks ${startBlockHeight}...${endBlockHeight}, total ${heightsBlocks.length} blocks`
       );
@@ -171,7 +170,7 @@ export abstract class BlockDispatcher<B, DS>
           })
           .then(
             (block) => {
-              const height = this.getBlockHeight(block);
+              const height = getBlockHeight(block);
 
               return this.processQueue.put(async () => {
                 // Check if the queues have been flushed between queue.takeMany and fetchBlocksBatches resolving

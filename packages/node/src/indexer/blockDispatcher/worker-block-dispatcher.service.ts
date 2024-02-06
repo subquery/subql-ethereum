@@ -94,6 +94,14 @@ export class WorkerBlockDispatcherService
     );
   }
 
+  getBlockHeight(block: BlockContent | number): number {
+    //TODO, this might get used in future
+    if (typeof block === 'number') {
+      return block;
+    }
+    return block.number;
+  }
+
   protected async fetchBlock(
     worker: IndexerWorker,
     height: number,

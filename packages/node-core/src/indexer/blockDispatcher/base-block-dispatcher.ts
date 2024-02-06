@@ -4,6 +4,7 @@
 import assert from 'assert';
 
 import {EventEmitter2} from '@nestjs/event-emitter';
+import {IBlockUtil} from '@subql/node-core/indexer';
 import {hexToU8a, u8aEq} from '@subql/utils';
 import {NodeConfig, IProjectUpgradeService} from '../../configure';
 import {IndexerEvent, PoiEvent} from '../../events';
@@ -25,7 +26,7 @@ export type ProcessBlockResponse = {
   reindexBlockHeight: number | null;
 };
 
-export interface IBlockDispatcher<B = number> {
+export interface IBlockDispatcher<B extends IBlockUtil | number> {
   // now within enqueueBlock should handle getLatestBufferHeight
   enqueueBlocks(heights: B[], latestBufferHeight?: number): void | Promise<void>;
   queueSize: number;
@@ -44,7 +45,7 @@ function isNullMerkelRoot(operationHash: Uint8Array): boolean {
   return u8aEq(operationHash, NULL_MERKEL_ROOT);
 }
 
-export abstract class BaseBlockDispatcher<Q extends IQueue, DS, B> implements IBlockDispatcher<B> {
+export abstract class BaseBlockDispatcher<Q extends IQueue, DS, B extends IBlockUtil> implements IBlockDispatcher<B> {
   protected _latestBufferedHeight = 0;
   protected _processedBlockCount = 0;
   protected _latestProcessedHeight = 0;

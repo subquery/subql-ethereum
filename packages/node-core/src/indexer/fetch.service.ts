@@ -12,8 +12,9 @@ import {IndexerEvent} from '../events';
 import {getLogger} from '../logger';
 import {checkMemoryUsage, cleanedBatchBlocks, delay, transformBypassBlocks, waitForBatchSize} from '../utils';
 import {IBlockDispatcher} from './blockDispatcher';
-import {IDictionary} from './dictionary';
+import {IBlockUtil, IDictionary, mergeNumAndBlocksToNums} from './dictionary';
 import {DictionaryService} from './dictionary/dictionary.service';
+import {getBlockHeight, mergeNumAndBlocks} from './dictionary/utils';
 import {DynamicDsService} from './dynamic-ds.service';
 import {IProjectService} from './types';
 
@@ -24,7 +25,7 @@ export abstract class BaseFetchService<
   DS extends BaseDataSource,
   B extends IBlockDispatcher<number | FB>,
   D extends IDictionary<DS, FB | number>,
-  FB
+  FB extends IBlockUtil
 > implements OnApplicationShutdown
 {
   private _latestBestHeight?: number;
@@ -288,20 +289,21 @@ export abstract class BaseFetchService<
           }
           if (dictionary) {
             const {batchBlocks} = dictionary;
-            // TODO, bring back modulo blocks sort with fat blocks
-            // const moduloBlocks = this.getModuloBlocks(
-            //   startBlockHeight,
-            //   // If the results fill the batch size then use the last block in the reesults
-            //   batchBlocks.length >= scaledBatchSize ? Math.max(...batchBlocks) : queryEndBlock
-            // );
-            // batchBlocks = uniq(batchBlocks.concat(moduloBlocks)).sort((a, b) => a - b);
-            if (batchBlocks.length === 0) {
+            // the last block returned from batch should have max height in this batch
+            const maxBatchBlocksNumber = getBlockHeight(batchBlocks[batchBlocks.length - 1]);
+            const moduloBlocks = this.getModuloBlocks(
+              startBlockHeight,
+              // If the results fill the batch size then use the last block in the reesults
+              batchBlocks.length >= scaledBatchSize ? maxBatchBlocksNumber : dictionary.queryEndBlock
+            );
+            const mergedBlocks = mergeNumAndBlocks(moduloBlocks, batchBlocks, getBlockHeight);
+            if (mergedBlocks.length === 0) {
               // There we're no blocks in this query range, we can set a new height we're up to
-              await this.blockDispatcher.enqueueBlocks([], dictionary.lastBufferedHeight);
+              await this.enqueueBlocks([], dictionary.lastBufferedHeight);
             } else {
-              const maxBlockSize = Math.min(batchBlocks.length, this.blockDispatcher.freeSize);
-              const enqueueBlocks = batchBlocks.slice(0, maxBlockSize);
-              await this.blockDispatcher.enqueueBlocks(enqueueBlocks, latestHeight);
+              const maxBlockSize = Math.min(mergedBlocks.length, this.blockDispatcher.freeSize);
+              const enqueueBlocks = mergedBlocks.slice(0, maxBlockSize);
+              await this.enqueueBlocks(enqueueBlocks, latestHeight);
             }
             continue; // skip nextBlockRange() way
           }
@@ -318,9 +320,17 @@ export abstract class BaseFetchService<
             ? this.getEnqueuedModuloBlocks(startBlockHeight, latestHeight)
             : range(startBlockHeight, endHeight + 1);
 
-        await this.blockDispatcher.enqueueBlocks(enqueuingBlocks, latestHeight);
+        await this.enqueueBlocks(enqueuingBlocks, latestHeight);
       }
     }
+  }
+
+  private async enqueueBlocks(enqueuingBlocks: (FB | number)[], latestHeight: number): Promise<void> {
+    const cleanedBatchBlocks = this.filteredBlockBatch(enqueuingBlocks);
+    await this.blockDispatcher.enqueueBlocks(
+      cleanedBatchBlocks,
+      this.getLatestBufferHeight(cleanedBatchBlocks, enqueuingBlocks, latestHeight)
+    );
   }
 
   /**
@@ -330,22 +340,29 @@ export abstract class BaseFetchService<
    * @param latestHeight
    * @private
    */
-  // private getLatestBufferHeight(cleanedBatchBlocks: number[], rawBatchBlocks: number[], latestHeight: number): number {
-  //   // When both BatchBlocks are empty, mean no blocks to enqueue and full synced,
-  //   // we are safe to update latestBufferHeight to this number
-  //   if (cleanedBatchBlocks.length === 0 && rawBatchBlocks.length === 0) {
-  //     return latestHeight;
-  //   }
-  //   return Math.max(...cleanedBatchBlocks, ...rawBatchBlocks);
-  // }
-  private filteredBlockBatch(currentBatchBlocks: number[]): number[] {
+  private getLatestBufferHeight(
+    cleanedBatchBlocks: (FB | number)[],
+    rawBatchBlocks: (FB | number)[],
+    latestHeight: number
+  ): number {
+    // When both BatchBlocks are empty, mean no blocks to enqueue and full synced,
+    // we are safe to update latestBufferHeight to this number
+    if (cleanedBatchBlocks.length === 0 && rawBatchBlocks.length === 0) {
+      return latestHeight;
+    }
+    return Math.max(...mergeNumAndBlocksToNums(cleanedBatchBlocks, rawBatchBlocks, getBlockHeight));
+  }
+
+  private filteredBlockBatch(currentBatchBlocks: (number | FB)[]): (number | FB)[] {
     if (!this.bypassBlocks.length || !currentBatchBlocks) {
       return currentBatchBlocks;
     }
 
-    const cleanedBatch = cleanedBatchBlocks(this.bypassBlocks, currentBatchBlocks);
+    const cleanedBatch = cleanedBatchBlocks(this.bypassBlocks, currentBatchBlocks, getBlockHeight);
 
-    const pollutedBlocks = this.bypassBlocks.filter((b) => b < Math.max(...currentBatchBlocks));
+    const pollutedBlocks = this.bypassBlocks.filter(
+      (b) => b < Math.max(...mergeNumAndBlocksToNums(currentBatchBlocks, [], getBlockHeight))
+    );
     if (pollutedBlocks.length) {
       logger.info(`Bypassing blocks: ${pollutedBlocks}`);
     }

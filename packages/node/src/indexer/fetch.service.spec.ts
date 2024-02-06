@@ -1,6 +1,7 @@
 // Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
+import { mergeNumAndBlocks } from '@subql/node-core';
 import {
   EthereumDatasourceKind,
   EthereumHandlerKind,
@@ -467,6 +468,61 @@ describe('Dictionary queries', () => {
           entity: 'evmLogs',
         },
       ]);
+    });
+
+    it('could arrange modulo blocks with both numbers and fat blocks', () => {
+      const moduloBlocks = [10, 20, 30, 40, 50];
+
+      const batchBlocks = [
+        // should keep these fat blocks rather than number, so we don't have to fetch again
+        { height: 50, hash: '0x50' },
+        { height: 12, hash: '0x12' },
+        { height: 22, hash: '0x22' },
+        { height: 23, hash: '0x23' },
+        { height: 44, hash: '0x44' },
+        { height: 45, hash: '0x45' },
+        // and it can order
+        { height: 20, hash: '0x20' },
+        // and it can remove duplicate
+        { height: 22, hash: '0x22' },
+      ];
+
+      function getBlockHeight(b: { height: number; hash: string }) {
+        return b.height;
+      }
+      const exampleHeight = getBlockHeight({ height: 12, hash: '0x12' });
+      expect(exampleHeight).toEqual(12);
+
+      const outcomeBlocks = [
+        10,
+        { height: 12, hash: '0x12' },
+        { height: 20, hash: '0x20' },
+        { height: 22, hash: '0x22' },
+        { height: 23, hash: '0x23' },
+        30,
+        40,
+        { height: 44, hash: '0x44' },
+        { height: 45, hash: '0x45' },
+        { height: 50, hash: '0x50' },
+      ];
+      expect(
+        mergeNumAndBlocks<{ height: number; hash: string } | number>(
+          moduloBlocks,
+          batchBlocks,
+          getBlockHeight,
+        ),
+      ).toStrictEqual(outcomeBlocks);
+
+      // also should work if batchBlocks is numbers
+      const batchBlocks2 = [12, 22, 23, 44, 45, 22];
+      const outcomeBlocks2 = [10, 12, 20, 22, 23, 30, 40, 44, 45, 50];
+      expect(
+        mergeNumAndBlocks<{ height: number; hash: string } | number>(
+          moduloBlocks,
+          batchBlocks2,
+          getBlockHeight,
+        ),
+      ).toStrictEqual(outcomeBlocks2);
     });
   });
 });

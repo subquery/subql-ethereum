@@ -123,7 +123,7 @@ const getBlockDispatcher = () => {
   const inst = {
     latestBufferedHeight: 0,
     smartBatchSize: 10,
-    minimumHeapLimit: 1000, // TOOD
+    minimumHeapLimit: 1000,
     freeSize: 10,
     enqueueBlocks: (heights: number[], latestBufferHeight: number) => {
       (inst as any).freeSize = inst.freeSize - heights.length;

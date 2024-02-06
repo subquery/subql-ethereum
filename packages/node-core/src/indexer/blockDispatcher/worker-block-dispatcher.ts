@@ -9,7 +9,7 @@ import {last} from 'lodash';
 import {NodeConfig} from '../../configure';
 import {IProjectUpgradeService} from '../../configure/ProjectUpgrade.service';
 import {IndexerEvent} from '../../events';
-import {PoiSyncService} from '../../indexer';
+import {IBlockUtil, PoiSyncService} from '../../indexer';
 import {getLogger} from '../../logger';
 import {AutoQueue, isTaskFlushedError} from '../../utils';
 import {DynamicDsService} from '../dynamic-ds.service';
@@ -41,7 +41,7 @@ function initAutoQueue<T>(
   return new AutoQueue(workers * batchSize * 2, 1, timeout, name);
 }
 
-export abstract class WorkerBlockDispatcher<DS, W extends Worker, B>
+export abstract class WorkerBlockDispatcher<DS, W extends Worker, B extends IBlockUtil>
   extends BaseBlockDispatcher<AutoQueue<void>, DS, B>
   implements OnApplicationShutdown
 {

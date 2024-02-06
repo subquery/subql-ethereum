@@ -44,3 +44,7 @@ export interface IDictionaryCtrl<DS, FB> {
     scaledBatchSize: number
   ): Promise<(DictionaryResponse<number | FB> & {queryEndBlock: number}) | undefined>;
 }
+
+export interface IBlockUtil {
+  getBlockHeight(): number;
+}

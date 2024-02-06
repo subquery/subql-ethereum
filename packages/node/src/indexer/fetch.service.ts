@@ -10,7 +10,6 @@ import {
   NodeConfig,
   BaseFetchService,
   ApiService,
-  getLogger,
   getModulos,
 } from '@subql/node-core';
 import { EthereumBlock, SubqlDatasource } from '@subql/types-ethereum';

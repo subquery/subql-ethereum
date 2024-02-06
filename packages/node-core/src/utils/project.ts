@@ -12,7 +12,7 @@ import Cron from 'cron-converter';
 import {isNumber, range, uniq, without, flatten} from 'lodash';
 import tar from 'tar';
 import {NodeConfig} from '../configure/NodeConfig';
-import {ISubqueryProject, StoreService} from '../indexer';
+import {getBlockHeight, IBlockUtil, ISubqueryProject, StoreService} from '../indexer';
 import {getLogger} from '../logger';
 
 const logger = getLogger('Project-Utils');
@@ -86,8 +86,18 @@ export function transformBypassBlocks(bypassBlocks: (number | string)[]): number
   );
 }
 
-export function cleanedBatchBlocks(bypassBlocks: number[], currentBlockBatch: number[]): number[] {
-  return without(currentBlockBatch, ...transformBypassBlocks(bypassBlocks));
+export function cleanedBatchBlocks<FB extends IBlockUtil>(
+  bypassBlocks: number[],
+  currentBlockBatch: (FB | number)[],
+  _getBlockHeight: (b: FB | number) => number = getBlockHeight
+): (FB | number)[] {
+  // more efficient to remove large amount numbers
+  const filteredNumbers = without(currentBlockBatch, ...transformBypassBlocks(bypassBlocks));
+  const filteredBlocks = filteredNumbers.filter((b) => {
+    const height = _getBlockHeight(b);
+    return bypassBlocks.indexOf(height) < 0;
+  });
+  return filteredBlocks;
 }
 
 export async function getEnumDeprecated(sequelize: Sequelize, enumTypeNameDeprecated: string): Promise<unknown[]> {
