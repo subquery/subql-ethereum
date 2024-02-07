@@ -1,7 +1,7 @@
 // Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
-import {cleanedBatchBlocks, transformBypassBlocks} from './project';
+import {transformBypassBlocks, cleanedBatchBlocks} from './blocks';
 
 describe('bypass logic', () => {
   it('process bypassBlocks with ranges', () => {

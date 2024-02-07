@@ -17,6 +17,7 @@ import {
   PoiSyncService,
   InMemoryCacheService,
   createIndexerWorker,
+  IBlockUtil,
 } from '@subql/node-core';
 import { EthereumBlock } from '@subql/types-ethereum';
 import {
@@ -35,7 +36,11 @@ type IndexerWorker = IIndexerWorker & {
 
 @Injectable()
 export class WorkerBlockDispatcherService
-  extends WorkerBlockDispatcher<EthereumProjectDs, IndexerWorker, EthereumBlock>
+  extends WorkerBlockDispatcher<
+    EthereumProjectDs,
+    IndexerWorker,
+    EthereumBlock & IBlockUtil
+  >
   implements OnApplicationShutdown
 {
   enqueueFatBlocks<B>(

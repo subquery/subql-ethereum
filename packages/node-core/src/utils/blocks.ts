@@ -1,0 +1,33 @@
+// Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
+// SPDX-License-Identifier: GPL-3.0
+
+import {flatten, isNumber, range, uniq, without} from 'lodash';
+import {getBlockHeight, IBlockUtil} from '../indexer';
+
+export function cleanedBatchBlocks<FB extends IBlockUtil>(
+  bypassBlocks: number[],
+  currentBlockBatch: (FB | number)[],
+  _getBlockHeight: (b: FB | number) => number = getBlockHeight
+): (FB | number)[] {
+  // more efficient to remove large amount numbers
+  const filteredNumbers = without(currentBlockBatch, ...transformBypassBlocks(bypassBlocks));
+  const filteredBlocks = filteredNumbers.filter((b) => {
+    const height = _getBlockHeight(b);
+    return bypassBlocks.indexOf(height) < 0;
+  });
+  return filteredBlocks;
+}
+
+export function transformBypassBlocks(bypassBlocks: (number | string)[]): number[] {
+  if (!bypassBlocks?.length) return [];
+
+  return uniq(
+    flatten(
+      bypassBlocks.map((bypassEntry) => {
+        if (isNumber(bypassEntry)) return [bypassEntry];
+        const splitRange = bypassEntry.split('-').map((val) => parseInt(val.trim(), 10));
+        return range(splitRange[0], splitRange[1] + 1);
+      })
+    )
+  );
+}

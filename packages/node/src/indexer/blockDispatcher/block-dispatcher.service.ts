@@ -15,6 +15,7 @@ import {
   ApiService,
   IProjectUpgradeService,
   PoiSyncService,
+  IBlockUtil,
 } from '@subql/node-core';
 import {
   EthereumProjectDs,
@@ -29,7 +30,7 @@ import { BlockContent } from '../types';
  */
 @Injectable()
 export class BlockDispatcherService
-  extends BlockDispatcher<BlockContent, EthereumProjectDs>
+  extends BlockDispatcher<BlockContent & IBlockUtil, EthereumProjectDs>
   implements OnApplicationShutdown
 {
   constructor(

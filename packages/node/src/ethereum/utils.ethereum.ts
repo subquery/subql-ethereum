@@ -4,6 +4,7 @@
 import { getAddress } from '@ethersproject/address';
 import { BigNumber } from '@ethersproject/bignumber';
 import { Zero } from '@ethersproject/constants';
+import { IBlockUtil } from '@subql/node-core';
 import {
   ApiWrapper,
   EthereumBlock,
@@ -58,6 +59,22 @@ export function formatBlock(block: Record<string, any>): EthereumBlock {
     logs: [], // Filled in at AvalancheBlockWrapped constructor
   } as EthereumBlock;
 }
+
+export function formatBlockUtil(
+  block: EthereumBlock,
+): EthereumBlock & IBlockUtil {
+  return {
+    ...block,
+    getHeader: () => {
+      return {
+        hash: block.hash,
+        height: block.number,
+        parentHash: block.parentHash,
+      };
+    },
+  };
+}
+
 export function formatLog(
   log: Omit<
     EthereumLog<EthereumResult> | EthereumLog,

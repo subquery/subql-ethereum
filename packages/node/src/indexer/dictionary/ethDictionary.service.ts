@@ -8,6 +8,7 @@ import {
   DictionaryVersion,
   NodeConfig,
   inspectDictionaryVersion,
+  IBlockUtil,
 } from '@subql/node-core';
 import { DictionaryService } from '@subql/node-core/indexer/dictionary/dictionary.service';
 import { EthereumBlock, SubqlDatasource } from '@subql/types-ethereum';
@@ -18,7 +19,7 @@ import { EthDictionaryV2 } from './v2';
 @Injectable()
 export class EthDictionaryService extends DictionaryService<
   SubqlDatasource,
-  EthereumBlock,
+  EthereumBlock & IBlockUtil,
   EthDictionaryV1 | EthDictionaryV2
 > {
   protected async initDictionariesV1(): Promise<EthDictionaryV1[]> {

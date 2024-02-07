@@ -13,7 +13,7 @@ import {
 } from '@ethersproject/abstract-provider';
 import { WebSocketProvider } from '@ethersproject/providers';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { getLogger, timeout } from '@subql/node-core';
+import { getLogger, IBlockUtil, timeout } from '@subql/node-core';
 import {
   ApiWrapper,
   EthereumBlock,
@@ -36,6 +36,7 @@ import { ConnectionInfo } from './ethers/web';
 import SafeEthProvider from './safe-api';
 import {
   formatBlock,
+  formatBlockUtil,
   formatLog,
   formatReceipt,
   formatTransaction,
@@ -261,11 +262,8 @@ export class EthereumApi implements ApiWrapper {
     if (!rawBlock) {
       throw new Error(`Failed to fetch block ${num}`);
     }
-
-    const block = formatBlock(rawBlock);
-
+    const block = formatBlockUtil(formatBlock(rawBlock));
     block.stateRoot = this.client.formatter.hash(block.stateRoot);
-
     return block;
   }
 
@@ -277,7 +275,7 @@ export class EthereumApi implements ApiWrapper {
     );
   }
 
-  async fetchBlock(blockNumber: number): Promise<EthereumBlock> {
+  async fetchBlock(blockNumber: number): Promise<EthereumBlock & IBlockUtil> {
     try {
       const block = await this.getBlockPromise(blockNumber, true);
       const logsRaw = await this.client.getLogs({ blockHash: block.hash });

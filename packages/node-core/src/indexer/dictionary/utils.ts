@@ -30,7 +30,7 @@ export async function subqlFilterBlocksCapabilities(
       },
     });
     const metadata: DictionaryV2Metadata = {
-      chain: '', //TODO, need chain for v2 meta
+      chain: '1', //TODO, need chain for v2 meta
       start: response.data.result.availableBlocks[0].startHeight,
       end: response.data.result.availableBlocks[0].endHeight,
       genesisHash: response.data.result.genesisHash,
@@ -48,7 +48,7 @@ export function getBlockHeight<FB extends IBlockUtil>(block: number | FB): numbe
   if (typeof block === 'number') {
     return block;
   }
-  return block.getBlockHeight();
+  return block.getHeader().height;
 }
 
 export function mergeNumAndBlocks<FB>(

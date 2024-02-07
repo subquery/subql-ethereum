@@ -80,7 +80,6 @@ export type EthereumBlock = {
   uncles: string[];
   baseFeePerGas?: bigint;
   blockGasCost?: bigint;
-  getBlockHeight: () => number;
 };
 
 export type FlareBlock = EthereumBlock;

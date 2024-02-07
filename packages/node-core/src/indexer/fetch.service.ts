@@ -10,7 +10,7 @@ import {range, uniq, without} from 'lodash';
 import {NodeConfig} from '../configure';
 import {IndexerEvent} from '../events';
 import {getLogger} from '../logger';
-import {checkMemoryUsage, cleanedBatchBlocks, delay, transformBypassBlocks, waitForBatchSize} from '../utils';
+import {checkMemoryUsage, delay, transformBypassBlocks, waitForBatchSize} from '../utils';
 import {IBlockDispatcher} from './blockDispatcher';
 import {IBlockUtil, IDictionary, mergeNumAndBlocksToNums} from './dictionary';
 import {DictionaryService} from './dictionary/dictionary.service';
@@ -20,6 +20,20 @@ import {IProjectService} from './types';
 
 const logger = getLogger('FetchService');
 const CHECK_MEMORY_INTERVAL = 60000;
+
+function cleanedBatchBlocks<FB extends IBlockUtil>(
+  bypassBlocks: number[],
+  currentBlockBatch: (FB | number)[],
+  _getBlockHeight: (b: FB | number) => number = getBlockHeight
+): (FB | number)[] {
+  // more efficient to remove large amount numbers
+  const filteredNumbers = without(currentBlockBatch, ...transformBypassBlocks(bypassBlocks));
+  const filteredBlocks = filteredNumbers.filter((b) => {
+    const height = _getBlockHeight(b);
+    return bypassBlocks.indexOf(height) < 0;
+  });
+  return filteredBlocks;
+}
 
 export abstract class BaseFetchService<
   DS extends BaseDataSource,
@@ -276,10 +290,14 @@ export abstract class BaseFetchService<
         /* queryEndBlock needs to be limited by the latest height or the maximum value of endBlock in datasources.
          * Dictionaries could be in the future depending on if they index unfinalized blocks or the node is using an RPC endpoint that is behind.
          */
+        const queryEnd = this.dictionaryService.dictionary.getQueryEndBlock(
+          startBlockHeight,
+          this.latestFinalizedHeight
+        );
         try {
           const dictionary = await this.dictionaryService.scopedDictionaryEntries(
             startBlockHeight,
-            this.dictionaryService.dictionary.getQueryEndBlock(startBlockHeight, this.latestFinalizedHeight),
+            queryEnd,
             scaledBatchSize
           );
 
@@ -290,11 +308,13 @@ export abstract class BaseFetchService<
           if (dictionary) {
             const {batchBlocks} = dictionary;
             // the last block returned from batch should have max height in this batch
-            const maxBatchBlocksNumber = getBlockHeight(batchBlocks[batchBlocks.length - 1]);
             const moduloBlocks = this.getModuloBlocks(
               startBlockHeight,
               // If the results fill the batch size then use the last block in the reesults
-              batchBlocks.length >= scaledBatchSize ? maxBatchBlocksNumber : dictionary.queryEndBlock
+              // If batchBlocks.length >= scaledBatchSize we can confident say that batchBlocks length is greater than 0, then getBlockHeight should return a valid value
+              batchBlocks.length >= scaledBatchSize
+                ? getBlockHeight(batchBlocks[batchBlocks.length - 1])
+                : dictionary.queryEndBlock
             );
             const mergedBlocks = mergeNumAndBlocks(moduloBlocks, batchBlocks, getBlockHeight);
             if (mergedBlocks.length === 0) {

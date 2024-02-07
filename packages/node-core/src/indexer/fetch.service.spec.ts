@@ -175,7 +175,7 @@ describe('Fetch Service', () => {
     (dictionaryService as any).dictionary = {
       queryMapValidByHeight: () => true,
       startHeight: 1,
-      getQueryEndBlock: () => 10,
+      getQueryEndBlock: () => 1000,
     };
     dictionaryService.scopedDictionaryEntries = (start, end, batch) => {
       return Promise.resolve({
@@ -279,7 +279,7 @@ describe('Fetch Service', () => {
     await fetchService.init(1);
 
     expect((fetchService as any).useDictionary).toBeFalsy();
-    expect(enqueueBlocksSpy).toHaveBeenCalledWith([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 1000);
+    expect(enqueueBlocksSpy).toHaveBeenCalledWith([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 10);
     expect(dictionarySpy).not.toHaveBeenCalled();
   });
 
@@ -291,7 +291,7 @@ describe('Fetch Service', () => {
     await fetchService.init(1);
     // wait enqueue completed
     await delay(3);
-    expect(enqueueBlocksSpy).toHaveBeenCalledWith([2, 4, 6, 8, 10], 1000);
+    expect(enqueueBlocksSpy).toHaveBeenCalledWith([2, 4, 6, 8, 10], 10);
     expect(dictionarySpy).toHaveBeenCalled();
   }, 50000);
 
@@ -307,7 +307,7 @@ describe('Fetch Service', () => {
     await delay(3);
 
     expect((fetchService as any).useDictionary).toBeTruthy();
-    expect(enqueueBlocksSpy).toHaveBeenCalledWith([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 1000);
+    expect(enqueueBlocksSpy).toHaveBeenCalledWith([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 10);
     expect(dictionarySpy).not.toHaveBeenCalled();
   });
 
@@ -476,6 +476,8 @@ describe('Fetch Service', () => {
     const FINALIZED_HEIGHT = 10;
 
     fetchService.finalizedHeight = FINALIZED_HEIGHT;
+    // change query end
+    dictionaryService.dictionary.getQueryEndBlock = () => 10;
 
     const dictSpy = jest.spyOn(dictionaryService, 'scopedDictionaryEntries');
 

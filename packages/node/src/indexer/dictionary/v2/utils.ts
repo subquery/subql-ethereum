@@ -1,6 +1,7 @@
 // Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
+import { IBlockUtil } from '@subql/node-core';
 import { DictionaryQueryCondition } from '@subql/types-core';
 import {
   EthereumBlock,
@@ -86,7 +87,9 @@ export function entryToLogConditions(
   }
 }
 
-export function rawFatBlockToEthBlock(block: RawEthFatBlock): EthereumBlock {
+export function rawFatBlockToEthBlock(
+  block: RawEthFatBlock,
+): EthereumBlock & IBlockUtil {
   const logs: EthereumLog[] = [];
   const transactions: EthereumTransaction[] = [];
   try {
@@ -119,7 +122,6 @@ export function rawFatBlockToEthBlock(block: RawEthFatBlock): EthereumBlock {
       transactionsRoot: block.Header.transactionRoot,
       baseFeePerGas: block.Header.baseFeePerGas,
       blockGasCost: undefined,
-      getBlockHeight: () => Number(block.Header.number),
     };
 
     if (block.Transactions !== null && block.Transactions.length) {
@@ -178,7 +180,16 @@ export function rawFatBlockToEthBlock(block: RawEthFatBlock): EthereumBlock {
       formatTransaction(tx, ethBlock),
     );
 
-    return ethBlock;
+    return {
+      ...ethBlock,
+      getHeader: () => {
+        return {
+          hash: block.Header.hash,
+          height: Number(block.Header.number),
+          parentHash: block.Header.parentHash,
+        };
+      },
+    };
   } catch (e) {
     throw new Error(
       `Convert fat block to Eth block failed at ${block.Header.number},${e.message}`,

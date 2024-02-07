@@ -12,7 +12,7 @@ import Cron from 'cron-converter';
 import {isNumber, range, uniq, without, flatten} from 'lodash';
 import tar from 'tar';
 import {NodeConfig} from '../configure/NodeConfig';
-import {getBlockHeight, IBlockUtil, ISubqueryProject, StoreService} from '../indexer';
+import {getBlockHeight, ISubqueryProject, StoreService} from '../indexer';
 import {getLogger} from '../logger';
 
 const logger = getLogger('Project-Utils');
@@ -70,34 +70,6 @@ export async function getExistingProjectSchema(
     return undefined;
   }
   return schema;
-}
-
-export function transformBypassBlocks(bypassBlocks: (number | string)[]): number[] {
-  if (!bypassBlocks?.length) return [];
-
-  return uniq(
-    flatten(
-      bypassBlocks.map((bypassEntry) => {
-        if (isNumber(bypassEntry)) return [bypassEntry];
-        const splitRange = bypassEntry.split('-').map((val) => parseInt(val.trim(), 10));
-        return range(splitRange[0], splitRange[1] + 1);
-      })
-    )
-  );
-}
-
-export function cleanedBatchBlocks<FB extends IBlockUtil>(
-  bypassBlocks: number[],
-  currentBlockBatch: (FB | number)[],
-  _getBlockHeight: (b: FB | number) => number = getBlockHeight
-): (FB | number)[] {
-  // more efficient to remove large amount numbers
-  const filteredNumbers = without(currentBlockBatch, ...transformBypassBlocks(bypassBlocks));
-  const filteredBlocks = filteredNumbers.filter((b) => {
-    const height = _getBlockHeight(b);
-    return bypassBlocks.indexOf(height) < 0;
-  });
-  return filteredBlocks;
 }
 
 export async function getEnumDeprecated(sequelize: Sequelize, enumTypeNameDeprecated: string): Promise<unknown[]> {

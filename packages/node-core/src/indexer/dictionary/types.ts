@@ -1,10 +1,7 @@
 // Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
-import {DictionaryQueryEntry as DictionaryV1QueryEntry} from '@subql/types-core/dist/project/types';
-import {MetaData as DictionaryV1Metadata} from '@subql/utils';
 import {BlockHeightMap} from '../../utils/blockHeightMap';
-import {DictionaryV2Metadata, DictionaryV2QueryEntry} from './';
 
 export type DictionaryResponse<B = number> = {
   batchBlocks: B[];
@@ -46,5 +43,9 @@ export interface IDictionaryCtrl<DS, FB> {
 }
 
 export interface IBlockUtil {
-  getBlockHeight(): number;
+  getHeader(): {
+    hash: string;
+    height: number;
+    parentHash?: string;
+  };
 }
