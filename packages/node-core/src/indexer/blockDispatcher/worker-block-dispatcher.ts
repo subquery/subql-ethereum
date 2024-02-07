@@ -109,7 +109,7 @@ export abstract class WorkerBlockDispatcher<DS, W extends Worker, B extends IBlo
    await this._enqueueBlocks(heights, latestBufferHeight);
   }
 
-  async _enqueueBlocks(heights: number[], latestBufferHeight?: number): Promise<void> {
+  private async _enqueueBlocks(heights: number[], latestBufferHeight?: number): Promise<void> {
     // In the case where factors of batchSize is equal to bypassBlock or when heights is []
     // to ensure block is bypassed, we set the latestBufferHeight to the heights
     // make sure lastProcessedHeight in metadata is updated
