@@ -102,14 +102,11 @@ export abstract class WorkerBlockDispatcher<DS, W extends Worker, B extends IBlo
     }
   }
   async enqueueBlocks(heights: (B | number)[], latestBufferHeight?: number): Promise<void> {
-    const numberHeights: number[] = [];
-    for (const height of heights) {
-      if (typeof height !== 'number') {
-        throw new Error('When worker enqueue block, heights must be of type number');
-      }
-      numberHeights.push(height);
-    }
-    await this._enqueueBlocks(numberHeights, latestBufferHeight);
+   assert(
+       heights.every(h => typeof height === 'number'),
+       'When worker enqueue block, heights must be of type number'
+   );
+   await this._enqueueBlocks(heights, latestBufferHeight);
   }
 
   async _enqueueBlocks(heights: number[], latestBufferHeight?: number): Promise<void> {
