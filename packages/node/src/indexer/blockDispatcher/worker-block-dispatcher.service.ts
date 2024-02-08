@@ -36,11 +36,7 @@ type IndexerWorker = IIndexerWorker & {
 
 @Injectable()
 export class WorkerBlockDispatcherService
-  extends WorkerBlockDispatcher<
-    EthereumProjectDs,
-    IndexerWorker,
-    EthereumBlock & IBlock
-  >
+  extends WorkerBlockDispatcher<EthereumProjectDs, IndexerWorker, EthereumBlock>
   implements OnApplicationShutdown
 {
   enqueueFatBlocks<B>(

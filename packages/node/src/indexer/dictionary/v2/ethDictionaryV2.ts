@@ -231,7 +231,7 @@ export class EthDictionaryV2 extends DictionaryV2<
     startBlock: number,
     queryEndBlock: number,
     limit = MIN_FAT_FETCH_LIMIT,
-  ): Promise<DictionaryResponse<EthereumBlock & IBlock> | undefined> {
+  ): Promise<DictionaryResponse<IBlock<EthereumBlock>> | undefined> {
     const queryDetails = this.queriesMap?.getDetails(startBlock);
     const conditions = queryDetails?.value;
     queryEndBlock = this.metadata.end;
@@ -275,16 +275,16 @@ export class EthDictionaryV2 extends DictionaryV2<
 
   convertResponseBlocks(
     data: RawFatDictionaryResponseData<RawEthFatBlock>,
-  ): FatDictionaryResponse<EthereumBlock & IBlock> | undefined {
-    const blocks: (EthereumBlock & IBlock)[] = [];
+  ): FatDictionaryResponse<IBlock<EthereumBlock>> | undefined {
+    const blocks: IBlock<EthereumBlock>[] = [];
     for (const block of data.Blocks) {
       blocks.push(rawFatBlockToEthBlock(block));
     }
     if (blocks.length !== 0) {
       return {
         blocks: blocks,
-        start: blocks[0].number,
-        end: blocks[blocks.length - 1].number,
+        start: blocks[0].block.number,
+        end: blocks[blocks.length - 1].block.number,
       };
     } else {
       return undefined;

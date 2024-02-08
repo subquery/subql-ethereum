@@ -263,7 +263,7 @@ export class EthereumApi implements ApiWrapper {
       throw new Error(`Failed to fetch block ${num}`);
     }
     const block = formatBlockUtil(formatBlock(rawBlock));
-    block.stateRoot = this.client.formatter.hash(block.stateRoot);
+    block.block.stateRoot = this.client.formatter.hash(block.block.stateRoot);
     return block;
   }
 
@@ -275,7 +275,7 @@ export class EthereumApi implements ApiWrapper {
     );
   }
 
-  async fetchBlock(blockNumber: number): Promise<EthereumBlock & IBlock> {
+  async fetchBlock(blockNumber: number): Promise<EthereumBlock> {
     try {
       const block = await this.getBlockPromise(blockNumber, true);
       const logsRaw = await this.client.getLogs({ blockHash: block.hash });

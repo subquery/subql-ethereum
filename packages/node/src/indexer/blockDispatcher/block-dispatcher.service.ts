@@ -30,7 +30,7 @@ import { BlockContent } from '../types';
  */
 @Injectable()
 export class BlockDispatcherService
-  extends BlockDispatcher<BlockContent & IBlock, EthereumProjectDs>
+  extends BlockDispatcher<IBlock<BlockContent>, EthereumProjectDs>
   implements OnApplicationShutdown
 {
   constructor(
@@ -70,16 +70,12 @@ export class BlockDispatcherService
     throw new Error('Method not implemented.');
   }
 
-  getBlockHeight(block: BlockContent): number {
-    return block.number;
-  }
-
   protected async indexBlock(
-    block: BlockContent,
+    block: IBlock<BlockContent>,
   ): Promise<ProcessBlockResponse> {
     return this.indexerManager.indexBlock(
-      block,
-      await this.projectService.getDataSources(this.getBlockHeight(block)),
+      block.block,
+      await this.projectService.getDataSources(block.getHeader().height),
     );
   }
 }

@@ -91,12 +91,12 @@ describe('eth dictionary v2', () => {
       2,
     );
 
-    expect(ethBlocks.batchBlocks.map((b) => b.number)).toStrictEqual([
+    expect(ethBlocks.batchBlocks.map((b) => b.block.number)).toStrictEqual([
       3678215, 3678250,
     ]);
 
-    ethBlock3678215 = ethBlocks.batchBlocks[0];
-    ethBlock3678250 = ethBlocks.batchBlocks[1];
+    ethBlock3678215 = ethBlocks.batchBlocks[0].block;
+    ethBlock3678250 = ethBlocks.batchBlocks[1].block;
 
     expect(ethBlock3678215.number).toBe(3678215);
     expect(ethBlock3678250.number).toBe(3678250);
@@ -119,20 +119,20 @@ describe('eth dictionary v2', () => {
       2,
     );
 
-    expect(ethBlocks.batchBlocks[0].number).toStrictEqual(3678215);
+    expect(ethBlocks.batchBlocks[0].block.number).toStrictEqual(3678215);
     expect(ethBlocks.lastBufferedHeight).toStrictEqual(3678250);
 
     // Can include input and hash
     // https://polygonscan.com/tx/0xb1b5f7882fa8d62d3650948c08066e928b7b5c9d607d2fe8c7e6ce57caf06774
-    expect(ethBlocks.batchBlocks[1].transactions[1].hash).toBe(
+    expect(ethBlocks.batchBlocks[1].block.transactions[1].hash).toBe(
       `0xb1b5f7882fa8d62d3650948c08066e928b7b5c9d607d2fe8c7e6ce57caf06774`,
     );
-    expect(ethBlocks.batchBlocks[1].transactions[1].input).toBe(
+    expect(ethBlocks.batchBlocks[1].block.transactions[1].input).toBe(
       `0x23b872dd000000000000000000000000244a79a2e79e8d884d9c9cc425d88f9e2ed988ca000000000000000000000000d22c4c383ce5efa0364d5fab5ce1313c24a52bda0000000000000000000000000000000000000000000000000000000000000159`,
     );
 
     // relate logs
     // https://polygonscan.com/tx/0xb1b5f7882fa8d62d3650948c08066e928b7b5c9d607d2fe8c7e6ce57caf06774#eventlog
-    expect(ethBlocks.batchBlocks[1].logs[0].data).toBe(`0x`);
+    expect(ethBlocks.batchBlocks[1].block.logs[0].data).toBe(`0x`);
   }, 5000000);
 });

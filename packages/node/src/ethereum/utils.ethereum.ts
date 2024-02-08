@@ -60,9 +60,9 @@ export function formatBlock(block: Record<string, any>): EthereumBlock {
   } as EthereumBlock;
 }
 
-export function formatBlockUtil(block: EthereumBlock): EthereumBlock & IBlock {
+export function formatBlockUtil(block: EthereumBlock): IBlock<EthereumBlock> {
   return {
-    ...block,
+    block,
     getHeader: () => {
       return {
         hash: block.hash,

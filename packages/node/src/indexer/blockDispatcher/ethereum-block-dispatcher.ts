@@ -5,6 +5,6 @@ import { IBlockDispatcher, IBlock } from '@subql/node-core';
 import { EthereumBlock } from '@subql/types-ethereum';
 
 export interface IEthereumBlockDispatcher
-  extends IBlockDispatcher<EthereumBlock & IBlock> {
+  extends IBlockDispatcher<EthereumBlock> {
   init(onDynamicDsCreated: (height: number) => Promise<void>): Promise<void>;
 }

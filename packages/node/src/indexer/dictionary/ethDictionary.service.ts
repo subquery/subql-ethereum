@@ -19,7 +19,7 @@ import { EthDictionaryV2 } from './v2';
 @Injectable()
 export class EthDictionaryService extends DictionaryService<
   SubqlDatasource,
-  EthereumBlock & IBlock,
+  EthereumBlock,
   EthDictionaryV1 | EthDictionaryV2
 > {
   protected async initDictionariesV1(

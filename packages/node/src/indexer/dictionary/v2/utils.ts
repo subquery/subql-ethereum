@@ -89,7 +89,7 @@ export function entryToLogConditions(
 
 export function rawFatBlockToEthBlock(
   block: RawEthFatBlock,
-): EthereumBlock & IBlock {
+): IBlock<EthereumBlock> {
   const logs: EthereumLog[] = [];
   const transactions: EthereumTransaction[] = [];
   try {
@@ -181,7 +181,7 @@ export function rawFatBlockToEthBlock(
     );
 
     return {
-      ...ethBlock,
+      block: ethBlock,
       getHeader: () => {
         return {
           hash: block.Header.hash,
