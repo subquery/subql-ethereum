@@ -253,7 +253,7 @@ export class EthDictionaryV2 extends DictionaryV2<
     };
 
     try {
-      const response = await this.dictionaryApi.post(
+      const response = await this.dictionaryApi.post<{ result?: RawFatDictionaryResponseData<RawEthFatBlock>, error?: { code: number; message: string;}}>(
         this.dictionaryEndpoint,
         requestData,
         {
@@ -262,6 +262,9 @@ export class EthDictionaryV2 extends DictionaryV2<
           },
         },
       );
+      if (response.data.error) {
+        throw new Error(response.data.error.message);
+      }
       const ethBlocks = this.convertResponseBlocks(response.data.result);
       return {
         batchBlocks: ethBlocks.blocks,
