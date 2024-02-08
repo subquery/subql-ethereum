@@ -280,7 +280,7 @@ export class EthDictionaryV2 extends DictionaryV2<
     data: RawFatDictionaryResponseData<RawEthFatBlock>,
   ): FatDictionaryResponse<IBlock<EthereumBlock>> | undefined {
     const blocks: IBlock<EthereumBlock>[] = [];
-    for (const block of data.Blocks) {
+    for (const block of data.blocks) {
       blocks.push(rawFatBlockToEthBlock(block));
     }
     if (blocks.length !== 0) {
