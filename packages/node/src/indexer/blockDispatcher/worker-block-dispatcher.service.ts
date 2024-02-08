@@ -17,7 +17,7 @@ import {
   PoiSyncService,
   InMemoryCacheService,
   createIndexerWorker,
-  IBlockUtil,
+  IBlock,
 } from '@subql/node-core';
 import { EthereumBlock } from '@subql/types-ethereum';
 import {
@@ -39,7 +39,7 @@ export class WorkerBlockDispatcherService
   extends WorkerBlockDispatcher<
     EthereumProjectDs,
     IndexerWorker,
-    EthereumBlock & IBlockUtil
+    EthereumBlock & IBlock
   >
   implements OnApplicationShutdown
 {

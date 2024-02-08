@@ -159,3 +159,28 @@ export type LightEthereumBlock = Omit<EthereumBlock, 'transactions' | 'logs'> & 
   logs: LightEthereumLog[];
   transactions: string[];
 };
+
+//
+// type a = {
+//   a_field1: string,
+//   a_field2: number
+// }
+//
+// type b = {
+//   b_field1: string,
+//   b_field2: number
+// }
+//
+// type IBlock<T> = T & {
+//   getHeader: () => {
+//     height: number,
+//     hash: string,
+//     parentHash:string
+//   }
+// }
+//
+// class EthBlock<T> implements IBlock<T> {
+//   constructor(private blockData: T) {}
+//
+//   getBlockHeight(): number { // implement}
+// }

@@ -8,7 +8,7 @@ import {
   DictionaryVersion,
   NodeConfig,
   inspectDictionaryVersion,
-  IBlockUtil,
+  IBlock,
 } from '@subql/node-core';
 import { DictionaryService } from '@subql/node-core/indexer/dictionary/dictionary.service';
 import { EthereumBlock, SubqlDatasource } from '@subql/types-ethereum';
@@ -19,10 +19,12 @@ import { EthDictionaryV2 } from './v2';
 @Injectable()
 export class EthDictionaryService extends DictionaryService<
   SubqlDatasource,
-  EthereumBlock & IBlockUtil,
+  EthereumBlock & IBlock,
   EthDictionaryV1 | EthDictionaryV2
 > {
-  protected async initDictionariesV1(): Promise<EthDictionaryV1[]> {
+  protected async initDictionariesV1(
+    endpoints: string[],
+  ): Promise<EthDictionaryV1[]> {
     if (!this.project) {
       throw new Error(`Project in Dictionary service not initialized `);
     }
@@ -33,7 +35,7 @@ export class EthDictionaryService extends DictionaryService<
       this.nodeConfig.dictionaryRegistry,
     );
     if (registryDictionary !== undefined) {
-      this._dictionaryV1Endpoints.push(registryDictionary);
+      endpoints.push(registryDictionary);
     }
 
     // Current We now only accept either resolver dictionary or multiple dictionaries
@@ -46,27 +48,25 @@ export class EthDictionaryService extends DictionaryService<
       );
       dictionaries = [resolverDictionary];
     } else {
-      dictionaries = [
-        ...(await Promise.all(
-          this._dictionaryV1Endpoints.map((endpoint) =>
-            EthDictionaryV1.create(
-              this.project,
-              this.nodeConfig,
-              this.eventEmitter,
-              endpoint,
-            ),
+      dictionaries = await Promise.all(
+        endpoints.map((endpoint) =>
+          EthDictionaryV1.create(
+            this.project,
+            this.nodeConfig,
+            this.eventEmitter,
+            endpoint,
           ),
-        )),
-      ];
+        ),
+      );
     }
     return dictionaries;
   }
 
-  protected initDictionariesV2(): EthDictionaryV2[] {
+  protected initDictionariesV2(endpoints: string[]): EthDictionaryV2[] {
     if (!this.project) {
       throw new Error(`Project in Dictionary service not initialized `);
     }
-    const dictionaries = this._dictionaryV2Endpoints.map(
+    const dictionaries = endpoints.map(
       (endpoint) =>
         new EthDictionaryV2(
           endpoint,
@@ -80,19 +80,22 @@ export class EthDictionaryService extends DictionaryService<
   }
 
   async initDictionaries() {
+    const dictionaryV1Endpoints = [];
+    const dictionaryV2Endpoints = [];
+    // TODO, change this to project.network.dictionary when rebase with main, this require update in type-core
     if (this.nodeConfig.networkDictionaries) {
       for (const endpoint of this.nodeConfig.networkDictionaries) {
         const version = await inspectDictionaryVersion(endpoint);
         if (version === DictionaryVersion.v1) {
-          this._dictionaryV1Endpoints.push(endpoint);
+          dictionaryV1Endpoints.push(endpoint);
         } else {
-          this._dictionaryV2Endpoints.push(endpoint);
+          dictionaryV2Endpoints.push(endpoint);
         }
       }
     }
     this.init([
-      ...(await this.initDictionariesV1()),
-      ...this.initDictionariesV2(),
+      ...(await this.initDictionariesV1(dictionaryV1Endpoints)),
+      ...this.initDictionariesV2(dictionaryV2Endpoints),
     ]);
   }
 

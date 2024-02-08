@@ -206,7 +206,7 @@ export function buildDictionaryV1QueryEntries(
 }
 
 export class EthDictionaryV1 extends DictionaryV1<EthDsInterface> {
-  constructor(
+  private constructor(
     project: SubqueryProject,
     nodeConfig: NodeConfig,
     eventEmitter: EventEmitter2,

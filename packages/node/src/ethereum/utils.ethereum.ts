@@ -4,7 +4,7 @@
 import { getAddress } from '@ethersproject/address';
 import { BigNumber } from '@ethersproject/bignumber';
 import { Zero } from '@ethersproject/constants';
-import { IBlockUtil } from '@subql/node-core';
+import { IBlock } from '@subql/node-core';
 import {
   ApiWrapper,
   EthereumBlock,
@@ -60,9 +60,7 @@ export function formatBlock(block: Record<string, any>): EthereumBlock {
   } as EthereumBlock;
 }
 
-export function formatBlockUtil(
-  block: EthereumBlock,
-): EthereumBlock & IBlockUtil {
+export function formatBlockUtil(block: EthereumBlock): EthereumBlock & IBlock {
   return {
     ...block,
     getHeader: () => {

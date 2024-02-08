@@ -5,7 +5,14 @@ import assert from 'assert';
 import {EventEmitter2} from '@nestjs/event-emitter';
 import {DictionaryQueryEntry as DictionaryV1QueryEntry} from '@subql/types-core/dist/project/types';
 import {MetaData as DictionaryV1Metadata} from '@subql/utils';
-import {IDictionary, DictionaryV2Metadata, DictionaryV2QueryEntry, DictionaryResponse, DictionaryVersion} from '../';
+import {
+  IDictionary,
+  DictionaryV2Metadata,
+  DictionaryV2QueryEntry,
+  DictionaryResponse,
+  DictionaryVersion,
+  IBlock,
+} from '../';
 import {NodeConfig} from '../../configure';
 import {BlockHeightMap} from '../../utils/blockHeightMap';
 
@@ -27,8 +34,8 @@ export abstract class CoreDictionary<DS, FB> implements IDictionary<DS, FB> {
     startBlock: number,
     queryEndBlock: number,
     limit: number
-  ): Promise<DictionaryResponse<FB> | undefined>;
-  abstract initMetadata(): Promise<void>;
+  ): Promise<DictionaryResponse<IBlock<FB> | number> | undefined>;
+  abstract init(): Promise<void>;
   protected abstract dictionaryValidation(
     metaData?: DictionaryV1Metadata | DictionaryV2Metadata,
     startBlockHeight?: number
@@ -45,7 +52,7 @@ export abstract class CoreDictionary<DS, FB> implements IDictionary<DS, FB> {
   }
 
   get startHeight(): number {
-    if (!this._startHeight) {
+    if (this._startHeight === undefined) {
       throw new Error('Dictionary start height is not set');
     }
     return this._startHeight;

@@ -20,7 +20,7 @@ import {DictionaryResponse} from '../types';
 
 const logger = getLogger('dictionary v1');
 
-export abstract class DictionaryV1<DS> extends CoreDictionary<DS, number> {
+export abstract class DictionaryV1<DS> extends CoreDictionary<DS, undefined> {
   queriesMap?: BlockHeightMap<DictionaryV1QueryEntry[]>;
   protected _metadata: DictionaryV1Metadata | undefined;
   private _client: ApolloClient<NormalizedCacheObject>;
@@ -68,7 +68,7 @@ export abstract class DictionaryV1<DS> extends CoreDictionary<DS, number> {
 
   abstract buildDictionaryQueryEntries(dataSources: DS[]): DictionaryV1QueryEntry[];
 
-  async initMetadata(): Promise<void> {
+  async init(): Promise<void> {
     const {query} = this.metadataQuery();
     try {
       const resp = await timeout(
@@ -87,7 +87,7 @@ export abstract class DictionaryV1<DS> extends CoreDictionary<DS, number> {
         this.useStartHeight = false;
         logger.warn(`Dictionary doesn't support validate start height.`);
         // Rerun the query now with distinct disabled
-        await this.initMetadata();
+        await this.init();
       }
       logger.error(err, `Failed to get dictionary metadata`);
       return;

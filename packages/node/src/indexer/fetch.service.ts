@@ -11,7 +11,7 @@ import {
   BaseFetchService,
   ApiService,
   getModulos,
-  IBlockUtil,
+  IBlock,
 } from '@subql/node-core';
 import { EthereumBlock, SubqlDatasource } from '@subql/types-ethereum';
 import { SubqueryProject } from '../configure/SubqueryProject';
@@ -37,7 +37,7 @@ export class FetchService extends BaseFetchService<
   SubqlDatasource,
   IEthereumBlockDispatcher,
   EthDictionaryV1 | EthDictionaryV2,
-  EthereumBlock & IBlockUtil
+  EthereumBlock & IBlock
 > {
   constructor(
     private apiService: ApiService,

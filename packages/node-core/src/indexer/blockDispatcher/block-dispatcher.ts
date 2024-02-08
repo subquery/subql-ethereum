@@ -9,7 +9,7 @@ import {last} from 'lodash';
 import {NodeConfig} from '../../configure';
 import {IProjectUpgradeService} from '../../configure/ProjectUpgrade.service';
 import {IndexerEvent} from '../../events';
-import {getBlockHeight, IBlockUtil, PoiSyncService} from '../../indexer';
+import {getBlockHeight, IBlock, PoiSyncService} from '../../indexer';
 import {getLogger} from '../../logger';
 import {profilerWrap} from '../../profiler';
 import {Queue, AutoQueue, delay, memoryLock, waitForBatchSize, isTaskFlushedError} from '../../utils';
@@ -23,17 +23,16 @@ import {BaseBlockDispatcher, ProcessBlockResponse} from './base-block-dispatcher
 
 const logger = getLogger('BlockDispatcherService');
 
-type BatchBlockFetcher<B> = (heights: number[]) => Promise<B[]>;
+type BatchBlockFetcher<B> = (heights: number[]) => Promise<IBlock<B>[]>;
 
 /**
  * @description Intended to behave the same as WorkerBlockDispatcherService but doesn't use worker threads or any parallel processing
  */
-export abstract class BlockDispatcher<B extends IBlockUtil, DS>
-  extends BaseBlockDispatcher<Queue<B | number>, DS, B>
+export abstract class BlockDispatcher<B, DS>
+  extends BaseBlockDispatcher<Queue<IBlock<B> | number>, DS, B>
   implements OnApplicationShutdown
 {
-  private fatBlocksQueue: Queue<B>;
-  private fetchQueue: AutoQueue<B>;
+  private fetchQueue: AutoQueue<IBlock<B>>;
   private processQueue: AutoQueue<void>;
 
   private fetchBlocksBatches: BatchBlockFetcher<B>;
@@ -71,7 +70,6 @@ export abstract class BlockDispatcher<B extends IBlockUtil, DS>
       poiSyncService,
       dynamicDsService
     );
-    this.fatBlocksQueue = new Queue(nodeConfig.batchSize * 3);
     this.processQueue = new AutoQueue(nodeConfig.batchSize * 3, 1, nodeConfig.timeout, 'Process');
     this.fetchQueue = new AutoQueue(nodeConfig.batchSize * 3, nodeConfig.batchSize, nodeConfig.timeout, 'Fetch');
     if (this.nodeConfig.profiler) {
@@ -86,7 +84,7 @@ export abstract class BlockDispatcher<B extends IBlockUtil, DS>
     this.processQueue.abort();
   }
 
-  enqueueBlocks(heightsBlocks: (B | number)[], latestBufferHeight?: number): void {
+  enqueueBlocks(heightsBlocks: (IBlock<B> | number)[], latestBufferHeight: number): void {
     // In the case where factors of batchSize is equal to bypassBlock or when heights is []
     // to ensure block is bypassed, we set the latestBufferHeight to the heights
     // make sure lastProcessedHeight in metadata is updated
@@ -186,7 +184,7 @@ export abstract class BlockDispatcher<B extends IBlockUtil, DS>
                 try {
                   await this.preProcessBlock(height);
                   // Inject runtimeVersion here to enhance api.at preparation
-                  const processBlockResponse = await this.indexBlock(block);
+                  const processBlockResponse = await this.indexBlock(block.block);
                   await this.postProcessBlock(height, processBlockResponse);
 
                   //set block to null for garbage collection

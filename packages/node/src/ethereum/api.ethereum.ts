@@ -13,7 +13,7 @@ import {
 } from '@ethersproject/abstract-provider';
 import { WebSocketProvider } from '@ethersproject/providers';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { getLogger, IBlockUtil, timeout } from '@subql/node-core';
+import { getLogger, IBlock, timeout } from '@subql/node-core';
 import {
   ApiWrapper,
   EthereumBlock,
@@ -275,7 +275,7 @@ export class EthereumApi implements ApiWrapper {
     );
   }
 
-  async fetchBlock(blockNumber: number): Promise<EthereumBlock & IBlockUtil> {
+  async fetchBlock(blockNumber: number): Promise<EthereumBlock & IBlock> {
     try {
       const block = await this.getBlockPromise(blockNumber, true);
       const logsRaw = await this.client.getLogs({ blockHash: block.hash });

@@ -10,7 +10,7 @@ import {
   DictionaryResponse,
   getLogger,
   DictionaryV2QueryEntry,
-  IBlockUtil,
+  IBlock,
 } from '@subql/node-core';
 import {
   EthereumBlock,
@@ -231,7 +231,7 @@ export class EthDictionaryV2 extends DictionaryV2<
     startBlock: number,
     queryEndBlock: number,
     limit = MIN_FAT_FETCH_LIMIT,
-  ): Promise<DictionaryResponse<EthereumBlock & IBlockUtil> | undefined> {
+  ): Promise<DictionaryResponse<EthereumBlock & IBlock> | undefined> {
     const queryDetails = this.queriesMap?.getDetails(startBlock);
     const conditions = queryDetails?.value;
     queryEndBlock = this.metadata.end;
@@ -269,14 +269,14 @@ export class EthDictionaryV2 extends DictionaryV2<
       };
     } catch (error) {
       // Handle the error as needed
-      throw new Error(`Fat dictionary get capacity failed ${error}`);
+      throw new Error(`V2 dictionary get query failed ${error}`);
     }
   }
 
   convertResponseBlocks(
     data: RawFatDictionaryResponseData<RawEthFatBlock>,
-  ): FatDictionaryResponse<EthereumBlock & IBlockUtil> | undefined {
-    const blocks: (EthereumBlock & IBlockUtil)[] = [];
+  ): FatDictionaryResponse<EthereumBlock & IBlock> | undefined {
+    const blocks: (EthereumBlock & IBlock)[] = [];
     for (const block of data.Blocks) {
       blocks.push(rawFatBlockToEthBlock(block));
     }

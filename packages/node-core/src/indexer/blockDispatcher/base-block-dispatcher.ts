@@ -9,7 +9,7 @@ import {NodeConfig, IProjectUpgradeService} from '../../configure';
 import {IndexerEvent, PoiEvent} from '../../events';
 import {getLogger} from '../../logger';
 import {IQueue, mainThreadOnly} from '../../utils';
-import {IBlockUtil} from '../dictionary/types';
+import {IBlock} from '../dictionary/types';
 import {DynamicDsService} from '../dynamic-ds.service';
 import {PoiBlock, PoiService, PoiSyncService} from '../poi';
 import {SmartBatchService} from '../smartBatch.service';
@@ -26,9 +26,9 @@ export type ProcessBlockResponse = {
   reindexBlockHeight: number | null;
 };
 
-export interface IBlockDispatcher<B extends IBlockUtil | number> {
+export interface IBlockDispatcher<B> {
   // now within enqueueBlock should handle getLatestBufferHeight
-  enqueueBlocks(heights: B[], latestBufferHeight?: number): void | Promise<void>;
+  enqueueBlocks(heights: (IBlock<B> | number)[], latestBufferHeight: number): void | Promise<void>;
   queueSize: number;
   freeSize: number;
   latestBufferedHeight: number;
@@ -45,7 +45,7 @@ function isNullMerkelRoot(operationHash: Uint8Array): boolean {
   return u8aEq(operationHash, NULL_MERKEL_ROOT);
 }
 
-export abstract class BaseBlockDispatcher<Q extends IQueue, DS, B extends IBlockUtil> implements IBlockDispatcher<B> {
+export abstract class BaseBlockDispatcher<Q extends IQueue, DS, B> implements IBlockDispatcher<B> {
   protected _latestBufferedHeight = 0;
   protected _processedBlockCount = 0;
   protected _latestProcessedHeight = 0;
@@ -67,7 +67,7 @@ export abstract class BaseBlockDispatcher<Q extends IQueue, DS, B extends IBlock
     protected dynamicDsService: DynamicDsService<any>
   ) {}
 
-  abstract enqueueBlocks(heights: (B | number)[], latestBufferHeight?: number): void | Promise<void>;
+  abstract enqueueBlocks(heights: (IBlock<B> | number)[], latestBufferHeight?: number): void | Promise<void>;
 
   async init(onDynamicDsCreated: (height: number) => Promise<void>): Promise<void> {
     this._onDynamicDsCreated = onDynamicDsCreated;

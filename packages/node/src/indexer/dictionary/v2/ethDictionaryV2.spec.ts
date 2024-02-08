@@ -73,7 +73,7 @@ describe('eth dictionary v2', () => {
   let ethBlock3678250: EthereumBlock;
   beforeAll(async () => {
     ethDictionaryV2.updateQueriesMap(dsMap);
-    await ethDictionaryV2.initMetadata();
+    await ethDictionaryV2.init();
   });
 
   it('convert ds to v2 dictionary queries', () => {

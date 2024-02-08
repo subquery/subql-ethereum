@@ -2,17 +2,16 @@
 // SPDX-License-Identifier: GPL-3.0
 
 import {flatten, isNumber, range, uniq, without} from 'lodash';
-import {getBlockHeight, IBlockUtil} from '../indexer';
+import {getBlockHeight, IBlock} from '../indexer';
 
-export function cleanedBatchBlocks<FB extends IBlockUtil>(
+export function cleanedBatchBlocks<FB>(
   bypassBlocks: number[],
-  currentBlockBatch: (FB | number)[],
-  _getBlockHeight: (b: FB | number) => number = getBlockHeight
-): (FB | number)[] {
+  currentBlockBatch: (IBlock<FB> | number)[]
+): (IBlock<FB> | number)[] {
   // more efficient to remove large amount numbers
   const filteredNumbers = without(currentBlockBatch, ...transformBypassBlocks(bypassBlocks));
   const filteredBlocks = filteredNumbers.filter((b) => {
-    const height = _getBlockHeight(b);
+    const height = getBlockHeight(b);
     return bypassBlocks.indexOf(height) < 0;
   });
   return filteredBlocks;

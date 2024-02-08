@@ -20,8 +20,8 @@ export interface IDictionary<DS, FB> {
     startBlock: number,
     queryEndBlock: number,
     limit: number
-  ): Promise<DictionaryResponse<FB | number> | undefined>;
-  initMetadata(): Promise<void>;
+  ): Promise<DictionaryResponse<IBlock<FB> | number> | undefined>;
+  init(): Promise<void>;
   queryMapValidByHeight(height: number): boolean;
   getQueryEndBlock(startHeight: number, apiFinalizedHeight: number): number;
   version: DictionaryVersion;
@@ -32,6 +32,7 @@ export interface IDictionary<DS, FB> {
 
 export interface IDictionaryCtrl<DS, FB> {
   initDictionaries(): void;
+  startHeight: number;
   useDictionary: boolean;
   findDictionary(height: number): Promise<void>;
   buildDictionaryEntryMap(dataSources: BlockHeightMap<DS[]>): void;
@@ -39,13 +40,14 @@ export interface IDictionaryCtrl<DS, FB> {
     startBlockHeight: number,
     queryEndBlock: number,
     scaledBatchSize: number
-  ): Promise<(DictionaryResponse<number | FB> & {queryEndBlock: number}) | undefined>;
+  ): Promise<(DictionaryResponse<number | IBlock<FB>> & {queryEndBlock: number}) | undefined>;
 }
 
-export interface IBlockUtil {
+export interface IBlock<B> {
   getHeader(): {
     hash: string;
     height: number;
     parentHash?: string;
   };
+  block: B;
 }

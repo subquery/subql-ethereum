@@ -9,7 +9,7 @@ import {last} from 'lodash';
 import {NodeConfig} from '../../configure';
 import {IProjectUpgradeService} from '../../configure/ProjectUpgrade.service';
 import {IndexerEvent} from '../../events';
-import {IBlockUtil, PoiSyncService} from '../../indexer';
+import {IBlock, PoiSyncService} from '../../indexer';
 import {getLogger} from '../../logger';
 import {AutoQueue, isTaskFlushedError} from '../../utils';
 import {DynamicDsService} from '../dynamic-ds.service';
@@ -41,7 +41,7 @@ function initAutoQueue<T>(
   return new AutoQueue(workers * batchSize * 2, 1, timeout, name);
 }
 
-export abstract class WorkerBlockDispatcher<DS, W extends Worker, B extends IBlockUtil>
+export abstract class WorkerBlockDispatcher<DS, W extends Worker, B>
   extends BaseBlockDispatcher<AutoQueue<void>, DS, B>
   implements OnApplicationShutdown
 {
@@ -101,12 +101,13 @@ export abstract class WorkerBlockDispatcher<DS, W extends Worker, B extends IBlo
       await Promise.all(this.workers.map((w) => w.terminate()));
     }
   }
-  async enqueueBlocks(heights: (B | number)[], latestBufferHeight?: number): Promise<void> {
-   assert(
-       heights.every(h => typeof height === 'number'),
-       'When worker enqueue block, heights must be of type number'
-   );
-   await this._enqueueBlocks(heights, latestBufferHeight);
+  async enqueueBlocks(heights: (IBlock<B> | number)[], latestBufferHeight?: number): Promise<void> {
+    assert(
+      heights.every((h) => typeof h === 'number'),
+      'When worker enqueue block, heights must be of type number'
+    );
+    // @ts-ignore
+    await this._enqueueBlocks(heights, latestBufferHeight);
   }
 
   private async _enqueueBlocks(heights: number[], latestBufferHeight?: number): Promise<void> {

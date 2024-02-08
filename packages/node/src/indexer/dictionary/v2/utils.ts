@@ -1,7 +1,7 @@
 // Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
-import { IBlockUtil } from '@subql/node-core';
+import { IBlock } from '@subql/node-core';
 import { DictionaryQueryCondition } from '@subql/types-core';
 import {
   EthereumBlock,
@@ -89,7 +89,7 @@ export function entryToLogConditions(
 
 export function rawFatBlockToEthBlock(
   block: RawEthFatBlock,
-): EthereumBlock & IBlockUtil {
+): EthereumBlock & IBlock {
   const logs: EthereumLog[] = [];
   const transactions: EthereumTransaction[] = [];
   try {

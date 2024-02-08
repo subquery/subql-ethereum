@@ -7,26 +7,23 @@ import fetch from 'cross-fetch';
 import {NodeConfig} from '../../configure';
 import {getLogger} from '../../logger';
 import {BlockHeightMap} from '../../utils/blockHeightMap';
-import {DictionaryResponse, DictionaryVersion, IDictionary, IDictionaryCtrl} from './types';
-import {subqlFilterBlocksCapabilities} from './utils';
+import {DictionaryResponse, DictionaryVersion, IBlock, IDictionary, IDictionaryCtrl} from './types';
+import {subqlFilterBlocksCapabilities} from './v2';
 import {DictionaryV2Metadata} from './';
 
 export async function inspectDictionaryVersion(endpoint: string): Promise<DictionaryVersion> {
-  if (endpoint.includes('/rpc')) {
-    let resp: DictionaryV2Metadata;
-    try {
-      resp = await subqlFilterBlocksCapabilities(endpoint);
-      if (resp.supported.includes('complete')) {
-        return DictionaryVersion.v2Complete;
-      } else {
-        return DictionaryVersion.v2Basic;
-      }
-    } catch (e) {
-      logger.warn(`${e}. Try to use dictionary V1`);
-      return DictionaryVersion.v1;
+  let resp: DictionaryV2Metadata;
+  try {
+    resp = await subqlFilterBlocksCapabilities(endpoint);
+    if (resp.supported.includes('complete')) {
+      return DictionaryVersion.v2Complete;
+    } else {
+      return DictionaryVersion.v2Basic;
     }
+  } catch (e) {
+    logger.warn(`${e}. Try to use dictionary V1`);
+    return DictionaryVersion.v1;
   }
-  return DictionaryVersion.v1;
 }
 
 const logger = getLogger('DictionaryService');
@@ -34,10 +31,6 @@ export abstract class DictionaryService<DS, FB, D extends IDictionary<DS, FB>> i
   protected _dictionaries: D[] = [];
 
   protected _currentDictionaryIndex: number | undefined;
-  // Keep in memory in order one of dictionary failed then we can switch
-  protected _dictionaryV1Endpoints: string[] = [];
-  protected _dictionaryV2Endpoints: string[] = [];
-
   constructor(
     protected chainId: string,
     protected readonly nodeConfig: NodeConfig,
@@ -50,11 +43,15 @@ export abstract class DictionaryService<DS, FB, D extends IDictionary<DS, FB>> i
     this._dictionaries = dictionaries;
   }
 
+  get startHeight(): number {
+    return this.dictionary.startHeight;
+  }
+
   get dictionary(): D {
     if (this._dictionaries.length === 0) {
       throw new Error(`No dictionaries available to use`);
     }
-    if (this._currentDictionaryIndex === undefined || this._currentDictionaryIndex <= 0) {
+    if (this._currentDictionaryIndex === undefined || this._currentDictionaryIndex < 0) {
       throw new Error(`Dictionary index is not set`);
     }
     return this._dictionaries[this._currentDictionaryIndex];
@@ -75,24 +72,33 @@ export abstract class DictionaryService<DS, FB, D extends IDictionary<DS, FB>> i
       return;
     }
     // update dictionary metadata
-    for (const dictionary of this._dictionaries) {
-      try {
-        await dictionary.initMetadata();
-        dictionary.heightValidation(height);
-      } catch (e) {
-        logger.warn(
-          `When find dictionary, init metadata and height validation failed, please check ${
-            (dictionary as any).dictionaryEndpoint
-          }`
-        );
-      }
-    }
+    await Promise.all(
+      this._dictionaries.map(async (dictionary) => {
+        try {
+          await dictionary.init();
+          dictionary.heightValidation(height);
+        } catch (e) {
+          logger.warn(
+            `When find dictionary, init metadata and height validation failed, please check ${
+              (dictionary as any).dictionaryEndpoint
+            }`
+          );
+        }
+      })
+    );
+
     const v2Index = this._dictionaries?.findIndex((d) => d.version === DictionaryVersion.v2Complete && d.metadataValid);
     const v1Index = (this._currentDictionaryIndex = this._dictionaries?.findIndex(
       (d) => d.version === DictionaryVersion.v1 && d.metadataValid
     ));
-    // Prioritise v2
-    this._currentDictionaryIndex = v2Index >= 0 ? v2Index : v1Index >= 0 ? v1Index : undefined;
+    // If workers are enable, we only support v1.
+    // Otherwise, prioritise v2
+    if (this.nodeConfig.workers !== undefined) {
+      this._currentDictionaryIndex = v1Index >= 0 ? v1Index : undefined;
+      logger.info('When workers currently only support v1 Dictionary, will use v1 dictionary');
+    } else {
+      this._currentDictionaryIndex = v2Index >= 0 ? v2Index : v1Index >= 0 ? v1Index : undefined;
+    }
   }
 
   /**
@@ -110,7 +116,7 @@ export abstract class DictionaryService<DS, FB, D extends IDictionary<DS, FB>> i
     startBlockHeight: number,
     queryEndBlock: number,
     scaledBatchSize: number
-  ): Promise<(DictionaryResponse<number | FB> & {queryEndBlock: number}) | undefined> {
+  ): Promise<(DictionaryResponse<number | IBlock<FB>> & {queryEndBlock: number}) | undefined> {
     const dict = await this.dictionary.getData(startBlockHeight, queryEndBlock, scaledBatchSize);
     // Check undefined
     if (!dict) return undefined;

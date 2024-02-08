@@ -3,7 +3,7 @@
 
 import {EventEmitter2} from '@nestjs/event-emitter';
 import {NETWORK_FAMILY} from '@subql/common';
-import {NodeConfig} from '../..';
+import {IBlock, NodeConfig} from '../..';
 import {DictionaryService} from './dictionary.service';
 import {DictionaryResponse} from './types';
 import {testDictionaryV1} from './v1/dictionaryV1.test';
@@ -24,7 +24,7 @@ class testDictionaryV2 extends DictionaryV2<testFB, any, any> {
     startBlock: number,
     queryEndBlock: number,
     limit: number
-  ): Promise<DictionaryResponse<testFB> | undefined> {
+  ): Promise<DictionaryResponse<IBlock<testFB>> | undefined> {
     return Promise.resolve(undefined);
   }
 }
@@ -32,18 +32,18 @@ class testDictionaryV2 extends DictionaryV2<testFB, any, any> {
 class testDictionaryService extends DictionaryService<any, testFB, any> {
   async initDictionaries(): Promise<void> {
     // Mock version inspection completed
-    this._dictionaryV1Endpoints = [
+    const dictionaryV1Endpoints = [
       'https://gx.api.subquery.network/sq/subquery/eth-dictionary',
       'https://dict-tyk.subquery.network/query/eth-mainnet',
     ];
-    this._dictionaryV2Endpoints = ['http://localhost:3000/rpc'];
+    const dictionaryV2Endpoints = ['http://localhost:3000/rpc'];
 
     const dictionariesV1 = await Promise.all(
-      this._dictionaryV1Endpoints.map(
+      dictionaryV1Endpoints.map(
         (endpoint) => new testDictionaryV1(endpoint, 'mockChainId', this.nodeConfig, this.eventEmitter)
       )
     );
-    const dictionariesV2 = this._dictionaryV2Endpoints.map(
+    const dictionariesV2 = dictionaryV2Endpoints.map(
       (endpoint) => new testDictionaryV2(endpoint, 'mockChainId', this.nodeConfig, this.eventEmitter)
     );
     this.init([...dictionariesV1, ...dictionariesV2]);

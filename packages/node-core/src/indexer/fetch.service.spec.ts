@@ -11,6 +11,7 @@ import {
   DictionaryV1,
   DictionaryV2,
   DynamicDsService,
+  IBlock,
   IBlockDispatcher,
   IProjectService,
   mergeNumAndBlocks,
@@ -491,47 +492,46 @@ describe('Fetch Service', () => {
   it('could arrange modulo blocks with both numbers and fat blocks', () => {
     const moduloBlocks = [10, 20, 30, 40, 50];
 
-    const batchBlocks = [
-      // should keep these fat blocks rather than number, so we don't have to fetch again
-      {height: 50, hash: '0x50'},
-      {height: 12, hash: '0x12'},
-      {height: 22, hash: '0x22'},
-      {height: 23, hash: '0x23'},
-      {height: 44, hash: '0x44'},
-      {height: 45, hash: '0x45'},
-      // and it can order
-      {height: 20, hash: '0x20'},
-      // and it can remove duplicate
-      {height: 22, hash: '0x22'},
-    ];
-
-    function getBlockHeight(b: {height: number; hash: string} | number) {
-      return typeof b === 'number' ? b : b.height;
+    function mockIblock(n: number): IBlock<{height: number; hash: string}> {
+      return {
+        getHeader: () => {
+          return {height: n, parentHash: `0x${n - 1}`, hash: `0x${n}`};
+        },
+        block: {height: n, hash: `0x${n}`},
+      };
     }
-    const exampleHeight = getBlockHeight({height: 12, hash: '0x12'});
-    expect(exampleHeight).toEqual(12);
+
+    const batchBlocks: IBlock<any>[] = [
+      // should keep these fat blocks rather than number, so we don't have to fetch again
+      mockIblock(50),
+      mockIblock(12),
+      mockIblock(22),
+      mockIblock(23),
+      mockIblock(44),
+      mockIblock(45),
+      // and it can order
+      mockIblock(20),
+      // and it can remove duplicate
+      mockIblock(22),
+    ];
 
     const outcomeBlocks = [
       10,
-      {height: 12, hash: '0x12'},
-      {height: 20, hash: '0x20'},
-      {height: 22, hash: '0x22'},
-      {height: 23, hash: '0x23'},
+      mockIblock(12),
+      mockIblock(20),
+      mockIblock(22),
+      mockIblock(23),
       30,
       40,
-      {height: 44, hash: '0x44'},
-      {height: 45, hash: '0x45'},
-      {height: 50, hash: '0x50'},
+      mockIblock(44),
+      mockIblock(45),
+      mockIblock(50),
     ];
-    expect(
-      mergeNumAndBlocks<{height: number; hash: string} | number>(moduloBlocks, batchBlocks, getBlockHeight)
-    ).toStrictEqual(outcomeBlocks);
+    expect(mergeNumAndBlocks(moduloBlocks, batchBlocks)).toBe([...outcomeBlocks]);
 
     // also should work if batchBlocks is numbers
     const batchBlocks2 = [12, 22, 23, 44, 45, 22];
     const outcomeBlocks2 = [10, 12, 20, 22, 23, 30, 40, 44, 45, 50];
-    expect(
-      mergeNumAndBlocks<{height: number; hash: string} | number>(moduloBlocks, batchBlocks2, getBlockHeight)
-    ).toStrictEqual(outcomeBlocks2);
+    expect(mergeNumAndBlocks(moduloBlocks, batchBlocks2)).toEqual(outcomeBlocks2);
   });
 });
