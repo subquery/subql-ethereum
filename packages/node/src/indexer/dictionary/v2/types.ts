@@ -4,7 +4,7 @@
 import { DictionaryV2QueryEntry } from '@subql/node-core';
 
 export interface RawEthFatBlock {
-  Header: {
+  header: {
     parentHash: string;
     sha3Uncles: string;
     miner: string;
