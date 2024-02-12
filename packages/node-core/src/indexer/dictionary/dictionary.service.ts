@@ -58,10 +58,7 @@ export abstract class DictionaryService<DS, FB, D extends IDictionary<DS, FB>> i
   }
 
   get useDictionary(): boolean {
-    if (
-      (!!this.nodeConfig.networkDictionaries || !!this.nodeConfig.dictionaryResolver) &&
-      this._currentDictionaryIndex !== undefined
-    ) {
+    if (!!this._dictionaries.length && this._currentDictionaryIndex !== undefined) {
       return !!this.dictionary.metadataValid;
     }
     return false;

@@ -8,6 +8,7 @@ import {
   EthereumLog,
   EthereumTransaction,
 } from '@subql/types-ethereum';
+import { BigNumber } from 'ethers';
 import { formatLog, formatTransaction } from '../../../ethereum/utils.ethereum';
 import {
   EthFatDictionaryLogConditions,
@@ -95,32 +96,32 @@ export function rawFatBlockToEthBlock(
   try {
     const ethBlock: EthereumBlock = {
       // Default available fields
-      number: Number(block.Header.number),
-      parentHash: block.Header.parentHash,
-      sha3Uncles: block.Header.sha3Uncles,
+      number: Number(block.header.number),
+      parentHash: block.header.parentHash,
+      sha3Uncles: block.header.sha3Uncles,
 
       // Missing, unless we force enable from query
-      hash: block.Header.hash,
-      blockExtraData: block.Header.extraData,
-      difficulty: block.Header.difficulty,
-      extDataGasUsed: block.Header.excessBlobGas?.toString(),
-      extDataHash: block.Header.extraData,
-      gasLimit: block.Header.gasLimit,
-      gasUsed: block.Header.gasUsed,
+      hash: block.header.hash,
+      blockExtraData: block.header.extraData,
+      difficulty: block.header.difficulty,
+      extDataGasUsed: block.header.excessBlobGas?.toString(),
+      extDataHash: block.header.extraData,
+      gasLimit: block.header.gasLimit,
+      gasUsed: block.header.gasUsed,
       logs: [],
-      logsBloom: block.Header.logsBloom,
-      miner: block.Header.miner,
-      mixHash: block.Header.mixHash,
-      nonce: block.Header.nonce,
-      receiptsRoot: block.Header.receiptsRoot,
+      logsBloom: block.header.logsBloom,
+      miner: block.header.miner,
+      mixHash: block.header.mixHash,
+      nonce: block.header.nonce,
+      receiptsRoot: block.header.receiptsRoot,
       size: undefined,
-      stateRoot: block.Header.stateRoot,
-      timestamp: block.Header.timestamp,
-      totalDifficulty: block.Header.difficulty,
+      stateRoot: block.header.stateRoot,
+      timestamp: block.header.timestamp,
+      totalDifficulty: block.header.difficulty,
       transactions: [],
       uncles: [],
-      transactionsRoot: block.Header.transactionRoot,
-      baseFeePerGas: block.Header.baseFeePerGas,
+      transactionsRoot: block.header.transactionRoot,
+      baseFeePerGas: block.header.baseFeePerGas,
       blockGasCost: undefined,
     };
 
@@ -184,15 +185,15 @@ export function rawFatBlockToEthBlock(
       block: ethBlock,
       getHeader: () => {
         return {
-          hash: block.Header.hash,
-          height: Number(block.Header.number),
-          parentHash: block.Header.parentHash,
+          hash: block.header.hash,
+          height: BigNumber.from(block.header.number).toNumber(),
+          parentHash: block.header.parentHash,
         };
       },
     };
   } catch (e) {
     throw new Error(
-      `Convert fat block to Eth block failed at ${block.Header.number},${e.message}`,
+      `Convert fat block to Eth block failed at ${block.header.number},${e.message}`,
     );
   }
 }

@@ -239,7 +239,7 @@ export abstract class BaseFetchService<
     // If currently there is a dictionary but metadata is not valid
     // to find next dictionary
     if (!this.dictionaryService.useDictionary) {
-      await this.dictionaryService.findDictionary(getStartBlockHeight());
+      // await this.dictionaryService.findDictionary(getStartBlockHeight());
       this.updateDictionary();
     }
 

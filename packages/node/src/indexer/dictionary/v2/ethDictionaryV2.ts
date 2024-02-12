@@ -253,22 +253,21 @@ export class EthDictionaryV2 extends DictionaryV2<
     };
 
     try {
-      const response = await this.dictionaryApi.post<{ result?: RawFatDictionaryResponseData<RawEthFatBlock>, error?: { code: number; message: string;}}>(
-        this.dictionaryEndpoint,
-        requestData,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
+      const response = await this.dictionaryApi.post<{
+        result?: RawFatDictionaryResponseData<RawEthFatBlock>;
+        error?: { code: number; message: string };
+      }>(this.dictionaryEndpoint, requestData, {
+        headers: {
+          'Content-Type': 'application/json',
         },
-      );
+      });
       if (response.data.error) {
         throw new Error(response.data.error.message);
       }
       const ethBlocks = this.convertResponseBlocks(response.data.result);
       return {
-        batchBlocks: ethBlocks.blocks,
-        lastBufferedHeight: ethBlocks.end,
+        batchBlocks: ethBlocks ? ethBlocks.blocks : [],
+        lastBufferedHeight: ethBlocks ? ethBlocks.end : queryEndBlock,
       };
     } catch (error) {
       // Handle the error as needed
@@ -280,7 +279,7 @@ export class EthDictionaryV2 extends DictionaryV2<
     data: RawFatDictionaryResponseData<RawEthFatBlock>,
   ): FatDictionaryResponse<IBlock<EthereumBlock>> | undefined {
     const blocks: IBlock<EthereumBlock>[] = [];
-    for (const block of data.blocks) {
+    for (const block of data.Blocks) {
       blocks.push(rawFatBlockToEthBlock(block));
     }
     if (blocks.length !== 0) {
