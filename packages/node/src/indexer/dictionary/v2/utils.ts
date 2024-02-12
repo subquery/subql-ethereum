@@ -1,15 +1,15 @@
 // Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
+import { Formatter } from '@ethersproject/providers';
 import { IBlock } from '@subql/node-core';
 import { DictionaryQueryCondition } from '@subql/types-core';
+import { EthereumBlock } from '@subql/types-ethereum';
 import {
-  EthereumBlock,
-  EthereumLog,
-  EthereumTransaction,
-} from '@subql/types-ethereum';
-import { BigNumber } from 'ethers';
-import { formatLog, formatTransaction } from '../../../ethereum/utils.ethereum';
+  formatBlockUtil,
+  formatLog,
+  formatTransaction,
+} from '../../../ethereum/utils.ethereum';
 import {
   EthFatDictionaryLogConditions,
   EthFatDictionaryTxConditions,
@@ -91,107 +91,25 @@ export function entryToLogConditions(
 export function rawFatBlockToEthBlock(
   block: RawEthFatBlock,
 ): IBlock<EthereumBlock> {
-  const logs: EthereumLog[] = [];
-  const transactions: EthereumTransaction[] = [];
   try {
-    const ethBlock: EthereumBlock = {
-      // Default available fields
-      number: Number(block.header.number),
-      parentHash: block.header.parentHash,
-      sha3Uncles: block.header.sha3Uncles,
+    const formatter = new Formatter();
 
-      // Missing, unless we force enable from query
-      hash: block.header.hash,
-      blockExtraData: block.header.extraData,
-      difficulty: block.header.difficulty,
-      extDataGasUsed: block.header.excessBlobGas?.toString(),
-      extDataHash: block.header.extraData,
-      gasLimit: block.header.gasLimit,
-      gasUsed: block.header.gasUsed,
-      logs: [],
-      logsBloom: block.header.logsBloom,
-      miner: block.header.miner,
-      mixHash: block.header.mixHash,
-      nonce: block.header.nonce,
-      receiptsRoot: block.header.receiptsRoot,
-      size: undefined,
-      stateRoot: block.header.stateRoot,
-      timestamp: block.header.timestamp,
-      totalDifficulty: block.header.difficulty,
-      transactions: [],
-      uncles: [],
-      transactionsRoot: block.header.transactionRoot,
-      baseFeePerGas: block.header.baseFeePerGas,
-      blockGasCost: undefined,
-    };
+    const ethBlock = formatter.block(block.header) as unknown as EthereumBlock;
 
-    if (block.Transactions !== null && block.Transactions.length) {
-      for (const tx of block.Transactions) {
-        const _ethTransaction: EthereumTransaction = {
-          blockHash: ethBlock.hash,
-          blockNumber: ethBlock.number,
-          blockTimestamp: ethBlock.timestamp,
-          from: tx.from,
-          gas: tx.gas,
-          gasPrice: tx.gasPrice,
-          hash: tx.hash,
-          input: tx.input,
-          nonce: tx.nonce,
-          to: tx.to,
-          transactionIndex: undefined,
-          value: tx.value,
-          type: tx.type,
-          v: tx.v,
-          r: tx.r,
-          s: tx.s,
-          receipt: undefined, //TODO, this might missing
-          logs: [],
-          accessList: [],
-          chainId: '',
-          maxFeePerGas: tx.maxFeePerGas,
-          maxPriorityFeePerGas: tx.maxPriorityFeePerGas,
-          args: undefined,
-        };
-        transactions.push(_ethTransaction);
-      }
-    }
-    ethBlock.transactions = transactions;
+    ethBlock.logs = Formatter.arrayOf(formatter.filterLog.bind(formatter))(
+      block.logs,
+    ).map((l) => formatLog(l, ethBlock));
 
-    if (block.Logs !== null && block.Logs.length) {
-      for (const log of block.Logs) {
-        const _ethLog: EthereumLog = {
-          address: log.address,
-          topics: log.topics,
-          data: log.data,
-          blockHash: log.blockHash,
-          blockNumber: Number(log.blockNumber),
-          transactionHash: log.transactionHash,
-          transactionIndex: Number(log.transactionIndex),
-          logIndex: Number(log.logIndex),
-          removed: log.removed,
-          args: undefined, //TODO, unknown
-          block: ethBlock,
-          transaction: undefined,
-        };
-        logs.push(_ethLog);
-      }
-    }
-    ethBlock.logs = logs.map((l) => formatLog(l, ethBlock));
-    ethBlock.transactions = transactions.map((tx) =>
-      formatTransaction(tx, ethBlock),
-    );
+    ethBlock.transactions = Formatter.arrayOf(
+      formatter.transactionResponse.bind(formatter),
+    )(block.transactions).map((tx) => ({
+      ...formatTransaction(tx, ethBlock),
+      logs: ethBlock.logs.filter((l) => l.transactionHash === tx.hash),
+    }));
 
-    return {
-      block: ethBlock,
-      getHeader: () => {
-        return {
-          hash: block.header.hash,
-          height: BigNumber.from(block.header.number).toNumber(),
-          parentHash: block.header.parentHash,
-        };
-      },
-    };
+    return formatBlockUtil(ethBlock);
   } catch (e) {
+    console.log('rawFatBlockToEthBlock failed', e);
     throw new Error(
       `Convert fat block to Eth block failed at ${block.header.number},${e.message}`,
     );

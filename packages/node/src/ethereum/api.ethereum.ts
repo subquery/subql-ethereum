@@ -253,7 +253,10 @@ export class EthereumApi implements ApiWrapper {
     return this.client.getBlock(heightOrHash);
   }
 
-  private async getBlockPromise(num: number, includeTx = true): Promise<any> {
+  private async getBlockPromise(
+    num: number,
+    includeTx = true,
+  ): Promise<IBlock<any>> {
     const rawBlock = await this.client.send('eth_getBlockByNumber', [
       hexValue(num),
       includeTx,
@@ -275,19 +278,21 @@ export class EthereumApi implements ApiWrapper {
     );
   }
 
-  async fetchBlock(blockNumber: number): Promise<EthereumBlock> {
+  async fetchBlock(blockNumber: number): Promise<IBlock<EthereumBlock>> {
     try {
       const block = await this.getBlockPromise(blockNumber, true);
-      const logsRaw = await this.client.getLogs({ blockHash: block.hash });
+      const logsRaw = await this.client.getLogs({
+        blockHash: block.block.hash,
+      });
 
-      block.logs = logsRaw.map((l) => formatLog(l, block));
-      block.transactions = block.transactions.map((tx) => ({
-        ...formatTransaction(tx, block),
+      block.block.logs = logsRaw.map((l) => formatLog(l, block.block));
+      block.block.transactions = block.block.transactions.map((tx) => ({
+        ...formatTransaction(tx, block.block),
         receipt: () =>
           this.getTransactionReceipt(tx.hash).then((r) =>
-            formatReceipt(r, block),
+            formatReceipt(r, block.block),
           ),
-        logs: block.logs.filter((l) => l.transactionHash === tx.hash),
+        logs: block.block.logs.filter((l) => l.transactionHash === tx.hash),
       }));
 
       this.eventEmitter.emit('fetchBlock');
@@ -299,23 +304,26 @@ export class EthereumApi implements ApiWrapper {
 
   private async fetchLightBlock(
     blockNumber: number,
-  ): Promise<LightEthereumBlock> {
+  ): Promise<IBlock<LightEthereumBlock>> {
     const block = await this.getBlockPromise(blockNumber, false);
-    const logs = await this.client.getLogs({ blockHash: block.hash });
+    const logs = await this.client.getLogs({ blockHash: block.block.hash });
 
     return {
+      block: {
+        logs: logs.map((l) => formatLog(l, block.block)),
+        ...block.block,
+      },
       ...block,
-      logs: logs.map((l) => formatLog(l, block)),
     };
   }
 
-  async fetchBlocks(bufferBlocks: number[]): Promise<EthereumBlock[]> {
+  async fetchBlocks(bufferBlocks: number[]): Promise<IBlock<EthereumBlock>[]> {
     return Promise.all(bufferBlocks.map(async (num) => this.fetchBlock(num)));
   }
 
   async fetchBlocksLight(
     bufferBlocks: number[],
-  ): Promise<LightEthereumBlock[]> {
+  ): Promise<IBlock<LightEthereumBlock>[]> {
     console.log('FETCH BLOCKS LIGHT');
     return Promise.all(
       bufferBlocks.map(async (num) => this.fetchLightBlock(num)),

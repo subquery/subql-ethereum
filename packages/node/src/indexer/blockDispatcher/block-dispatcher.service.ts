@@ -30,7 +30,7 @@ import { BlockContent } from '../types';
  */
 @Injectable()
 export class BlockDispatcherService
-  extends BlockDispatcher<IBlock<BlockContent>, EthereumProjectDs>
+  extends BlockDispatcher<BlockContent, EthereumProjectDs>
   implements OnApplicationShutdown
 {
   constructor(

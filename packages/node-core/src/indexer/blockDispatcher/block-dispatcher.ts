@@ -40,7 +40,7 @@ export abstract class BlockDispatcher<B, DS>
   private fetching = false;
   private isShutdown = false;
 
-  protected abstract indexBlock(block: B): Promise<ProcessBlockResponse>;
+  protected abstract indexBlock(block: IBlock<B>): Promise<ProcessBlockResponse>;
 
   constructor(
     nodeConfig: NodeConfig,
@@ -168,7 +168,7 @@ export abstract class BlockDispatcher<B, DS>
           })
           .then(
             (block) => {
-              const height = getBlockHeight(block);
+              const height = block.getHeader().height;
 
               return this.processQueue.put(async () => {
                 // Check if the queues have been flushed between queue.takeMany and fetchBlocksBatches resolving
@@ -184,7 +184,7 @@ export abstract class BlockDispatcher<B, DS>
                 try {
                   await this.preProcessBlock(height);
                   // Inject runtimeVersion here to enhance api.at preparation
-                  const processBlockResponse = await this.indexBlock(block.block);
+                  const processBlockResponse = await this.indexBlock(block);
                   await this.postProcessBlock(height, processBlockResponse);
 
                   //set block to null for garbage collection

@@ -9,8 +9,13 @@ import {
   getLogger,
   NodeConfig,
   profilerWrap,
+  IBlock,
 } from '@subql/node-core';
-import { EthereumBlock, EthereumNetworkConfig, LightEthereumBlock } from '@subql/types-ethereum';
+import {
+  EthereumBlock,
+  EthereumNetworkConfig,
+  LightEthereumBlock,
+} from '@subql/types-ethereum';
 import { EthereumNodeConfig } from '../configure/NodeConfig';
 import { SubqueryProject } from '../configure/SubqueryProject';
 import { isOnlyEventHandlers } from '../utils/project';
@@ -154,14 +159,14 @@ export class EthereumApiService extends ApiService<
   private async fetchFullBlocksBatch(
     api: EthereumApi,
     batch: number[],
-  ): Promise<EthereumBlock[]> {
+  ): Promise<IBlock<EthereumBlock>[]> {
     return api.fetchBlocks(batch);
   }
 
   private async fetchLightBlocksBatch(
     api: EthereumApi,
     batch: number[],
-  ): Promise<LightEthereumBlock[]> {
+  ): Promise<IBlock<LightEthereumBlock>[]> {
     return api.fetchBlocksLight(batch);
   }
 

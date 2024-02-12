@@ -27,8 +27,8 @@ export interface RawEthFatBlock {
     parentBeaconBlockRoot: string;
     hash: string;
   };
-  Transactions: RawEthFatTransaction[];
-  Logs: RawEthFatLog[];
+  transactions: RawEthFatTransaction[];
+  logs: RawEthFatLog[];
 }
 
 export interface RawEthFatTransaction {

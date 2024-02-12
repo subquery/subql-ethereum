@@ -43,6 +43,7 @@ export interface IDictionaryCtrl<DS, FB> {
   ): Promise<(DictionaryResponse<number | IBlock<FB>> & {queryEndBlock: number}) | undefined>;
 }
 
+// TODO, move this to type-core
 export interface IBlock<B> {
   getHeader(): {
     hash: string;

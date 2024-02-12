@@ -49,7 +49,7 @@ describe('Api.ethereum', () => {
   const fetchBlock = async (height: number) => {
     const block = await ethApi.fetchBlock(height);
 
-    return block as EthereumBlock;
+    return block.block as EthereumBlock;
   };
 
   beforeEach(async () => {
