@@ -33,7 +33,7 @@ const logger = getLogger('api');
 export class EthereumApiService extends ApiService<
   EthereumApi,
   SafeEthProvider,
-  EthereumBlock[] | LightEthereumBlock[]
+  IBlock<EthereumBlock>[] | IBlock<LightEthereumBlock>[]
 > {
   private fetchBlocksFunction: FetchFunc;
   private fetchBlocksBatches: GetFetchFunc = () => this.fetchBlocksFunction;
