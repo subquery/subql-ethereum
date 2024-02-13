@@ -324,7 +324,6 @@ export class EthereumApi implements ApiWrapper {
   async fetchBlocksLight(
     bufferBlocks: number[],
   ): Promise<IBlock<LightEthereumBlock>[]> {
-    console.log('FETCH BLOCKS LIGHT');
     return Promise.all(
       bufferBlocks.map(async (num) => this.fetchLightBlock(num)),
     );

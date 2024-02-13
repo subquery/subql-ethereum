@@ -94,7 +94,9 @@ export abstract class DictionaryV2<
   ): Promise<DictionaryResponse<IBlock<FB>> | undefined>;
 
   queryMapValidByHeight(height: number): boolean {
-    return !!this.queriesMap?.has(height);
+    // we can not use map.has method here, has method only return true when value for corresponding key is set
+    // but in BlockHeightMap it need to return any map <= key value, see `getDetails` method
+    return !!this.queriesMap?.get(height);
   }
 
   protected dictionaryValidation(metaData?: DictionaryV2Metadata, startBlockHeight?: number): boolean {

@@ -15,10 +15,6 @@ export class BlockHeightMap<T> {
     return this.#map;
   }
 
-  has(height: number): boolean {
-    return this.#map.has(height);
-  }
-
   get(height: number): T {
     const details = this.getDetails(height);
 

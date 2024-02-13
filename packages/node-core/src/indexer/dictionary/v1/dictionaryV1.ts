@@ -177,7 +177,7 @@ export abstract class DictionaryV1<DS> extends CoreDictionary<DS, undefined> {
       }
 
       return {
-        lastBufferedHeight: endBlock,
+        lastBufferedHeight: Math.min(endBlock, queryEndBlock),
         batchBlocks,
       };
     } catch (err: any) {

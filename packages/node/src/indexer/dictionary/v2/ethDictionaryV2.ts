@@ -265,6 +265,9 @@ export class EthDictionaryV2 extends DictionaryV2<
         throw new Error(response.data.error.message);
       }
       const ethBlocks = this.convertResponseBlocks(response.data.result);
+      logger.debug(
+        `DictionaryV2 Fetched Eth blocks ${ethBlocks.start} - ${ethBlocks.end}`,
+      );
       return {
         batchBlocks: ethBlocks ? ethBlocks.blocks : [],
         lastBufferedHeight: ethBlocks ? ethBlocks.end : queryEndBlock,

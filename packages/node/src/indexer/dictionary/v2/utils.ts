@@ -92,6 +92,10 @@ export function rawFatBlockToEthBlock(
   block: RawEthFatBlock,
 ): IBlock<EthereumBlock> {
   try {
+    // if logs/tx returns null treat as empty array , as when format log/tx only accept array
+    block.logs = block.logs === null ? [] : block.logs;
+    block.transactions = block.transactions === null ? [] : block.transactions;
+
     const formatter = new Formatter();
 
     const ethBlock = formatter.block(block.header) as unknown as EthereumBlock;
