@@ -6,21 +6,29 @@ import {NETWORK_FAMILY} from '@subql/common';
 import fetch from 'cross-fetch';
 import {NodeConfig} from '../../configure';
 import {getLogger} from '../../logger';
+import {timeout} from '../../utils';
 import {BlockHeightMap} from '../../utils/blockHeightMap';
 import {DictionaryResponse, DictionaryVersion, IBlock, IDictionary, IDictionaryCtrl} from './types';
 import {subqlFilterBlocksCapabilities} from './v2';
 import {DictionaryV2Metadata} from './';
 
-export async function inspectDictionaryVersion(endpoint: string): Promise<DictionaryVersion> {
+export async function inspectDictionaryVersion(
+  endpoint: string,
+  timeoutSec: number
+): Promise<DictionaryVersion | undefined> {
   let resp: DictionaryV2Metadata;
+  const timeoutMsg = 'Inspect dictionary version timeout';
   try {
-    resp = await subqlFilterBlocksCapabilities(endpoint);
+    resp = await timeout(subqlFilterBlocksCapabilities(endpoint), timeoutSec, timeoutMsg);
     if (resp.supported.includes('complete')) {
       return DictionaryVersion.v2Complete;
     } else {
       return DictionaryVersion.v2Basic;
     }
-  } catch (e) {
+  } catch (e: any) {
+    if (e.message === timeoutMsg) {
+      return undefined;
+    }
     logger.warn(`${e}. Try to use dictionary V1`);
     return DictionaryVersion.v1;
   }

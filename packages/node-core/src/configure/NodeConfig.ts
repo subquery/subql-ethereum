@@ -141,9 +141,11 @@ export class NodeConfig<C extends IConfig = IConfig> implements IConfig {
     return this._config.primaryNetworkEndpoint;
   }
 
-  get networkDictionaries(): string[] | undefined {
+  get networkDictionaries(): string[] | undefined | false {
     return typeof this._config.networkDictionary === 'string'
-      ? [this._config.networkDictionary]
+      ? this._config.networkDictionary === 'false'
+        ? false
+        : [this._config.networkDictionary]
       : this._config.networkDictionary;
   }
 

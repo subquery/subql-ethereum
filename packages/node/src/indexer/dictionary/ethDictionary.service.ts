@@ -6,9 +6,8 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { NETWORK_FAMILY } from '@subql/common';
 import {
   DictionaryVersion,
-  NodeConfig,
   inspectDictionaryVersion,
-  IBlock,
+  NodeConfig,
 } from '@subql/node-core';
 import { DictionaryService } from '@subql/node-core/indexer/dictionary/dictionary.service';
 import { EthereumBlock, SubqlDatasource } from '@subql/types-ethereum';
@@ -29,6 +28,7 @@ export class EthDictionaryService extends DictionaryService<
       throw new Error(`Project in Dictionary service not initialized `);
     }
     let dictionaries: EthDictionaryV1[] = [];
+
     const registryDictionary = await this.resolveDictionary(
       NETWORK_FAMILY.ethereum,
       this.project.network.chainId,
@@ -85,11 +85,20 @@ export class EthDictionaryService extends DictionaryService<
     // TODO, change this to project.network.dictionary when rebase with main, this require update in type-core
     if (this.nodeConfig.networkDictionaries) {
       for (const endpoint of this.nodeConfig.networkDictionaries) {
-        const version = await inspectDictionaryVersion(endpoint);
+        const version = await inspectDictionaryVersion(
+          endpoint,
+          this.nodeConfig.dictionaryTimeout,
+        );
+
         if (version === DictionaryVersion.v1) {
           dictionaryV1Endpoints.push(endpoint);
-        } else {
+        } else if (
+          version === DictionaryVersion.v2Complete ||
+          version === DictionaryVersion.v2Basic
+        ) {
           dictionaryV2Endpoints.push(endpoint);
+        } else {
+          // When version is undefined, indicate the dictionary is not valid, do not use it
         }
       }
     }
