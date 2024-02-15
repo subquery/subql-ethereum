@@ -116,7 +116,11 @@ export abstract class DictionaryService<DS, FB, D extends IDictionary<DS, FB>> i
 
     /* queryEndBlock needs to be limited by the latest height or the maximum value of endBlock in datasources.
      * Dictionaries could be in the future depending on if they index unfinalized blocks or the node is using an RPC endpoint that is behind.
-     */
+     *
+     * DictionaryV1 should use start + dictionaryQuerySize compare with api latestFinalizedHeight
+     * DictionaryV2 should use start + dictionaryQuerySize compare with dictionary metadata endHeight( same as lastProcessedHeight)
+     *
+     * */
     const queryEndBlock = dictionary.getQueryEndBlock(startBlockHeight, latestFinalizedHeight);
 
     const dict = await dictionary.getData(startBlockHeight, queryEndBlock, scaledBatchSize);

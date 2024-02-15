@@ -286,6 +286,7 @@ export class EthDictionaryV2 extends DictionaryV2<
         'NUM DICT RESULTS',
         ethBlocks.blocks.map((b) => b.block.number),
       );
+      this.metadata.end = response.data.result.BlockRange[1];
       return {
         batchBlocks: ethBlocks.blocks,
         lastBufferedHeight:
