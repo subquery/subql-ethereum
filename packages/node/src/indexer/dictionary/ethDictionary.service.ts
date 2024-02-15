@@ -102,10 +102,14 @@ export class EthDictionaryService extends DictionaryService<
         }
       }
     }
+    // Init for dictionary service, construct all dictionaries
     this.init([
       ...(await this.initDictionariesV1(dictionaryV1Endpoints)),
       ...this.initDictionariesV2(dictionaryV2Endpoints),
     ]);
+
+    // Init matadata for all dictionaries
+    await Promise.all(this._dictionaries.map((d) => d.init()));
   }
 
   constructor(

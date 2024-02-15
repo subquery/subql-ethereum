@@ -69,6 +69,7 @@ describe('Dictionary service', function () {
 
     dictionaryService = new testDictionaryService('0xchainId', nodeConfig, new EventEmitter2());
     await dictionaryService.initDictionaries();
+    await Promise.all((dictionaryService as any)._dictionaries.map((d: any) => d.init()));
   });
 
   it('can use the dictionary registry to resolve a url', async () => {
@@ -85,22 +86,26 @@ describe('Dictionary service', function () {
     expect((dictionaryService as any)._dictionaries.length).toBe(3);
   });
 
-  it('can find valid dictionary with height', async () => {
+  it('can find valid dictionary with height', () => {
     // If we haven't set dictionary
-    expect(() => dictionaryService.dictionary).toThrow(`Dictionary index is not set`);
+    expect((dictionaryService as any)._currentDictionaryIndex).toBeUndefined();
 
-    await dictionaryService.findDictionary(1);
-    expect(dictionaryService.dictionary).toBeTruthy();
+    (dictionaryService as any).findDictionary(1);
+    expect((dictionaryService as any)._currentDictionaryIndex).toBe(0);
+
+    expect((dictionaryService as any).getDictionary(1)).toBeTruthy();
     // Current only valid endpoint been provided
-    expect(dictionaryService.dictionary.dictionaryEndpoint).toBe('https://dict-tyk.subquery.network/query/eth-mainnet');
+    expect((dictionaryService as any).getDictionary(1).dictionaryEndpoint).toBe(
+      'https://dict-tyk.subquery.network/query/eth-mainnet'
+    );
 
-    expect(dictionaryService.useDictionary).toBeTruthy();
+    expect(dictionaryService.useDictionary(1)).toBeTruthy();
   });
 
   it('scopedDictionaryEntries, dictionary get data should be called', async () => {
-    await dictionaryService.findDictionary(1000);
+    const dictionary = (dictionaryService as any).getDictionary(1000);
 
-    const spyDictionary = jest.spyOn(dictionaryService.dictionary, 'getData');
+    const spyDictionary = jest.spyOn(dictionary, 'getData');
 
     const blocks = await dictionaryService.scopedDictionaryEntries(1000, 11000, 100);
     expect(spyDictionary).toHaveBeenCalled();

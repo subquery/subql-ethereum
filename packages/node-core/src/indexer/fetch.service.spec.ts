@@ -102,7 +102,9 @@ const dynamicDsService = {
 
 const getDictionaryService = () =>
   ({
-    useDictionary: false,
+    useDictionary: () => {
+      return false;
+    },
     findDictionary: () => {
       /* TODO*/
     },
@@ -112,7 +114,6 @@ const getDictionaryService = () =>
     initValidation: () => {
       /* TODO */
     },
-    startHeight: 0,
     scopedDictionaryEntries: () => {
       /* TODO */
     },
@@ -171,13 +172,16 @@ describe('Fetch Service', () => {
 
   const enableDictionary = () => {
     // Mock the remainder of dictionary service so it works
-    (dictionaryService as any).useDictionary = true;
+    (dictionaryService as any).useDictionary = () => jest.fn(() => true);
     // dictionaryService.queriesMap = new BlockHeightMap(new Map([[1, [{entity: 'mock', conditions: []}]]]));
-    (dictionaryService as any).dictionary = {
-      queryMapValidByHeight: () => true,
-      startHeight: 1,
-      getQueryEndBlock: () => 1000,
-    };
+    (dictionaryService as any).getDictionary = () =>
+      jest.fn(() => {
+        return {
+          queryMapValidByHeight: () => true,
+          startHeight: 1,
+          getQueryEndBlock: () => 1000,
+        };
+      });
     dictionaryService.scopedDictionaryEntries = (start, end, batch) => {
       return Promise.resolve({
         batchBlocks: [2, 4, 6, 8, 10],
@@ -296,9 +300,9 @@ describe('Fetch Service', () => {
     expect(dictionarySpy).toHaveBeenCalled();
   }, 50000);
 
-  it('skips the dictionary if the start height is later', async () => {
+  it('skips the dictionary', async () => {
     enableDictionary();
-    (dictionaryService as any).dictionary.startHeight = 100;
+    (dictionaryService as any).useDictionary = jest.fn(() => false);
 
     const enqueueBlocksSpy = jest.spyOn(blockDispatcher, 'enqueueBlocks');
     const dictionarySpy = jest.spyOn(dictionaryService, 'scopedDictionaryEntries');
@@ -307,7 +311,6 @@ describe('Fetch Service', () => {
     // wait enqueue completed
     await delay(3);
 
-    expect((fetchService as any).useDictionary).toBeTruthy();
     expect(enqueueBlocksSpy).toHaveBeenCalledWith([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 10);
     expect(dictionarySpy).not.toHaveBeenCalled();
   });
@@ -478,7 +481,7 @@ describe('Fetch Service', () => {
 
     fetchService.finalizedHeight = FINALIZED_HEIGHT;
     // change query end
-    dictionaryService.dictionary.getQueryEndBlock = () => 10;
+    (dictionaryService as any).getDictionary(1).getQueryEndBlock = () => 10;
 
     const dictSpy = jest.spyOn(dictionaryService, 'scopedDictionaryEntries');
 

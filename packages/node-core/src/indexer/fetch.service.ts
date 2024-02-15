@@ -83,11 +83,8 @@ export abstract class BaseFetchService<
   }
 
   private get useDictionary(): boolean {
-    return (
-      this.dictionaryService.useDictionary &&
-      this.dictionaryService.dictionary.queryMapValidByHeight(
-        this.blockDispatcher.latestBufferedHeight || this.projectService.getStartBlockFromDataSources()
-      )
+    return this.dictionaryService.useDictionary(
+      this.blockDispatcher.latestBufferedHeight || this.projectService.getStartBlockFromDataSources()
     );
   }
 
@@ -137,7 +134,6 @@ export abstract class BaseFetchService<
       // Update all dictionaries execute before find one usable dictionary
       this.updateDictionary();
       // Find one usable dictionary at start
-      await this.dictionaryService.findDictionary(startHeight);
     }
 
     await this.preLoopHook({startHeight});
@@ -236,21 +232,6 @@ export abstract class BaseFetchService<
         : initBlockHeight;
     };
 
-    // If currently there is a dictionary but metadata is not valid
-    // to find next dictionary
-    if (!this.dictionaryService.useDictionary) {
-      // await this.dictionaryService.findDictionary(getStartBlockHeight());
-      this.updateDictionary();
-    }
-
-    if (this.useDictionary && this.dictionaryService.startHeight > getStartBlockHeight()) {
-      logger.warn(
-        `Dictionary start height ${
-          this.dictionaryService.startHeight
-        } is beyond indexing height ${getStartBlockHeight()}, skipping dictionary for now`
-      );
-    }
-
     while (!this.isShutdown) {
       startBlockHeight = getStartBlockHeight();
 
@@ -270,21 +251,15 @@ export abstract class BaseFetchService<
 
       if (
         this.useDictionary &&
-        startBlockHeight >= this.dictionaryService.startHeight &&
+        // TODO, do we still need to check useDictionary method here, this will
+        this.dictionaryService.useDictionary(startBlockHeight) &&
         startBlockHeight < this.latestFinalizedHeight
       ) {
-        /* queryEndBlock needs to be limited by the latest height or the maximum value of endBlock in datasources.
-         * Dictionaries could be in the future depending on if they index unfinalized blocks or the node is using an RPC endpoint that is behind.
-         */
-        const queryEnd = this.dictionaryService.dictionary.getQueryEndBlock(
-          startBlockHeight,
-          this.latestFinalizedHeight
-        );
         try {
           const dictionary = await this.dictionaryService.scopedDictionaryEntries(
             startBlockHeight,
-            queryEnd,
-            scaledBatchSize
+            scaledBatchSize,
+            this.latestFinalizedHeight
           );
 
           if (startBlockHeight !== getStartBlockHeight()) {

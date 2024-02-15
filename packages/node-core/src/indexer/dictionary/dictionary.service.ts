@@ -51,47 +51,32 @@ export abstract class DictionaryService<DS, FB, D extends IDictionary<DS, FB>> i
     this._dictionaries = dictionaries;
   }
 
-  get startHeight(): number {
-    return this.dictionary.startHeight;
-  }
-
-  get dictionary(): D {
+  private getDictionary(height: number): D | undefined {
     if (this._dictionaries.length === 0) {
       throw new Error(`No dictionaries available to use`);
     }
-    if (this._currentDictionaryIndex === undefined || this._currentDictionaryIndex < 0) {
-      throw new Error(`Dictionary index is not set`);
+    // If current dictionary is valid, use current one instead of find a dictionary
+    if (
+      this._currentDictionaryIndex !== undefined &&
+      this._dictionaries[this._currentDictionaryIndex].heightValidation(height)
+    ) {
+      return this._dictionaries[this._currentDictionaryIndex];
+    } else {
+      this.findDictionary(height);
+      if (this._currentDictionaryIndex === undefined) {
+        logger.warn(`No supported dictionary found`);
+        return undefined;
+      } else {
+        logger.debug(`Updated : current dictionary Index is ${this._currentDictionaryIndex}`);
+        return this._dictionaries[this._currentDictionaryIndex];
+      }
     }
-    return this._dictionaries[this._currentDictionaryIndex];
   }
 
-  get useDictionary(): boolean {
-    if (!!this._dictionaries.length && this._currentDictionaryIndex !== undefined) {
-      return !!this.dictionary.metadataValid;
-    }
-    return false;
-  }
-
-  async findDictionary(height: number): Promise<void> {
-    if (this._dictionaries.length === 0) {
-      return;
-    }
-    // update dictionary metadata
-    await Promise.all(
-      this._dictionaries.map(async (dictionary) => {
-        try {
-          await dictionary.init();
-          dictionary.heightValidation(height);
-        } catch (e) {
-          logger.warn(
-            `When find dictionary, init metadata and height validation failed, please check ${
-              (dictionary as any).dictionaryEndpoint
-            }`
-          );
-        }
-      })
-    );
-
+  // Find the next valid dictionary
+  private findDictionary(height: number, skipDictionaryIndex: number[] = []) {
+    // remove dictionary not valid
+    this._dictionaries = this._dictionaries.filter((d) => d.heightValidation(height));
     const v2Index = this._dictionaries?.findIndex((d) => d.version === DictionaryVersion.v2Complete && d.metadataValid);
     const v1Index = (this._currentDictionaryIndex = this._dictionaries?.findIndex(
       (d) => d.version === DictionaryVersion.v1 && d.metadataValid
@@ -104,6 +89,10 @@ export abstract class DictionaryService<DS, FB, D extends IDictionary<DS, FB>> i
     } else {
       this._currentDictionaryIndex = v2Index >= 0 ? v2Index : v1Index >= 0 ? v1Index : undefined;
     }
+  }
+
+  useDictionary(height: number): boolean {
+    return !!this.getDictionary(height);
   }
 
   /**
@@ -119,10 +108,18 @@ export abstract class DictionaryService<DS, FB, D extends IDictionary<DS, FB>> i
 
   async scopedDictionaryEntries(
     startBlockHeight: number,
-    queryEndBlock: number,
-    scaledBatchSize: number
+    scaledBatchSize: number,
+    latestFinalizedHeight: number //api FinalizedHeight
   ): Promise<(DictionaryResponse<number | IBlock<FB>> & {queryEndBlock: number}) | undefined> {
-    const dict = await this.dictionary.getData(startBlockHeight, queryEndBlock, scaledBatchSize);
+    const dictionary = this.getDictionary(startBlockHeight);
+    if (!dictionary) return undefined;
+
+    /* queryEndBlock needs to be limited by the latest height or the maximum value of endBlock in datasources.
+     * Dictionaries could be in the future depending on if they index unfinalized blocks or the node is using an RPC endpoint that is behind.
+     */
+    const queryEndBlock = dictionary.getQueryEndBlock(startBlockHeight, latestFinalizedHeight);
+
+    const dict = await dictionary.getData(startBlockHeight, queryEndBlock, scaledBatchSize);
     // Check undefined
     if (!dict) return undefined;
 
