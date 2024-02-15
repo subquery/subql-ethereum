@@ -84,7 +84,7 @@ export abstract class DictionaryV2<
   }
 
   getQueryEndBlock(startBlockHeight: number, apiFinalizedHeight: number): number {
-    return this.metadata.end;
+    return Math.min(startBlockHeight + this.nodeConfig.dictionaryQuerySize, apiFinalizedHeight);
   }
 
   abstract getData(

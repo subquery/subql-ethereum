@@ -101,5 +101,11 @@ export function filterLogsProcessor(
 
 export function isFullBlock(block: BlockContent): block is EthereumBlock {
   // Light etherum block just contains transaction hashes for transactions. If the block has no transactions then both types would be the same
-  return typeof (block as EthereumBlock).transactions[0] !== 'string';
+  return (
+    typeof (block as EthereumBlock).transactions[0] !== 'string' ||
+    !(
+      !(block as EthereumBlock).transactions.length &&
+      (block as EthereumBlock).logs.length
+    )
+  );
 }

@@ -92,23 +92,23 @@ export function rawFatBlockToEthBlock(
   block: RawEthFatBlock,
 ): IBlock<EthereumBlock> {
   try {
-    // if logs/tx returns null treat as empty array , as when format log/tx only accept array
-    block.logs = block.logs === null ? [] : block.logs;
-    block.transactions = block.transactions === null ? [] : block.transactions;
-
     const formatter = new Formatter();
 
-    const ethBlock = formatter.block(block.header) as unknown as EthereumBlock;
+    const ethBlock = formatter.blockWithTransactions({
+      ...block.header,
+      transactions: block.transactions,
+    }) as unknown as EthereumBlock;
 
     ethBlock.logs = Formatter.arrayOf(formatter.filterLog.bind(formatter))(
-      block.logs,
+      block.logs ?? [],
     ).map((l) => formatLog(l, ethBlock));
 
     ethBlock.transactions = Formatter.arrayOf(
       formatter.transactionResponse.bind(formatter),
-    )(block.transactions).map((tx) => ({
+    )(block.transactions ?? []).map((tx) => ({
       ...formatTransaction(tx, ethBlock),
       logs: ethBlock.logs.filter((l) => l.transactionHash === tx.hash),
+      input: tx.data, // Why is ethers renaming this to data?
     }));
 
     return formatBlockUtil(ethBlock);

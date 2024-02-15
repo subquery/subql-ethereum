@@ -20,6 +20,7 @@ import {
   SubqlDatasource,
   SubqlEthereumProcessorOptions,
 } from '@subql/types-ethereum';
+import { utils } from 'ethers';
 import { SubqueryProject } from '../../../configure/SubqueryProject';
 import { eventToTopic, functionToSighash } from '../../../utils/string';
 import { yargsOptions } from '../../../yargs';
@@ -182,6 +183,14 @@ export function buildDictionaryV2QueryEntry(
     }
   }
 
+  if (!fatDictionaryConditions.logs.length) {
+    delete fatDictionaryConditions.logs;
+  }
+
+  if (!fatDictionaryConditions.transactions.length) {
+    delete fatDictionaryConditions.transactions;
+  }
+
   //TODO, unique
   return fatDictionaryConditions;
   // return uniqBy(
@@ -234,21 +243,28 @@ export class EthDictionaryV2 extends DictionaryV2<
   ): Promise<DictionaryResponse<IBlock<EthereumBlock>> | undefined> {
     const queryDetails = this.queriesMap?.getDetails(startBlock);
     const conditions = queryDetails?.value;
-    queryEndBlock = this.metadata.end;
+    // queryEndBlock = this.metadata.end;
 
     if (!conditions) {
       return undefined;
     }
+
     const requestData = {
       jsonrpc: '2.0',
       method: FAT_BLOCKS_QUERY_METHOD,
       id: 1,
       params: [
-        startBlock,
-        queryEndBlock,
-        limit,
-        conditions,
-        { blockHeader: true, logs: true, transactions: { data: true } },
+        {
+          fromBlock: utils.hexValue(startBlock),
+          toBlock: utils.hexValue(queryEndBlock),
+          limit: utils.hexValue(limit),
+          blockFilter: conditions,
+          fieldSelector: {
+            blockHeader: true,
+            logs: { transaction: true },
+            transactions: { log: true },
+          },
+        },
       ],
     };
 
@@ -264,35 +280,58 @@ export class EthDictionaryV2 extends DictionaryV2<
       if (response.data.error) {
         throw new Error(response.data.error.message);
       }
+
       const ethBlocks = this.convertResponseBlocks(response.data.result);
       logger.debug(
-        `DictionaryV2 Fetched Eth blocks ${ethBlocks.start} - ${ethBlocks.end}`,
+        'NUM DICT RESULTS',
+        ethBlocks.blocks.map((b) => b.block.number),
       );
       return {
-        batchBlocks: ethBlocks ? ethBlocks.blocks : [],
-        lastBufferedHeight: ethBlocks ? ethBlocks.end : queryEndBlock,
+        batchBlocks: ethBlocks.blocks,
+        lastBufferedHeight:
+          ethBlocks.blocks.length === limit ? ethBlocks.end : queryEndBlock,
       };
     } catch (error) {
+      logger.error(
+        error,
+        `Dictionary query failed. request: ${JSON.stringify(
+          requestData,
+          null,
+          2,
+        )}`,
+      );
       // Handle the error as needed
-      throw new Error(`V2 dictionary get query failed ${error}`);
+      throw new Error(`Fat dictionary get capacity failed ${error}`);
     }
   }
 
   convertResponseBlocks(
     data: RawFatDictionaryResponseData<RawEthFatBlock>,
   ): FatDictionaryResponse<IBlock<EthereumBlock>> | undefined {
-    const blocks: IBlock<EthereumBlock>[] = [];
-    for (const block of data.Blocks) {
-      blocks.push(rawFatBlockToEthBlock(block));
-    }
-    if (blocks.length !== 0) {
-      return {
-        blocks: blocks,
-        start: blocks[0].block.number,
-        end: blocks[blocks.length - 1].block.number,
-      };
-    } else {
-      return undefined;
+    try {
+      const blocks: IBlock<EthereumBlock>[] = [];
+      for (const block of (data as any).blocks) {
+        blocks.push(rawFatBlockToEthBlock(block));
+      }
+      if (blocks.length !== 0) {
+        return {
+          blocks: blocks,
+          start: blocks[0].block.number,
+          end: blocks[blocks.length - 1].block.number,
+        };
+      } else {
+        return {
+          blocks: [],
+          start: undefined,
+          end: undefined,
+        };
+      }
+    } catch (e) {
+      logger.error(
+        e,
+        `Failed to handle block response ${JSON.stringify(data)}`,
+      );
+      throw e;
     }
   }
 }

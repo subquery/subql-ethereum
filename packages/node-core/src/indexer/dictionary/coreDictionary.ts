@@ -81,6 +81,8 @@ export abstract class CoreDictionary<DS, FB> implements IDictionary<DS, FB> {
 
   // Base validation is required, and specific validation for each network should be implemented accordingly
   protected validateChainMeta(metaData: DictionaryV1Metadata | DictionaryV2Metadata): boolean {
-    return metaData.chain === this.chainId || metaData.genesisHash === this.chainId;
+    return true;
+    // TODO, bring this back if v2 response return chainId
+    // return metaData.chain === this.chainId || metaData.genesisHash === this.chainId;
   }
 }
