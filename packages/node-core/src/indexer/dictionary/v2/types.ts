@@ -3,7 +3,7 @@
 
 // Before conversion
 export interface RawFatDictionaryResponseData<RFB> {
-  Blocks: RFB[]; //raw fat blocks
+  blocks: RFB[]; //raw fat blocks
   BlockRange: number[];
   GenesisHash: string;
 }

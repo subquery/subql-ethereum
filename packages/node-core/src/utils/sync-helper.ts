@@ -99,8 +99,8 @@ export async function getFunctions(sequelize: Sequelize, schema: string, functio
          information_schema.routines
      WHERE
          specific_schema not in ('pg_catalog', 'information_schema')
-       and routine_type = 'FUNCTION' 
-       and routine_schema = :schema 
+       and routine_type = 'FUNCTION'
+       and routine_schema = :schema
        and routine_name = :functionName;
     `,
     {
@@ -218,7 +218,7 @@ export const sqlIterator = (tableName: string, sql: string, batch: number = DEFA
     current_id INT;
   BEGIN
     SELECT MIN(id), MAX(id) INTO start_id, end_id FROM ${tableName};
-    
+
     IF start_id IS NOT NULL AND end_id IS NOT NULL THEN
         FOR current_id IN start_id..end_id BY batch_size LOOP
             ${sql};

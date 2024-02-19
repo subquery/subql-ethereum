@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0
 
 import assert from 'assert';
+import {IBlock} from '@subql/node-core/indexer/dictionary';
 import {BaseCustomDataSource, BaseDataSource} from '@subql/types-core';
 import {IApi} from '../api.service';
 import {NodeConfig} from '../configure';
@@ -34,7 +35,7 @@ export abstract class BaseIndexerManager<
   SA, // Api Type
   A, // SafeApi Type
   B, // Block Type
-  API extends IApi<A, SA, B[]>,
+  API extends IApi<A, SA, IBlock<B>[]>,
   DS extends BaseDataSource,
   CDS extends DS & BaseCustomDataSource, // Custom datasource
   FilterMap extends FilterTypeMap,
@@ -152,10 +153,10 @@ export abstract class BaseIndexerManager<
     if (!ds.length) {
       logger.error(
         `Issue detected with data sources: \n
-        Either all data sources have a 'startBlock' greater than the current indexed block height (${blockHeight}), 
+        Either all data sources have a 'startBlock' greater than the current indexed block height (${blockHeight}),
         or they have an 'endBlock' less than the current block. \n
         Solution options: \n
-        1. Adjust 'startBlock' in project.yaml to be less than or equal to ${blockHeight}, 
+        1. Adjust 'startBlock' in project.yaml to be less than or equal to ${blockHeight},
            and 'endBlock' to be greater than or equal to ${blockHeight}. \n
         2. Delete your database and start again with the currently specified 'startBlock' and 'endBlock'.`
       );
