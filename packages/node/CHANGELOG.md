@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove unnecessary logging relating to light blocks (#249)
 
 ### Changed
-- Update `@subql/node-core` to 7.3.0
+- Updates to match changes in `@subql/node-core` to 7.3.0
 
 ## [3.7.1] - 2024-02-07
 ### Added
