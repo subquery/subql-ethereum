@@ -344,13 +344,13 @@ describe('Api.ethereum', () => {
     jest.spyOn(ethApi as any, 'getBlockPromise').mockResolvedValueOnce({
       hash: mockBlockHash,
       transactions: [],
-      // Add other necessary block properties here
     });
 
-    jest.spyOn((ethApi as any).client, 'getLogs').mockResolvedValueOnce([
-      { blockHash: mockIncorrectBlockHash, transactionHash: 'tx1' },
-      // Add more logs if necessary
-    ]);
+    jest
+      .spyOn((ethApi as any).client, 'getLogs')
+      .mockResolvedValueOnce([
+        { blockHash: mockIncorrectBlockHash, transactionHash: 'tx1' },
+      ]);
 
     await expect(ethApi.fetchBlock(mockBlockNumber)).rejects.toThrow(
       `Log BlockHash does not match block: ${mockBlockNumber}`,
