@@ -309,7 +309,7 @@ export class EthereumApi implements ApiWrapper {
       // Certain RPC may not accommodate for blockHash, and would return wrong logs
       if (logsRaw.length) {
         assert(
-          logsRaw.find((l) => l.blockHash === block.hash),
+          logsRaw.every((l) => l.blockHash === block.hash),
           `Log BlockHash does not match block: ${blockNumber}`,
         );
       }
