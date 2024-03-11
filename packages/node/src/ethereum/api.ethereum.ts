@@ -35,7 +35,7 @@ import {
 } from './ethers/celo/celo-provider';
 import { JsonRpcBatchProvider } from './ethers/json-rpc-batch-provider';
 import { JsonRpcProvider } from './ethers/json-rpc-provider';
-import { OPBlockFormatterMixin } from './ethers/op/op-provider';
+import { OPFormatterMixin } from './ethers/op/op-provider';
 import { ConnectionInfo } from './ethers/web';
 import SafeEthProvider from './safe-api';
 import {
@@ -138,16 +138,10 @@ export class EthereumApi implements ApiWrapper {
       searchParams.forEach((value, name, searchParams) => {
         (connection.headers as any)[name] = value;
       });
-      this.client = new (OPBlockFormatterMixin(JsonRpcBatchProvider))(
-        connection,
-      );
-      this.nonBatchClient = new (OPBlockFormatterMixin(JsonRpcProvider))(
-        connection,
-      );
+      this.client = new (OPFormatterMixin(JsonRpcBatchProvider))(connection);
+      this.nonBatchClient = new (OPFormatterMixin(JsonRpcProvider))(connection);
     } else if (protocolStr === 'ws' || protocolStr === 'wss') {
-      this.client = new (OPBlockFormatterMixin(WebSocketProvider))(
-        this.endpoint,
-      );
+      this.client = new (OPFormatterMixin(WebSocketProvider))(this.endpoint);
     } else {
       throw new Error(`Unsupported protocol: ${protocol}`);
     }

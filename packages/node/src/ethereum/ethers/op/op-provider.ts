@@ -11,7 +11,7 @@ import { JsonRpcProvider } from '../json-rpc-provider';
 
 /* This mixin replaces the block formatter on any provider with specific OP changes */
 type Constructor = new (...args: any[]) => BaseProvider;
-export function OPBlockFormatterMixin<B extends Constructor>(Base: B) {
+export function OPFormatterMixin<B extends Constructor>(Base: B) {
   return class OPProvider extends Base {
     constructor(...args: any[]) {
       super(...args);
@@ -33,7 +33,6 @@ export function OPBlockFormatterMixin<B extends Constructor>(Base: B) {
   };
 }
 
-export const OPWsProvider = OPBlockFormatterMixin(WebSocketProvider);
-export const OPJsonRpcProvider = OPBlockFormatterMixin(JsonRpcProvider);
-export const OPJsonRpcBatchProvider =
-  OPBlockFormatterMixin(JsonRpcBatchProvider);
+export const OPWsProvider = OPFormatterMixin(WebSocketProvider);
+export const OPJsonRpcProvider = OPFormatterMixin(JsonRpcProvider);
+export const OPJsonRpcBatchProvider = OPFormatterMixin(JsonRpcBatchProvider);
