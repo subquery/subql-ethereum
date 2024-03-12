@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: GPL-3.0
 
 import { NodeConfig } from '@subql/node-core';
-import { EthDictionaryService } from './ethDictionary.service';
+import { EthDictionaryV1 } from './ethDictionaryV1';
 
-describe('Dictionary service', () => {
+describe('Eth Dictionary V1', () => {
   it('Can resovle chain aliases', async () => {
-    const dictionary = await DictionaryService.create(
+    const dictionary = await EthDictionaryV1.create(
       {
         network: { chainId: '336', dictionary: 'https://foo.bar' } as any,
       } as any,

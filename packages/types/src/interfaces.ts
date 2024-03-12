@@ -2,17 +2,8 @@
 // SPDX-License-Identifier: GPL-3.0
 
 import {Block} from '@ethersproject/abstract-provider';
+import {IBlock} from '@subql/node-core';
 import {EthereumBlock, LightEthereumBlock} from './ethereum';
-
-// TODO, remove this after moved to type core
-interface IBlock<B> {
-  getHeader(): {
-    hash: string;
-    height: number;
-    parentHash?: string;
-  };
-  block: B;
-}
 
 export interface ApiWrapper {
   init: () => Promise<void>;

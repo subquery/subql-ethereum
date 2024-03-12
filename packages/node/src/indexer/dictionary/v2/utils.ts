@@ -1,4 +1,4 @@
-// Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
+// Copyright 2020-2024 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
 import { Formatter } from '@ethersproject/providers';
@@ -13,7 +13,7 @@ import {
 import {
   EthFatDictionaryLogConditions,
   EthFatDictionaryTxConditions,
-  RawEthFatBlock,
+  RawEthBlock,
 } from './types';
 
 export function entryToTxConditions(
@@ -89,7 +89,7 @@ export function entryToLogConditions(
 }
 
 export function rawFatBlockToEthBlock(
-  block: RawEthFatBlock,
+  block: RawEthBlock,
 ): IBlock<EthereumBlock> {
   try {
     const formatter = new Formatter();

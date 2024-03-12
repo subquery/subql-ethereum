@@ -1,4 +1,4 @@
-// Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
+// Copyright 2020-2024 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
 import { EventEmitter2 } from '@nestjs/event-emitter';
@@ -14,9 +14,8 @@ import {
   SubqlDatasource,
   SubqlEthereumProcessorOptions,
 } from '@subql/types-ethereum';
-import { MetaData } from '@subql/utils';
 import JSON5 from 'json5';
-import { groupBy, partition, sortBy, uniqBy } from 'lodash';
+import { sortBy, uniqBy } from 'lodash';
 import fetch from 'node-fetch';
 import { SubqueryProject } from '../../../configure/SubqueryProject';
 import { eventToTopic, functionToSighash } from '../../../utils/string';
@@ -205,7 +204,7 @@ export function buildDictionaryV1QueryEntries(
   );
 }
 
-export class EthDictionaryV1 extends DictionaryV1<EthDsInterface> {
+export class EthDictionaryV1 extends DictionaryV1<GroupedEthereumProjectDs> {
   private constructor(
     project: SubqueryProject,
     nodeConfig: NodeConfig,

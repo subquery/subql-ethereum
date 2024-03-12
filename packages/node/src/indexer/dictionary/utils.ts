@@ -1,4 +1,4 @@
-// Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
+// Copyright 2020-2024 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
 import { SubqlDatasource } from '@subql/types-ethereum';
@@ -27,8 +27,7 @@ export function ethFilterDs(dataSources: EthDsInterface[]): EthDsInterface[] {
     };
   });
 
-  const filteredDs = [...normalDataSources, ...groupedDataSources];
-  return filteredDs;
+  return [...normalDataSources, ...groupedDataSources];
 }
 
 export type EthDsInterface = SubqlDatasource & { name?: string };

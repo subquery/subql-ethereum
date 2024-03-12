@@ -1,4 +1,4 @@
-// Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
+// Copyright 2020-2024 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
 import { NodeConfig, BlockHeightMap } from '@subql/node-core';
@@ -11,7 +11,6 @@ import {
   EthereumProjectDs,
   SubqueryProject,
 } from '../../../configure/SubqueryProject';
-import { functionToSighash } from '../../../utils/string';
 import { EthDictionaryV2 } from './ethDictionaryV2';
 
 const HTTP_ENDPOINT = 'https://polygon.api.onfinality.io/public';
@@ -21,7 +20,6 @@ const mockDs: EthereumProjectDs[] = [
     assets: new Map(),
     startBlock: 3678215,
     mapping: {
-      entryScript: '',
       file: './dist/index.js',
       handlers: [
         {
@@ -53,14 +51,6 @@ const nodeConfig = new NodeConfig({
   networkDictionary: ['http://localhost:3000/rpc'],
 });
 
-const ethDictionaryV2 = new EthDictionaryV2(
-  'http://localhost:3000/rpc',
-  nodeConfig,
-  undefined,
-  { network: { chainId: '10' } } as SubqueryProject,
-  '10',
-);
-
 const m = new Map<number, any>();
 mockDs.forEach((ds, index, dataSources) => {
   m.set(ds.startBlock, dataSources.slice(0, index + 1));
@@ -69,16 +59,24 @@ const dsMap = new BlockHeightMap(m);
 
 // enable this once dictionary v2 is online
 describe('eth dictionary v2', () => {
+  let ethDictionaryV2: EthDictionaryV2;
   let ethBlock3678215: EthereumBlock;
   let ethBlock3678250: EthereumBlock;
-  beforeAll(async () => {
+  beforeEach(async () => {
+    ethDictionaryV2 = await EthDictionaryV2.create(
+      'http://localhost:3000/rpc',
+      nodeConfig,
+      undefined,
+      { network: { chainId: '10' } } as SubqueryProject,
+      '10',
+    );
+
     ethDictionaryV2.updateQueriesMap(dsMap);
-    await ethDictionaryV2.init();
   });
 
   it('convert ds to v2 dictionary queries', () => {
     //Polygon
-    const query = ethDictionaryV2.queriesMap.get(3678215);
+    const query = (ethDictionaryV2 as any).queriesMap.get(3678215);
     expect(query.logs.length).toBe(1);
     expect(query.transactions.length).toBe(1);
   }, 5000000);

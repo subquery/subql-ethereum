@@ -1,10 +1,11 @@
 // Copyright 2020-2024 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
+import { Block } from '@ethersproject/abstract-provider';
 import { getAddress } from '@ethersproject/address';
 import { BigNumber } from '@ethersproject/bignumber';
 import { Zero } from '@ethersproject/constants';
-import { IBlock } from '@subql/node-core';
+import { Header, IBlock } from '@subql/node-core';
 import {
   ApiWrapper,
   EthereumBlock,
@@ -14,6 +15,7 @@ import {
   EthereumTransaction,
 } from '@subql/types-ethereum';
 import { omit } from 'lodash';
+import { BlockContent } from '../indexer/types';
 
 export function calcInterval(api: ApiWrapper): number {
   // TODO find a way to get this from the blockchain
@@ -65,8 +67,8 @@ export function formatBlockUtil(block: EthereumBlock): IBlock<EthereumBlock> {
     block,
     getHeader: () => {
       return {
-        hash: block.hash,
-        height: block.number,
+        blockHash: block.hash,
+        blockHeight: block.number,
         parentHash: block.parentHash,
       };
     },
@@ -153,4 +155,12 @@ export function formatReceipt<R extends EthereumReceipt = EthereumReceipt>(
       return JSON.stringify(omit(this, ['toJSON']));
     },
   } as unknown as R;
+}
+
+export function ethereumBlockToHeader(block: BlockContent | Block): Header {
+  return {
+    blockHeight: block.number,
+    blockHash: block.hash,
+    parentHash: block.parentHash,
+  };
 }

@@ -3278,6 +3278,7 @@ __metadata:
     "@types/lodash": ^4
     "@types/pino": ^6.3.12
     "@types/rimraf": 3.0.2
+    "@zilliqa-js/crypto": ^3.5.0
     ejs: 3.1.7
     js-yaml: ^4.1.0
     lodash: 4.17.21
@@ -3305,24 +3306,6 @@ __metadata:
     semver: ^7.5.2
     update-notifier: 5.1.0
   checksum: 7ca9c725de52c2b9be5740716db27739b5948c4bf9e9962896712f3890dae41e301e75c68277fb18082b11a3e949311581f640357e8f93ae149d07495a268015
-  languageName: node
-  linkType: hard
-
-"@subql/common@npm:^3.3.0":
-  version: 3.3.0
-  resolution: "@subql/common@npm:3.3.0"
-  dependencies:
-    "@subql/types-core": 0.3.0
-    axios: ^0.27.2
-    class-transformer: ^0.5.1
-    class-validator: ^0.14.0
-    fs-extra: ^10.1.0
-    ipfs-http-client: 56
-    js-yaml: ^4.1.0
-    reflect-metadata: ^0.1.13
-    semver: ^7.5.2
-    update-notifier: 5.1.0
-  checksum: 50d904c0c7e0b8caeb1f53a968c9c5aa223fa8bc822ab164edbe7043a922e5c200d1ac67996358d9152d443e9288c3e5164c906181cc305a0471ffa6c8e2fdea
   languageName: node
   linkType: hard
 
@@ -3401,10 +3384,10 @@ __metadata:
     "@nestjs/schedule": ^3.0.1
     "@nestjs/schematics": ^9.2.0
     "@nestjs/testing": ^9.4.0
-    "@subql/common": ^3.3.0
+    "@subql/common": ^3.4.1
     "@subql/common-ethereum": "workspace:*"
     "@subql/node-core": 7.4.2-0
-    "@subql/testing": ^2.0.2
+    "@subql/testing": ^2.1.0
     "@subql/types-ethereum": "workspace:*"
     "@types/express": ^4.17.13
     "@types/jest": ^27.4.0
@@ -3443,21 +3426,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@subql/testing@npm:^2.0.2":
-  version: 2.0.2
-  resolution: "@subql/testing@npm:2.0.2"
+"@subql/testing@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "@subql/testing@npm:2.1.0"
   dependencies:
-    "@subql/types": ^2.1.3
-  checksum: c564a80d226509c5343b2ffb8f10f6836a16ace8767bd8805db68ae0b01f000ec5e66b889049d1ff3fc401b5e343d447a5407f14515dc572e5695e15c862a37a
-  languageName: node
-  linkType: hard
-
-"@subql/types-core@npm:0.3.0":
-  version: 0.3.0
-  resolution: "@subql/types-core@npm:0.3.0"
-  dependencies:
-    package-json-type: ^1.0.3
-  checksum: fa9ec3bb27d33b57a18425553f6f9239dca439f37f296ae49dd1da958a3d6f14d73aa0831c057828618798926049c0308f3cba68276c80bfbff2fbfe265d1bf3
+    "@subql/types-core": ^0.1.2-0
+  checksum: 42885519277ec48d079accbc68ca600da64e1c960930d506dcd4a207188ad399ff42f81dfeb5d447f235f3bf7ef61ea55d332d47cb10e6d89c4fafda61fe8bac
   languageName: node
   linkType: hard
 
@@ -3476,6 +3450,15 @@ __metadata:
   dependencies:
     package-json-type: ^1.0.3
   checksum: f5e9a4e4a34f00216dfd1a75a7866f87e2540abdb3a9433e7ecff3944222218404321b0c6667fb32702aea92b5c9258b0b6554fb6250e6d7c7b1a58508f73489
+  languageName: node
+  linkType: hard
+
+"@subql/types-core@npm:^0.1.2-0":
+  version: 0.1.2-1
+  resolution: "@subql/types-core@npm:0.1.2-1"
+  dependencies:
+    package-json-type: ^1.0.3
+  checksum: 1c54fecfd7b99875528a87109a3cb8cfcb86a61221f7e715be49198381c6c97e481b60f351c8210df67d1074d3541cd6ee0aad17831f0896dcea63e9784bda64
   languageName: node
   linkType: hard
 
@@ -3505,15 +3488,6 @@ __metadata:
   peerDependencies:
     "@polkadot/api": ^10
   checksum: ce71b9513a0f1c06f6a382a6ddcb7661286686015d18970bb8f9a55a30da828f3006e72f2d76fa273f9478754e100afc80da75591ed68f6861c1e1d532c79e78
-  languageName: node
-  linkType: hard
-
-"@subql/types@npm:^2.1.3":
-  version: 2.2.0
-  resolution: "@subql/types@npm:2.2.0"
-  peerDependencies:
-    "@polkadot/api": ^10
-  checksum: 1dd38caed6697182862792401b8edf3dec04ddaa8caf1b6255363c5a53ddad98a22a24a3eab92b7c8b0ee0d19e09c9b20b44bd0c988f416d6b72ac5a016e5d6d
   languageName: node
   linkType: hard
 
@@ -4396,6 +4370,38 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@zilliqa-js/crypto@npm:^3.5.0":
+  version: 3.5.0
+  resolution: "@zilliqa-js/crypto@npm:3.5.0"
+  dependencies:
+    "@zilliqa-js/util": 3.5.0
+    aes-js: ^3.1.1
+    buffer: ^6.0.3
+    crypto-js: ^4.2.0
+    elliptic: ^6.5.0
+    hash.js: ^1.1.5
+    hmac-drbg: ^1.0.1
+    pbkdf2: ^3.0.16
+    scrypt-js: ^3.0.1
+    scryptsy: ^2.1.0
+    tslib: 2.3.1
+    uuid: 8.3.2
+  checksum: 3fdbe49f5d02382d6496dd2579295d63fac0fb45206f95b77ff0c723ee56f1fd62ecf2150883e8d6b3e0023694d9e20ebf14eb82b01614d8dd540af754a2f3b4
+  languageName: node
+  linkType: hard
+
+"@zilliqa-js/util@npm:3.5.0":
+  version: 3.5.0
+  resolution: "@zilliqa-js/util@npm:3.5.0"
+  dependencies:
+    bn.js: ^4.11.8
+    camelcase: ^5.0.0
+    long: ^4.0.0
+    tslib: 2.3.1
+  checksum: 2df9c17873e9d6867e8f335592cfc5381d58ff6f040d0851f0e6dc9b8b02131a97f3f5aa62cae93639c7fc82cb6900f262dd341d88492daa2880a601f6224968
+  languageName: node
+  linkType: hard
+
 "abbrev@npm:1, abbrev@npm:^1.0.0":
   version: 1.1.1
   resolution: "abbrev@npm:1.1.1"
@@ -4456,6 +4462,13 @@ __metadata:
   version: 3.0.0
   resolution: "aes-js@npm:3.0.0"
   checksum: 251e26d533cd1a915b44896b17d5ed68c24a02484cfdd2e74ec700a309267db96651ea4eb657bf20aac32a3baa61f6e34edf8e2fec2de440a655da9942d334b8
+  languageName: node
+  linkType: hard
+
+"aes-js@npm:^3.1.1":
+  version: 3.1.2
+  resolution: "aes-js@npm:3.1.2"
+  checksum: 062154d50b1e433cc8c3b8ca7879f3a6375d5e79c2a507b2b6c4ec920b4cd851bf2afa7f65c98761a9da89c0ab618cbe6529e8e9a1c71f93290b53128fb8f712
   languageName: node
   linkType: hard
 
@@ -4847,16 +4860,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:^0.27.2":
-  version: 0.27.2
-  resolution: "axios@npm:0.27.2"
-  dependencies:
-    follow-redirects: ^1.14.9
-    form-data: ^4.0.0
-  checksum: 38cb7540465fe8c4102850c4368053c21683af85c5fdf0ea619f9628abbcb59415d1e22ebc8a6390d2bbc9b58a9806c874f139767389c862ec9b772235f06854
-  languageName: node
-  linkType: hard
-
 "axios@npm:^0.28.0":
   version: 0.28.0
   resolution: "axios@npm:0.28.0"
@@ -5114,7 +5117,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bn.js@npm:^4.11.9, bn.js@npm:^4.12.0":
+"bn.js@npm:^4.11.8, bn.js@npm:^4.11.9, bn.js@npm:^4.12.0":
   version: 4.12.0
   resolution: "bn.js@npm:4.12.0"
   checksum: 39afb4f15f4ea537b55eaf1446c896af28ac948fdcf47171961475724d1bb65118cca49fa6e3d67706e4790955ec0e74de584e45c8f1ef89f46c812bee5b5a12
@@ -5425,7 +5428,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"camelcase@npm:^5.3.1":
+"camelcase@npm:^5.0.0, camelcase@npm:^5.3.1":
   version: 5.3.1
   resolution: "camelcase@npm:5.3.1"
   checksum: e6effce26b9404e3c0f301498184f243811c30dfe6d0b9051863bd8e4034d09c8c2923794f280d6827e5aa055f6c434115ff97864a16a963366fb35fd673024b
@@ -5987,6 +5990,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"crypto-js@npm:^4.2.0":
+  version: 4.2.0
+  resolution: "crypto-js@npm:4.2.0"
+  checksum: f051666dbc077c8324777f44fbd3aaea2986f198fe85092535130d17026c7c2ccf2d23ee5b29b36f7a4a07312db2fae23c9094b644cc35f7858b1b4fcaf27774
+  languageName: node
+  linkType: hard
+
 "crypto-random-string@npm:^2.0.0":
   version: 2.0.0
   resolution: "crypto-random-string@npm:2.0.0"
@@ -6346,6 +6356,21 @@ __metadata:
     minimalistic-assert: ^1.0.1
     minimalistic-crypto-utils: ^1.0.1
   checksum: d56d21fd04e97869f7ffcc92e18903b9f67f2d4637a23c860492fbbff5a3155fd9ca0184ce0c865dd6eb2487d234ce9551335c021c376cd2d3b7cb749c7d10f4
+  languageName: node
+  linkType: hard
+
+"elliptic@npm:^6.5.0":
+  version: 6.5.5
+  resolution: "elliptic@npm:6.5.5"
+  dependencies:
+    bn.js: ^4.11.9
+    brorand: ^1.1.0
+    hash.js: ^1.0.0
+    hmac-drbg: ^1.0.1
+    inherits: ^2.0.4
+    minimalistic-assert: ^1.0.1
+    minimalistic-crypto-utils: ^1.0.1
+  checksum: ec9105e4469eb3b32b0ee2579756c888ddf3f99d259aa0d65fccb906ee877768aaf8880caae73e3e669c9a4adeb3eb1945703aa974ec5000d2d33a239f4567eb
   languageName: node
   linkType: hard
 
@@ -7312,16 +7337,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"follow-redirects@npm:^1.14.9":
-  version: 1.15.2
-  resolution: "follow-redirects@npm:1.15.2"
-  peerDependenciesMeta:
-    debug:
-      optional: true
-  checksum: faa66059b66358ba65c234c2f2a37fcec029dc22775f35d9ad6abac56003268baf41e55f9ee645957b32c7d9f62baf1f0b906e68267276f54ec4b4c597c2b190
-  languageName: node
-  linkType: hard
-
 "follow-redirects@npm:^1.15.0":
   version: 1.15.5
   resolution: "follow-redirects@npm:1.15.5"
@@ -7861,7 +7876,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"hash.js@npm:1.1.7, hash.js@npm:^1.0.0, hash.js@npm:^1.0.3, hash.js@npm:^1.1.7":
+"hash.js@npm:1.1.7, hash.js@npm:^1.0.0, hash.js@npm:^1.0.3, hash.js@npm:^1.1.5, hash.js@npm:^1.1.7":
   version: 1.1.7
   resolution: "hash.js@npm:1.1.7"
   dependencies:
@@ -10915,7 +10930,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pbkdf2@npm:^3.0.17":
+"pbkdf2@npm:^3.0.16, pbkdf2@npm:^3.0.17":
   version: 3.1.2
   resolution: "pbkdf2@npm:3.1.2"
   dependencies:
@@ -11888,10 +11903,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"scrypt-js@npm:3.0.1, scrypt-js@npm:^3.0.0":
+"scrypt-js@npm:3.0.1, scrypt-js@npm:^3.0.0, scrypt-js@npm:^3.0.1":
   version: 3.0.1
   resolution: "scrypt-js@npm:3.0.1"
   checksum: b7c7d1a68d6ca946f2fbb0778e0c4ec63c65501b54023b2af7d7e9f48fdb6c6580d6f7675cd53bda5944c5ebc057560d5a6365079752546865defb3b79dea454
+  languageName: node
+  linkType: hard
+
+"scryptsy@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "scryptsy@npm:2.1.0"
+  checksum: 46eee33a59895fbdc920da97446572083667512d8408548cc0d5f190eb4b84aa5d75a4bc8d0495530ff6a62d980497c72eb6fe8e6ab9c26aaa3d4dacb7954d08
   languageName: node
   linkType: hard
 
@@ -12874,6 +12896,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"tslib@npm:2.3.1":
+  version: 2.3.1
+  resolution: "tslib@npm:2.3.1"
+  checksum: de17a98d4614481f7fcb5cd53ffc1aaf8654313be0291e1bfaee4b4bb31a20494b7d218ff2e15017883e8ea9626599b3b0e0229c18383ba9dce89da2adf15cb9
+  languageName: node
+  linkType: hard
+
 "tslib@npm:2.5.3, tslib@npm:^2.1.0, tslib@npm:^2.3.0, tslib@npm:^2.4.0":
   version: 2.5.3
   resolution: "tslib@npm:2.5.3"
@@ -13406,21 +13435,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"uuid@npm:8.3.2, uuid@npm:^8.3.2":
+  version: 8.3.2
+  resolution: "uuid@npm:8.3.2"
+  bin:
+    uuid: dist/bin/uuid
+  checksum: 5575a8a75c13120e2f10e6ddc801b2c7ed7d8f3c8ac22c7ed0c7b2ba6383ec0abda88c905085d630e251719e0777045ae3236f04c812184b7c765f63a70e58df
+  languageName: node
+  linkType: hard
+
 "uuid@npm:9.0.0":
   version: 9.0.0
   resolution: "uuid@npm:9.0.0"
   bin:
     uuid: dist/bin/uuid
   checksum: 8dd2c83c43ddc7e1c71e36b60aea40030a6505139af6bee0f382ebcd1a56f6cd3028f7f06ffb07f8cf6ced320b76aea275284b224b002b289f89fe89c389b028
-  languageName: node
-  linkType: hard
-
-"uuid@npm:^8.3.2":
-  version: 8.3.2
-  resolution: "uuid@npm:8.3.2"
-  bin:
-    uuid: dist/bin/uuid
-  checksum: 5575a8a75c13120e2f10e6ddc801b2c7ed7d8f3c8ac22c7ed0c7b2ba6383ec0abda88c905085d630e251719e0777045ae3236f04c812184b7c765f63a70e58df
   languageName: node
   linkType: hard
 

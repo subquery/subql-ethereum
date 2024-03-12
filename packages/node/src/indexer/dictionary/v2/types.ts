@@ -1,9 +1,9 @@
-// Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
+// Copyright 2020-2024 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
 import { DictionaryV2QueryEntry } from '@subql/node-core';
 
-export interface RawEthFatBlock {
+export interface RawEthBlock {
   header: {
     parentHash: string;
     sha3Uncles: string;

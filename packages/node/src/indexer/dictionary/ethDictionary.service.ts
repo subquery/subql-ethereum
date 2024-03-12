@@ -1,55 +1,66 @@
-// Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
+// Copyright 2020-2024 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
 import { Inject, Injectable } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { NETWORK_FAMILY } from '@subql/common';
-import {
-  DictionaryVersion,
-  inspectDictionaryVersion,
-  NodeConfig,
-} from '@subql/node-core';
-import { DictionaryService } from '@subql/node-core/indexer/dictionary/dictionary.service';
+import { NodeConfig, DictionaryService } from '@subql/node-core';
 import { EthereumBlock, SubqlDatasource } from '@subql/types-ethereum';
 import { SubqueryProject } from '../../configure/SubqueryProject';
-import { EthDictionaryV1 } from './v1/ethDictionaryV1';
+import { EthDictionaryV1 } from './v1';
 import { EthDictionaryV2 } from './v2';
 
 @Injectable()
 export class EthDictionaryService extends DictionaryService<
   SubqlDatasource,
-  EthereumBlock,
-  EthDictionaryV1 | EthDictionaryV2
+  EthereumBlock
 > {
-  protected async initDictionariesV1(
-    endpoints: string[],
-  ): Promise<EthDictionaryV1[]> {
+  async initDictionaries(): Promise<void> {
+    let dictionaryV1Endpoints: string[] = [];
+    const dictionariesV2: EthDictionaryV2[] = [];
+
     if (!this.project) {
       throw new Error(`Project in Dictionary service not initialized `);
     }
-    let dictionaries: EthDictionaryV1[] = [];
-
-    const registryDictionary = await this.resolveDictionary(
-      NETWORK_FAMILY.ethereum,
+    const registryDictionaries = await this.resolveDictionary(
+      NETWORK_FAMILY.substrate,
       this.project.network.chainId,
       this.nodeConfig.dictionaryRegistry,
     );
-    if (registryDictionary !== undefined) {
-      endpoints.push(registryDictionary);
+
+    const dictionaryEndpoints: string[] = (
+      !Array.isArray(this.project.network.dictionary)
+        ? !this.project.network.dictionary
+          ? []
+          : [this.project.network.dictionary]
+        : this.project.network.dictionary
+    ).concat(registryDictionaries);
+
+    for (const endpoint of dictionaryEndpoints) {
+      try {
+        const dictionaryV2 = await EthDictionaryV2.create(
+          endpoint,
+          this.nodeConfig,
+          this.eventEmitter,
+          this.project,
+          this.project.network.chainId,
+        );
+        dictionariesV2.push(dictionaryV2);
+      } catch (e) {
+        dictionaryV1Endpoints.push(endpoint);
+      }
     }
 
-    // Current We now only accept either resolver dictionary or multiple dictionaries
-    // TODO, this may move to core dictionary service
     if (this.nodeConfig.dictionaryResolver) {
-      const resolverDictionary = await EthDictionaryV1.create(
-        this.project,
-        this.nodeConfig,
-        this.eventEmitter,
-      );
-      dictionaries = [resolverDictionary];
-    } else {
-      dictionaries = await Promise.all(
-        endpoints.map((endpoint) =>
+      // Create a v1 dictionary with dictionary resolver
+      // future resolver should a URL, and fetched from registryDictionaries
+      dictionaryV1Endpoints = dictionaryV1Endpoints.concat([undefined]);
+    }
+    // v2 should be prioritised
+    this.init([
+      ...dictionariesV2,
+      ...(await Promise.all(
+        dictionaryV1Endpoints.map((endpoint) =>
           EthDictionaryV1.create(
             this.project,
             this.nodeConfig,
@@ -57,59 +68,8 @@ export class EthDictionaryService extends DictionaryService<
             endpoint,
           ),
         ),
-      );
-    }
-    return dictionaries;
-  }
-
-  protected initDictionariesV2(endpoints: string[]): EthDictionaryV2[] {
-    if (!this.project) {
-      throw new Error(`Project in Dictionary service not initialized `);
-    }
-    const dictionaries = endpoints.map(
-      (endpoint) =>
-        new EthDictionaryV2(
-          endpoint,
-          this.nodeConfig,
-          this.eventEmitter,
-          this.project,
-          this.project.network.chainId,
-        ),
-    );
-    return dictionaries;
-  }
-
-  async initDictionaries() {
-    const dictionaryV1Endpoints = [];
-    const dictionaryV2Endpoints = [];
-    // TODO, change this to project.network.dictionary when rebase with main, this require update in type-core
-    if (this.nodeConfig.networkDictionaries) {
-      for (const endpoint of this.nodeConfig.networkDictionaries) {
-        const version = await inspectDictionaryVersion(
-          endpoint,
-          this.nodeConfig.dictionaryTimeout,
-        );
-
-        if (version === DictionaryVersion.v1) {
-          dictionaryV1Endpoints.push(endpoint);
-        } else if (
-          version === DictionaryVersion.v2Complete ||
-          version === DictionaryVersion.v2Basic
-        ) {
-          dictionaryV2Endpoints.push(endpoint);
-        } else {
-          // When version is undefined, indicate the dictionary is not valid, do not use it
-        }
-      }
-    }
-    // Init for dictionary service, construct all dictionaries
-    this.init([
-      ...(await this.initDictionariesV1(dictionaryV1Endpoints)),
-      ...this.initDictionariesV2(dictionaryV2Endpoints),
+      )),
     ]);
-
-    // Init matadata for all dictionaries
-    await Promise.all(this._dictionaries.map((d) => d.init()));
   }
 
   constructor(

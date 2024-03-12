@@ -1,15 +1,13 @@
-// Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
+// Copyright 2020-2024 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import {
   NodeConfig,
-  FatDictionaryResponse,
   DictionaryV2,
-  RawFatDictionaryResponseData,
+  RawDictionaryResponseData,
   DictionaryResponse,
   getLogger,
-  DictionaryV2QueryEntry,
   IBlock,
 } from '@subql/node-core';
 import {
@@ -27,7 +25,7 @@ import { yargsOptions } from '../../../yargs';
 import { ethFilterDs } from '../utils';
 import { GroupedEthereumProjectDs } from '../v1';
 import {
-  RawEthFatBlock,
+  RawEthBlock,
   EthDictionaryV2QueryEntry,
   EthFatDictionaryTxConditions,
   EthFatDictionaryLogConditions,
@@ -207,13 +205,6 @@ export class EthDictionaryV2 extends DictionaryV2<
   SubqlDatasource,
   EthDictionaryV2QueryEntry
 > {
-  protected buildDictionaryQueryEntries(
-    dataSources: SubqlDatasource[],
-  ): DictionaryV2QueryEntry {
-    const filteredDs = ethFilterDs(dataSources);
-    return buildDictionaryV2QueryEntry(filteredDs);
-  }
-
   constructor(
     endpoint: string,
     nodeConfig: NodeConfig,
@@ -227,6 +218,31 @@ export class EthDictionaryV2 extends DictionaryV2<
       nodeConfig,
       eventEmitter,
     );
+  }
+
+  static async create(
+    endpoint: string,
+    nodeConfig: NodeConfig,
+    eventEmitter: EventEmitter2,
+    project: SubqueryProject,
+    chainId?: string,
+  ): Promise<EthDictionaryV2> {
+    const dictionary = new EthDictionaryV2(
+      endpoint,
+      nodeConfig,
+      eventEmitter,
+      project,
+      chainId,
+    );
+    await dictionary.init();
+    return dictionary;
+  }
+
+  buildDictionaryQueryEntries(
+    dataSources: SubqlDatasource[],
+  ): EthDictionaryV2QueryEntry {
+    const filteredDs = ethFilterDs(dataSources);
+    return buildDictionaryV2QueryEntry(filteredDs);
   }
 
   /**
@@ -270,7 +286,7 @@ export class EthDictionaryV2 extends DictionaryV2<
 
     try {
       const response = await this.dictionaryApi.post<{
-        result?: RawFatDictionaryResponseData<RawEthFatBlock>;
+        result?: RawDictionaryResponseData<RawEthBlock>;
         error?: { code: number; message: string };
       }>(this.dictionaryEndpoint, requestData, {
         headers: {
@@ -282,16 +298,8 @@ export class EthDictionaryV2 extends DictionaryV2<
       }
 
       const ethBlocks = this.convertResponseBlocks(response.data.result);
-      logger.debug(
-        'NUM DICT RESULTS',
-        ethBlocks.blocks.map((b) => b.block.number),
-      );
       this.metadata.end = response.data.result.BlockRange[1];
-      return {
-        batchBlocks: ethBlocks.blocks,
-        lastBufferedHeight:
-          ethBlocks.blocks.length === limit ? ethBlocks.end : queryEndBlock,
-      };
+      return ethBlocks;
     } catch (error) {
       logger.error(
         error,
@@ -306,9 +314,9 @@ export class EthDictionaryV2 extends DictionaryV2<
     }
   }
 
-  convertResponseBlocks(
-    data: RawFatDictionaryResponseData<RawEthFatBlock>,
-  ): FatDictionaryResponse<IBlock<EthereumBlock>> | undefined {
+  convertResponseBlocks<RFB = RawEthBlock>(
+    data: RawDictionaryResponseData<RFB>,
+  ): DictionaryResponse<IBlock<EthereumBlock>> | undefined {
     try {
       const blocks: IBlock<EthereumBlock>[] = [];
       for (const block of (data as any).blocks) {
@@ -316,15 +324,13 @@ export class EthDictionaryV2 extends DictionaryV2<
       }
       if (blocks.length !== 0) {
         return {
-          blocks: blocks,
-          start: blocks[0].block.number,
-          end: blocks[blocks.length - 1].block.number,
+          batchBlocks: blocks,
+          lastBufferedHeight: blocks[blocks.length - 1].block.number,
         };
       } else {
         return {
-          blocks: [],
-          start: undefined,
-          end: undefined,
+          batchBlocks: [],
+          lastBufferedHeight: undefined, // TODO is this correct?
         };
       }
     } catch (e) {

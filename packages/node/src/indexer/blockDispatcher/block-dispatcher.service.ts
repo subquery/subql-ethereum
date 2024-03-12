@@ -9,7 +9,6 @@ import {
   StoreCacheService,
   StoreService,
   IProjectService,
-  PoiService,
   BlockDispatcher,
   ProcessBlockResponse,
   ApiService,
@@ -72,8 +71,8 @@ export class BlockDispatcherService
     block: IBlock<BlockContent>,
   ): Promise<ProcessBlockResponse> {
     return this.indexerManager.indexBlock(
-      block.block,
-      await this.projectService.getDataSources(block.getHeader().height),
+      block,
+      await this.projectService.getDataSources(block.getHeader().blockHeight),
     );
   }
 }
