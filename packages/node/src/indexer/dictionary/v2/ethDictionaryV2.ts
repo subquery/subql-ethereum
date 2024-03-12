@@ -27,13 +27,13 @@ import { GroupedEthereumProjectDs } from '../v1';
 import {
   RawEthBlock,
   EthDictionaryV2QueryEntry,
-  EthFatDictionaryTxConditions,
-  EthFatDictionaryLogConditions,
+  EthDictionaryTxConditions,
+  EthDictionaryLogConditions,
 } from './types';
-import { rawFatBlockToEthBlock } from './utils';
+import { rawBlockToEthBlock } from './utils';
 
-const MIN_FAT_FETCH_LIMIT = 200;
-const FAT_BLOCKS_QUERY_METHOD = `subql_filterBlocks`;
+const MIN_FETCH_LIMIT = 200;
+const BLOCKS_QUERY_METHOD = `subql_filterBlocks`;
 
 const logger = getLogger('eth-dictionary v2');
 
@@ -61,11 +61,11 @@ function extractOptionAddresses(
   return addressArray;
 }
 
-function callFilterToFatDictionaryCondition(
+function callFilterToDictionaryCondition(
   filter: EthereumTransactionFilter,
   dsOptions: SubqlEthereumProcessorOptions,
-): EthFatDictionaryTxConditions {
-  const txConditions: EthFatDictionaryTxConditions = {};
+): EthDictionaryTxConditions {
+  const txConditions: EthDictionaryTxConditions = {};
   const toArray = [];
   const fromArray = [];
   const funcArray = [];
@@ -103,11 +103,11 @@ function callFilterToFatDictionaryCondition(
   return txConditions;
 }
 
-function eventFilterToFatDictionaryCondition(
+function eventFilterToDictionaryCondition(
   filter: EthereumLogFilter,
   dsOptions: SubqlEthereumProcessorOptions | SubqlEthereumProcessorOptions[],
-): EthFatDictionaryLogConditions {
-  const logConditions: EthFatDictionaryLogConditions = {};
+): EthDictionaryLogConditions {
+  const logConditions: EthDictionaryLogConditions = {};
   logConditions.address = extractOptionAddresses(dsOptions);
   if (filter.topics) {
     for (let i = 0; i < Math.min(filter.topics.length, 4); i++) {
@@ -133,7 +133,7 @@ function eventFilterToFatDictionaryCondition(
 export function buildDictionaryV2QueryEntry(
   dataSources: GroupedEthereumProjectDs[],
 ): EthDictionaryV2QueryEntry {
-  const fatDictionaryConditions: EthDictionaryV2QueryEntry = {
+  const dictionaryConditions: EthDictionaryV2QueryEntry = {
     logs: [],
     transactions: [],
   };
@@ -141,11 +141,11 @@ export function buildDictionaryV2QueryEntry(
   for (const ds of dataSources) {
     for (const handler of ds.mapping.handlers) {
       // No filters, cant use dictionary
-      if (!handler.filter) return fatDictionaryConditions;
+      if (!handler.filter) return dictionaryConditions;
 
       switch (handler.kind) {
         case EthereumHandlerKind.Block:
-          return fatDictionaryConditions;
+          return dictionaryConditions;
         case EthereumHandlerKind.Call: {
           const filter = handler.filter as EthereumTransactionFilter;
           if (
@@ -153,8 +153,8 @@ export function buildDictionaryV2QueryEntry(
             filter.to !== undefined ||
             filter.function
           ) {
-            fatDictionaryConditions.transactions.push(
-              callFilterToFatDictionaryCondition(filter, ds.options),
+            dictionaryConditions.transactions.push(
+              callFilterToDictionaryCondition(filter, ds.options),
             );
           } else {
             // do nothing;
@@ -164,12 +164,12 @@ export function buildDictionaryV2QueryEntry(
         case EthereumHandlerKind.Event: {
           const filter = handler.filter as EthereumLogFilter;
           if (ds.groupedOptions) {
-            fatDictionaryConditions.logs.push(
-              eventFilterToFatDictionaryCondition(filter, ds.groupedOptions),
+            dictionaryConditions.logs.push(
+              eventFilterToDictionaryCondition(filter, ds.groupedOptions),
             );
           } else if (ds.options?.address || filter.topics) {
-            fatDictionaryConditions.logs.push(
-              eventFilterToFatDictionaryCondition(filter, ds.options),
+            dictionaryConditions.logs.push(
+              eventFilterToDictionaryCondition(filter, ds.options),
             );
           } else {
             // do nothing;
@@ -181,16 +181,16 @@ export function buildDictionaryV2QueryEntry(
     }
   }
 
-  if (!fatDictionaryConditions.logs.length) {
-    delete fatDictionaryConditions.logs;
+  if (!dictionaryConditions.logs.length) {
+    delete dictionaryConditions.logs;
   }
 
-  if (!fatDictionaryConditions.transactions.length) {
-    delete fatDictionaryConditions.transactions;
+  if (!dictionaryConditions.transactions.length) {
+    delete dictionaryConditions.transactions;
   }
 
   //TODO, unique
-  return fatDictionaryConditions;
+  return dictionaryConditions;
   // return uniqBy(
   //   allDictionaryConditions,
   //   (item) =>
@@ -255,7 +255,7 @@ export class EthDictionaryV2 extends DictionaryV2<
   async getData(
     startBlock: number,
     queryEndBlock: number,
-    limit = MIN_FAT_FETCH_LIMIT,
+    limit = MIN_FETCH_LIMIT,
   ): Promise<DictionaryResponse<IBlock<EthereumBlock>> | undefined> {
     const queryDetails = this.queriesMap?.getDetails(startBlock);
     const conditions = queryDetails?.value;
@@ -267,7 +267,7 @@ export class EthDictionaryV2 extends DictionaryV2<
 
     const requestData = {
       jsonrpc: '2.0',
-      method: FAT_BLOCKS_QUERY_METHOD,
+      method: BLOCKS_QUERY_METHOD,
       id: 1,
       params: [
         {
@@ -310,7 +310,7 @@ export class EthDictionaryV2 extends DictionaryV2<
         )}`,
       );
       // Handle the error as needed
-      throw new Error(`Fat dictionary get capacity failed ${error}`);
+      throw new Error(`dictionary get capability failed ${error}`);
     }
   }
 
@@ -320,7 +320,7 @@ export class EthDictionaryV2 extends DictionaryV2<
     try {
       const blocks: IBlock<EthereumBlock>[] = [];
       for (const block of (data as any).blocks) {
-        blocks.push(rawFatBlockToEthBlock(block));
+        blocks.push(rawBlockToEthBlock(block));
       }
       if (blocks.length !== 0) {
         return {

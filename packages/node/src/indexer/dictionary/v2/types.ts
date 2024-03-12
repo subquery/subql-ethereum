@@ -27,11 +27,11 @@ export interface RawEthBlock {
     parentBeaconBlockRoot: string;
     hash: string;
   };
-  transactions: RawEthFatTransaction[];
-  logs: RawEthFatLog[];
+  transactions: RawEthTransaction[];
+  logs: RawEthLog[];
 }
 
-export interface RawEthFatTransaction {
+export interface RawEthTransaction {
   type: string;
   nonce: bigint;
   to: string;
@@ -49,7 +49,7 @@ export interface RawEthFatTransaction {
   func: string;
 }
 
-export interface RawEthFatLog {
+export interface RawEthLog {
   address: string;
   topics: string[];
   data: string;
@@ -62,21 +62,21 @@ export interface RawEthFatLog {
 }
 
 /**
- * Eth Fat dictionary RPC request filter conditions
+ * Eth dictionary RPC request filter conditions
  */
 export interface EthDictionaryV2QueryEntry extends DictionaryV2QueryEntry {
-  logs: EthFatDictionaryLogConditions[];
-  transactions: EthFatDictionaryTxConditions[];
+  logs: EthDictionaryLogConditions[];
+  transactions: EthDictionaryTxConditions[];
 }
 
-export interface EthFatDictionaryLogConditions {
+export interface EthDictionaryLogConditions {
   address?: string[];
   topics0?: string[];
   topics1?: string[];
   topics2?: string[];
 }
 
-export interface EthFatDictionaryTxConditions {
+export interface EthDictionaryTxConditions {
   to?: string[];
   from?: string[];
   function?: string[];

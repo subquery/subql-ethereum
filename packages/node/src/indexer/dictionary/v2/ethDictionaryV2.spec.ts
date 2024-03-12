@@ -109,7 +109,7 @@ describe('eth dictionary v2', () => {
     );
   }, 5000000);
 
-  it('able to convert raw fatBlocks into eth blocks when getData', async () => {
+  it('able to convert raw v2 Blocks into eth blocks when getData', async () => {
     //Polygon
     const ethBlocks = await ethDictionaryV2.getData(
       3678215,

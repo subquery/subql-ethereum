@@ -11,15 +11,15 @@ import {
   formatTransaction,
 } from '../../../ethereum/utils.ethereum';
 import {
-  EthFatDictionaryLogConditions,
-  EthFatDictionaryTxConditions,
+  EthDictionaryLogConditions,
+  EthDictionaryTxConditions,
   RawEthBlock,
 } from './types';
 
 export function entryToTxConditions(
   conditions: DictionaryQueryCondition[],
-): EthFatDictionaryTxConditions {
-  const filter: EthFatDictionaryTxConditions = {};
+): EthDictionaryTxConditions {
+  const filter: EthDictionaryTxConditions = {};
   const toArray = [];
   const fromArray = [];
   const funcArray = [];
@@ -57,8 +57,8 @@ export function entryToTxConditions(
 
 export function entryToLogConditions(
   conditions: DictionaryQueryCondition[],
-): EthFatDictionaryLogConditions {
-  const filter: EthFatDictionaryLogConditions = {};
+): EthDictionaryLogConditions {
+  const filter: EthDictionaryLogConditions = {};
   const addressArray = [];
   const topicsArray = [];
   for (const condition of conditions) {
@@ -88,9 +88,7 @@ export function entryToLogConditions(
   }
 }
 
-export function rawFatBlockToEthBlock(
-  block: RawEthBlock,
-): IBlock<EthereumBlock> {
+export function rawBlockToEthBlock(block: RawEthBlock): IBlock<EthereumBlock> {
   try {
     const formatter = new Formatter();
 
@@ -113,9 +111,9 @@ export function rawFatBlockToEthBlock(
 
     return formatBlockUtil(ethBlock);
   } catch (e) {
-    console.log('rawFatBlockToEthBlock failed', e);
+    console.log('rawBlockToEthBlock failed', e);
     throw new Error(
-      `Convert fat block to Eth block failed at ${block.header.number},${e.message}`,
+      `Convert raw block to Eth block failed at ${block.header.number},${e.message}`,
     );
   }
 }
