@@ -1,4 +1,4 @@
-// Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
+// Copyright 2020-2024 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
 import { EventEmitter2 } from '@nestjs/event-emitter';
@@ -53,8 +53,14 @@ export class EthereumApiConnection
     blockConfirmations: number,
     fetchBlocksBatches: GetFetchFunc,
     eventEmitter: EventEmitter2,
+    unfinalizedBlocks: boolean,
   ): Promise<EthereumApiConnection> {
-    const api = new EthereumApi(endpoint, blockConfirmations, eventEmitter);
+    const api = new EthereumApi(
+      endpoint,
+      blockConfirmations,
+      eventEmitter,
+      unfinalizedBlocks,
+    );
 
     await api.init();
 

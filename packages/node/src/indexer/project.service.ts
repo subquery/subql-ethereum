@@ -1,4 +1,4 @@
-// Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
+// Copyright 2020-2024 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
 import { isMainThread } from 'worker_threads';
@@ -12,6 +12,7 @@ import {
   NodeConfig,
   IProjectUpgradeService,
   ApiService,
+  profiler,
 } from '@subql/node-core';
 import { Sequelize } from '@subql/x-sequelize';
 import {
@@ -29,7 +30,8 @@ const { version: packageVersion } = require('../../package.json');
 @Injectable()
 export class ProjectService extends BaseProjectService<
   EthereumApiService,
-  EthereumProjectDs
+  EthereumProjectDs,
+  UnfinalizedBlocksService
 > {
   protected packageVersion = packageVersion;
 
@@ -65,6 +67,11 @@ export class ProjectService extends BaseProjectService<
     );
   }
 
+  @profiler()
+  async init(startHeight?: number): Promise<void> {
+    return super.init(startHeight);
+  }
+
   protected async getBlockTimestamp(height: number): Promise<Date> {
     const block = await this.apiService.unsafeApi.api.getBlock(height);
 
@@ -74,5 +81,12 @@ export class ProjectService extends BaseProjectService<
   protected onProjectChange(project: SubqueryProject): void | Promise<void> {
     // TODO update this when implementing skipBlock feature for Eth
     this.apiService.updateBlockFetching();
+  }
+
+  protected async initUnfinalized(): Promise<number | undefined> {
+    return this.unfinalizedBlockService.init(
+      this.reindex.bind(this),
+      this.apiService.api.supportsFinalization,
+    );
   }
 }

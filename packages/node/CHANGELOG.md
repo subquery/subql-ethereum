@@ -5,8 +5,116 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- Op L1 fields to transaction receipts (#258)
+
+## [3.9.1] - 2024-03-09
+### Changed
+- Update `@subql/node-core` to 7.4.1 with bug fixes
+
+## [3.9.0] - 2024-03-06
+### Fixed
+- Add assertion on mismatched blockHash for getLogs and getBlocks (#252)
+- ### Changed
+- Update `@subql/node-core` to 7.4.0
+
+## [3.8.1] - 2024-03-01
+### Fixed
+- Update `@subql/node-core` to fix Poi generation issue with negative integer, also drop subscription triggers and notifiy_functions
+
+## [3.8.0] - 2024-02-23
+### Fixed
+- Remove unnecessary logging relating to light blocks (#249)
+
+### Changed
+- Updates to match changes in `@subql/node-core` to 7.3.0
+
+## [3.7.1] - 2024-02-07
+### Added
+- The ability to filter transactions with no input data (#243)
+
+### Fixed
+- Error handling for fetching dictionary chain aliases and switch to built in nodejs fetch (#247)
+- Critical bug introduced in 3.6.0 which broke historical indexing
+
+## [3.7.0] - 2024-01-30
+### Added
+- Special support for BEVM Canary (#241)
+
+## [3.6.0] - 2024-01-25
+### Changed
+- Update @subql/node-core with
+  - a performance fix when using modulo filters with other datasources
+  - support for CSV exports
+  - support for schema migrations
+
+## [3.5.2] - 2024-01-18
+### Fixed
+- Fix undefined on timestamp filter (#237)
+
+## [3.5.1] - 2024-01-10
+### Fixed
+- Update node-core with initialization query improvement
+
+## [3.5.0] - 2024-01-08
+### Added
+- Update with common-ethereum to support for Zilliqa addresses (#231)
+
+## [3.4.5] - 2024-01-04
+### Fixed
+- Timestamp filters not working (#229)
+
+### Changed
+- Update node-core with DB query fix
+
+## [3.4.4] - 2023-12-20
+### Fixed
+- Metadata lastProcessedHeight undefined issue via `@subql/node-core`
+
+## [3.4.3] - 2023-12-04
+### Fixed
+- Fix with after correct asset type (#223)
+
+## [3.4.2] - 2023-11-30
+### Fixed
+- Sync with `node-core` 7.0.2
+
+## [3.4.1] - 2023-11-28
+### Fixed
+- Fix ipfs deployment templates path failed to resolved, issue was introduced node-core 7.0.0
+- Update with node-core to fix network dictionary timeout but not fallback to config dictionary issue
+
+## [3.4.0] - 2023-11-27
+### Added
+- Update `@subql/node-core` with bug fixes
+- Different method for detecting block forks for chains with probabalistic finalization (#217)
+
+## [3.3.6] - 2023-11-23
+### Fixed
+- Ensure that the best block updates correctly when `unfinalized-blocks` is enabled. The issue was caused by using `getBestBlockHeight` with the wrong tag.(#215)
+
+## [3.3.5] - 2023-11-17
+### Fixed
+- `block-confirmations` arg being removed in recent sync with main SDK (#213)
+
+## [3.3.4] - 2023-11-16
+### Fixed
+- Sync with `node-core` 6.4.2, Fix incorrect enqueuedBlocks, dictionaries timing out by updating `@subql/apollo-links` (#212)
+
+## [3.3.3] - 2023-11-13
+### Changed
+- Updates to match changes in
+  - Dictionary service to use dictionary registry
+  - Use yargs from node core
+
+## [3.3.2] - 2023-11-08
+### Fixed
+- Fixed docker build pipeline, release to re-publish docker image(#207)
+
+## [3.3.1] - 2023-11-08
 ### Fixed
 - Getting transaction receipts when accessing via a log handler
+- transaction missing from log (#202)
 
 ## [3.3.0] - 2023-11-06
 ### Added
@@ -313,7 +421,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Init release
 
-[Unreleased]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/3.3.0...HEAD
+[Unreleased]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/3.9.1...HEAD
+[3.9.1]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/3.9.0...node-ethereum/3.9.1
+[3.9.0]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/3.8.1...node-ethereum/3.9.0
+[3.8.1]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/3.8.0...node-ethereum/3.8.1
+[3.8.0]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/3.7.1...node-ethereum/3.8.0
+[3.7.1]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/3.7.0...node-ethereum/3.7.1
+[3.7.0]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/3.6.0...node-ethereum/3.7.0
+[3.6.0]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/3.5.2...node-ethereum/3.6.0
+[3.5.2]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/3.5.1...node-ethereum/3.5.2
+[3.5.1]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/3.5.0...node-ethereum/3.5.1
+[3.5.0]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/3.4.5...node-ethereum/3.5.0
+[3.4.5]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/3.4.4...node-ethereum/3.4.5
+[3.4.4]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/3.4.3...node-ethereum/3.4.4
+[3.4.3]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/3.4.2...node-ethereum/3.4.3
+[3.4.2]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/3.4.1...node-ethereum/3.4.2
+[3.4.1]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/3.4.0...node-ethereum/3.4.1
+[3.4.0]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/3.3.6...node-ethereum/3.4.0
+[3.3.6]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/3.3.5...node-ethereum/3.3.6
+[3.3.5]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/3.3.4...node-ethereum/3.3.5
+[3.3.4]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/3.3.3...node-ethereum/3.3.4
+[3.3.3]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/3.3.2...node-ethereum/3.3.3
+[3.3.2]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/3.3.1...node-ethereum/3.3.2
+[3.3.1]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/3.3.0...node-ethereum/3.3.1
 [3.3.0]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/3.1.2...node-ethereum/3.3.0
 [3.1.2]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/3.1.1...node-ethereum/3.1.2
 [3.1.1]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/3.1.0...node-ethereum/3.1.1

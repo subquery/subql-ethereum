@@ -1,4 +1,4 @@
-// Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
+// Copyright 2020-2024 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
 import path from 'path';
@@ -50,7 +50,6 @@ export class WorkerBlockDispatcherService
     cacheService: InMemoryCacheService,
     storeService: StoreService,
     storeCacheService: StoreCacheService,
-    poiService: PoiService,
     poiSyncService: PoiSyncService,
     @Inject('ISubqueryProject') project: SubqueryProject,
     dynamicDsService: DynamicDsService,
@@ -65,7 +64,6 @@ export class WorkerBlockDispatcherService
       smartBatchService,
       storeService,
       storeCacheService,
-      poiService,
       poiSyncService,
       project,
       dynamicDsService,

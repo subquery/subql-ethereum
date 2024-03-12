@@ -1,4 +1,4 @@
-// Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
+// Copyright 2020-2024 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
 import { Module } from '@nestjs/common';
@@ -94,7 +94,6 @@ import { UnfinalizedBlocksService } from './unfinalizedBlocks.service';
         cacheService: InMemoryCacheService,
         storeService: StoreService,
         storeCacheService: StoreCacheService,
-        poiService: PoiService,
         poiSyncService: PoiSyncService,
         project: SubqueryProject,
         dynamicDsService: DynamicDsService,
@@ -111,7 +110,6 @@ import { UnfinalizedBlocksService } from './unfinalizedBlocks.service';
               cacheService,
               storeService,
               storeCacheService,
-              poiService,
               poiSyncService,
               project,
               dynamicDsService,
@@ -128,7 +126,6 @@ import { UnfinalizedBlocksService } from './unfinalizedBlocks.service';
               smartBatchService,
               storeService,
               storeCacheService,
-              poiService,
               poiSyncService,
               project,
               dynamicDsService,
@@ -144,7 +141,6 @@ import { UnfinalizedBlocksService } from './unfinalizedBlocks.service';
         InMemoryCacheService,
         StoreService,
         StoreCacheService,
-        PoiService,
         PoiSyncService,
         'ISubqueryProject',
         DynamicDsService,

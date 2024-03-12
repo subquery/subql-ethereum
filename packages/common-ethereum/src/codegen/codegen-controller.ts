@@ -1,8 +1,9 @@
-// Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
+// Copyright 2020-2024 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
 import fs from 'fs';
 import path from 'path';
+import {FileReference} from '@subql/types-core';
 import {SubqlRuntimeDatasource} from '@subql/types-ethereum';
 import {Data} from 'ejs';
 import {runTypeChain, glob, parseContractPath} from 'typechain';
@@ -26,12 +27,14 @@ export interface AbiRenderProps {
 export interface AbiInterface {
   name: string;
   type: 'event' | 'function';
-  inputs: {
-    internalType: string;
-    name: string;
-    type: string;
-  }[];
+  inputs: AbiInput[];
 }
+type AbiInput = {
+  internalType: string;
+  components?: AbiInput[];
+  name: string;
+  type: string;
+};
 
 function validateCustomDsDs(d: {kind: string}): boolean {
   return CUSTOM_EVM_HANDLERS.includes(d.kind);
@@ -43,6 +46,23 @@ export function joinInputAbiName(abiObject: AbiInterface): string {
   return `${abiObject.name}_${inputToSnake}_`;
 }
 
+function inputsToArgs(inputs: AbiInput[]): string {
+  const args = inputs
+    .map((input) => {
+      if (input.components) {
+        const inner = inputsToArgs(input.components);
+        if (input.type === 'tuple[]') {
+          return `${inner}[]`;
+        }
+        return inner;
+      }
+
+      return input.type.toLowerCase();
+    })
+    .join(',');
+  return `(${args})`;
+}
+
 export function prepareSortedAssets(
   datasources: SubqlRuntimeDatasource[],
   projectPath: string
@@ -51,8 +71,8 @@ export function prepareSortedAssets(
   datasources
     .filter((d) => !!d?.assets && (isRuntimeDs(d) || isCustomDs(d) || validateCustomDsDs(d)))
     .forEach((d) => {
-      Object.entries(d.assets).map(([name, value]) => {
-        // should do a if covert to absolute
+      const addAsset = (name: string, value: FileReference) => {
+        // should do if covert to absolute
         // if value.file is not absolute, the
         const filePath = path.join(projectPath, value.file);
         if (!fs.existsSync(filePath)) {
@@ -61,7 +81,17 @@ export function prepareSortedAssets(
         // We use actual abi file name instead on name provided in assets
         // This is aligning with files in './ethers-contracts'
         sortedAssets[parseContractPath(filePath).name] = value.file;
-      });
+      };
+
+      if (d.assets instanceof Map) {
+        for (const [name, value] of d.assets.entries()) {
+          addAsset(name, value);
+        }
+      } else {
+        Object.entries(d.assets).map(([name, value]) => {
+          addAsset(name, value as any);
+        });
+      }
     });
   return sortedAssets;
 }
@@ -108,7 +138,7 @@ export function prepareAbiJob(
         let typeName = abiObject.name;
         let functionName = abiObject.name;
         if (duplicateFunctionNames.includes(abiObject.name)) {
-          functionName = `${abiObject.name}(${abiObject.inputs.map((obj) => obj.type.toLowerCase()).join(',')})`;
+          functionName = `${abiObject.name}${inputsToArgs(abiObject.inputs)}`;
           typeName = joinInputAbiName(abiObject);
         }
         renderProps.functions.push({typeName, functionName});

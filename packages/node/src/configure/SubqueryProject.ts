@@ -1,4 +1,4 @@
-// Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
+// Copyright 2020-2024 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
 import assert from 'assert';
@@ -16,25 +16,33 @@ import {
   insertBlockFiltersCronSchedules,
   ISubqueryProject,
   loadProjectTemplates,
-  SubqlProjectDs,
 } from '@subql/node-core';
 import { ParentProject, Reader, RunnerSpecs } from '@subql/types-core';
 import {
   EthereumNetworkConfig,
   RuntimeDatasourceTemplate,
   CustomDatasourceTemplate,
+  EthereumBlockFilter,
 } from '@subql/types-ethereum';
 import { buildSchemaFromString } from '@subql/utils';
+import Cron from 'cron-converter';
 import { GraphQLSchema } from 'graphql';
 import { updateDatasourcesFlare } from '../utils/project';
 
 const { version: packageVersion } = require('../../package.json');
 
-export type EthereumProjectDs = SubqlProjectDs<SubqlEthereumDataSource>;
+export type EthereumProjectDs = SubqlEthereumDataSource;
 
 export type EthereumProjectDsTemplate =
-  | SubqlProjectDs<RuntimeDatasourceTemplate>
-  | SubqlProjectDs<CustomDatasourceTemplate>;
+  | RuntimeDatasourceTemplate
+  | CustomDatasourceTemplate;
+
+export type SubqlProjectBlockFilter = EthereumBlockFilter & {
+  cronSchedule?: {
+    schedule: Cron.Seeker;
+    next: number;
+  };
+};
 
 const NOT_SUPPORT = (name: string) => {
   throw new Error(`Manifest specVersion ${name} is not supported`);

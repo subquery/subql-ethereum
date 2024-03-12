@@ -1,4 +1,4 @@
-// Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
+// Copyright 2020-2024 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
 import { Inject, Injectable } from '@nestjs/common';
@@ -76,6 +76,7 @@ export class EthereumApiService extends ApiService<
           this.nodeConfig.blockConfirmations,
           this.fetchBlocksBatches,
           this.eventEmitter,
+          this.nodeConfig.unfinalizedBlocks,
         ),
       //eslint-disable-next-line @typescript-eslint/require-await
       async (connection: EthereumApiConnection) => {

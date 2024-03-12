@@ -5,6 +5,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- Make receipt method on transaction type generic for OP L1 fields support (#258)
+
+## [3.3.1] - 2024-02-07
+### Changed
+- Update `@subql/types-core`
+
+## [3.3.0] - 2024-02-02
+### Fixed
+- Fix Eth datasource miss extend base datasource type, missing `endBlock` in Datasource
+
+### Added
+- Transaction filter function field can now be null (#243)
+
+## [3.2.1] - 2023-11-30
+### Changed
+- Sync with `@subql/types-core` 0.4.0
 
 ## [3.2.0] - 2023-11-01
 ### Changed
@@ -83,7 +100,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Sync with main sdk (#14)
 
 ## [0.1.0] - 2022-10-31
-[Unreleased]: https://github.com/subquery/subql-ethereum/compare/types-ethereum/3.2.0...HEAD
+[Unreleased]: https://github.com/subquery/subql-ethereum/compare/types-ethereum/3.3.1...HEAD
+[3.3.1]: https://github.com/subquery/subql-ethereum/compare/types-ethereum/3.3.0...types-ethereum/3.3.1
+[3.3.0]: https://github.com/subquery/subql-ethereum/compare/types-ethereum/3.2.1...types-ethereum/3.3.0
+[3.2.1]: https://github.com/subquery/subql-ethereum/compare/types-ethereum/3.2.0...types-ethereum/3.2.1
 [3.2.0]: https://github.com/subquery/subql-ethereum/compare/types-ethereum/3.1.0...types-ethereum/3.2.0
 [3.1.0]: https://github.com/subquery/subql-ethereum/compare/types-ethereum/3.0.2...types-ethereum/3.1.0
 [3.0.2]: https://github.com/subquery/subql-ethereum/compare/types/3.0.1...types/3.0.2

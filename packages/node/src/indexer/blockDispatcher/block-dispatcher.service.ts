@@ -1,4 +1,4 @@
-// Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
+// Copyright 2020-2024 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
 import { Inject, Injectable, OnApplicationShutdown } from '@nestjs/common';
@@ -45,7 +45,6 @@ export class BlockDispatcherService
     smartBatchService: SmartBatchService,
     storeService: StoreService,
     storeCacheService: StoreCacheService,
-    poiService: PoiService,
     poiSyncService: PoiSyncService,
     @Inject('ISubqueryProject') project: SubqueryProject,
     dynamicDsService: DynamicDsService,
@@ -58,7 +57,6 @@ export class BlockDispatcherService
       smartBatchService,
       storeService,
       storeCacheService,
-      poiService,
       poiSyncService,
       project,
       dynamicDsService,

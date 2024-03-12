@@ -1,4 +1,4 @@
-// Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
+// Copyright 2020-2024 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
 import { IConfig, NodeConfig } from '@subql/node-core';
@@ -6,6 +6,7 @@ import { IConfig, NodeConfig } from '@subql/node-core';
 export interface IEthereumConfig extends IConfig {
   skipTransactions: boolean;
   blockConfirmations: number;
+  blockForkReindex: number;
 }
 
 export class EthereumNodeConfig extends NodeConfig<IEthereumConfig> {
@@ -31,5 +32,9 @@ export class EthereumNodeConfig extends NodeConfig<IEthereumConfig> {
 
   get blockConfirmations(): number {
     return this._config.blockConfirmations;
+  }
+
+  get blockForkReindex(): number {
+    return this._config.blockForkReindex;
   }
 }

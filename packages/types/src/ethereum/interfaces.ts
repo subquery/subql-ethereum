@@ -1,4 +1,4 @@
-// Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
+// Copyright 2020-2024 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
 import {BlockFilter} from '@subql/types-core';
@@ -27,8 +27,12 @@ export interface EthereumTransactionFilter {
    * The function sighash or function signature of the call. This is the first 32bytes of the data field
    * @example
    * function: 'setminimumStakingAmount(uint256 amount)',
+   * @example
+   * function: null, // This will filter transactions that have no input
+   * @example
+   * function: '0x, // This will filter transactions that have no input
    * */
-  function?: string;
+  function?: string | null;
 }
 
 /**
@@ -101,7 +105,10 @@ export type EthereumTransaction<T extends EthereumResult = EthereumResult> = {
   v: bigint;
   r: string;
   s: string;
-  receipt: () => Promise<EthereumReceipt>;
+  /**
+   * @return {EthereumReceipt} This return type is generic because some networks may return more fields such as OP based networks. This allows your to override the type easily
+   **/
+  receipt: <R extends EthereumReceipt = EthereumReceipt>() => Promise<R>;
   logs?: EthereumLog[];
   accessList?: string[];
   chainId?: string; // Hex string , example: "0x1"

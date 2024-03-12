@@ -6,6 +6,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.4.1] - 2024-02-23
+### Changed
+- version bump with `@subql/common`
+
+## [3.4.0] - 2024-02-07
+### Changed
+- Update `@subql/common`
+
+## [3.3.0] - 2024-02-02
+### Added
+- Transaction filter function field can now be null (#243)
+
+### Fixed
+- Codegen not matching typechain types with complex arguments (#244)
+
+## [3.2.0] - 2024-01-08
+### Added
+- Support for Zilliqa addresses (#231)
+
+## [3.1.2] - 2023-12-22
+### Fixed
+- Codegen when assets are either an object or map (#227)
+
+## [3.1.1] - 2023-12-20
+### Fixed
+- Correct asset type to map, also made update in codegen controller (#223)
+
+### Changed
+- Update @subql/common
+
 ## [3.1.0] - 2023-11-01
 ### Added
 - Update `@subql/common` and relevant changes to support endBlock feature (#195)
@@ -109,7 +139,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Sync with main sdk (#14)
 
 ## [0.1.0] - 2022-10-31
-[Unreleased]: https://github.com/subquery/subql-ethereum/compare/common-ethereum/3.1.0...HEAD
+[Unreleased]: https://github.com/subquery/subql-ethereum/compare/common-ethereum/3.4.1...HEAD
+[3.4.1]: https://github.com/subquery/subql-ethereum/compare/common-ethereum/3.4.0...common-ethereum/3.4.1
+[3.4.0]: https://github.com/subquery/subql-ethereum/compare/common-ethereum/3.3.0...common-ethereum/3.4.0
+[3.3.0]: https://github.com/subquery/subql-ethereum/compare/common-ethereum/3.2.0...common-ethereum/3.3.0
+[3.2.0]: https://github.com/subquery/subql-ethereum/compare/common-ethereum/3.1.2...common-ethereum/3.2.0
+[3.1.2]: https://github.com/subquery/subql-ethereum/compare/common-ethereum/3.1.1...common-ethereum/3.1.2
+[3.1.1]: https://github.com/subquery/subql-ethereum/compare/common-ethereum/3.1.0...common-ethereum/3.1.1
 [3.1.0]: https://github.com/subquery/subql-ethereum/compare/common-ethereum/3.0.6...common-ethereum/3.1.0
 [3.0.6]: https://github.com/subquery/subql-ethereum/compare/common-ethereum/3.0.5...common-ethereum/3.0.6
 [3.0.5]: https://github.com/subquery/subql-ethereum/compare/common-ethereum/3.0.4...common-ethereum/3.0.5

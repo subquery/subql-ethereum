@@ -1,4 +1,4 @@
-// Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
+// Copyright 2020-2024 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
 import path from 'path';
@@ -35,9 +35,9 @@ const ds: SubqlRuntimeDatasource = {
   kind: EthereumDatasourceKind.Runtime,
   startBlock: 16258633,
   options: { abi: 'erc721' },
-  assets: {
-    erc721: { file: path.join(__dirname, '../../test/erc721.json') },
-  } as unknown as Map<string, { file: string }>,
+  assets: new Map([
+    ['erc721', { file: path.join(__dirname, '../../test/erc721.json') }],
+  ]),
 };
 
 jest.setTimeout(90000);
@@ -73,6 +73,10 @@ describe('Api.ethereum', () => {
   it('should have the ability to get receipts via transactions from all types', () => {
     expect(typeof blockData.transactions[0].receipt).toEqual('function');
     expect(typeof blockData.logs[0].transaction.receipt).toEqual('function');
+    expect(typeof blockData.logs[0].transaction.from).toEqual('string');
+    expect(typeof blockData.transactions[81].logs[0].transaction.from).toEqual(
+      'string',
+    );
     expect(
       typeof blockData.transactions[81].logs[0].transaction.receipt,
     ).toEqual('function');
@@ -89,6 +93,17 @@ describe('Api.ethereum', () => {
     expect(parsedTx.logs[0].args).toBeTruthy();
   });
 
+  it('Should decode transaction data and not clone object', async () => {
+    const tx = blockData.transactions.find(
+      (e) =>
+        e.hash ===
+        '0x8e419d0e36d7f9c099a001fded516bd168edd9d27b4aec2bcd56ba3b3b955ccc',
+    );
+    const parsedTx = await ethApi.parseTransaction(tx, ds);
+
+    expect(parsedTx).toBe(tx);
+  });
+
   it('Should return raw logs, if decode fails', async () => {
     // not Erc721
     const tx = blockData.transactions.find(
@@ -99,6 +114,18 @@ describe('Api.ethereum', () => {
     const parsedLog = await ethApi.parseLog(tx.logs[0], ds);
     expect(parsedLog).not.toHaveProperty('args');
     expect(parsedLog).toBeTruthy();
+  });
+
+  // This test is here to ensure getters aren't removed
+  it('Should not clone logs when parsing args', async () => {
+    const log = blockData.transactions.find(
+      (e) =>
+        e.hash ===
+        '0x8e419d0e36d7f9c099a001fded516bd168edd9d27b4aec2bcd56ba3b3b955ccc',
+    ).logs[1];
+
+    const parsedLog = await ethApi.parseLog(log, ds);
+    expect(parsedLog).toBe(log);
   });
 
   it('Null filter support', async () => {
@@ -158,6 +185,33 @@ describe('Api.ethereum', () => {
 
     expect(erc20Transfers.length).toBe(7);
     expect(erc721Transfers.length).toBe(2);
+  });
+
+  it('Null and 0x (empty) filter support for transaction data', async () => {
+    const beamEndpoint = 'https://mainnet.base.org/';
+    ethApi = new EthereumApi(beamEndpoint, BLOCK_CONFIRMATIONS, eventEmitter);
+    await ethApi.init();
+    blockData = await fetchBlock(1104962);
+    // blockData.transactions[0].to = undefined;
+    const result = blockData.transactions.filter((tx) => {
+      if (filterTransactionsProcessor(tx, { function: null })) {
+        return tx.hash;
+      }
+    });
+    expect(result.length).toBe(1);
+    expect(result[0].hash).toBe(
+      '0x182c5381f8fa3332a7bd676b1c819a15119972db52bd5210afead88f18fff642',
+    );
+
+    const result2 = blockData.transactions.filter((tx) => {
+      if (filterTransactionsProcessor(tx, { function: '0x' })) {
+        return tx.hash;
+      }
+    });
+    expect(result2.length).toBe(1);
+    expect(result2[0].hash).toBe(
+      '0x182c5381f8fa3332a7bd676b1c819a15119972db52bd5210afead88f18fff642',
+    );
   });
 
   it('Null filter support, for undefined transaction.to', async () => {
@@ -274,5 +328,32 @@ describe('Api.ethereum', () => {
     await ethApi.init();
 
     expect((ethApi as any).supportsFinalized).toBeFalsy();
+  });
+  it('Assert blockHash on logs and block', async () => {
+    ethApi = new EthereumApi(
+      'https://rpc.ankr.com/xdc',
+      BLOCK_CONFIRMATIONS,
+      eventEmitter,
+    );
+    await ethApi.init();
+
+    const mockBlockNumber = 72194336;
+    const mockBlockHash = 'mockBlockHash';
+    const mockIncorrectBlockHash = 'mockIncorrectBlockHash';
+
+    jest.spyOn(ethApi as any, 'getBlockPromise').mockResolvedValueOnce({
+      hash: mockBlockHash,
+      transactions: [],
+    });
+
+    jest
+      .spyOn((ethApi as any).client, 'getLogs')
+      .mockResolvedValueOnce([
+        { blockHash: mockIncorrectBlockHash, transactionHash: 'tx1' },
+      ]);
+
+    await expect(ethApi.fetchBlock(mockBlockNumber)).rejects.toThrow(
+      `Log BlockHash does not match block: ${mockBlockNumber}`,
+    );
   });
 });

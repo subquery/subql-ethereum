@@ -1,4 +1,4 @@
-// Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
+// Copyright 2020-2024 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
 import {BaseDataSource} from '@subql/common';
@@ -35,6 +35,7 @@ import {
   ValidationArguments,
 } from 'class-validator';
 import {SubqlEthereumDatasourceKind, SubqlEthereumHandlerKind, SubqlEthereumProcessorOptions} from './types';
+import {IsEthereumOrZilliqaAddress} from './utils';
 
 export class BlockFilter implements EthereumBlockFilter {
   @IsOptional()
@@ -60,7 +61,7 @@ export class TransactionFilter implements EthereumTransactionFilter {
   to?: string;
   @IsOptional()
   @IsString()
-  function?: string;
+  function?: string | null;
 }
 
 export function forbidNonWhitelisted(keys: any, validationOptions?: ValidationOptions) {
@@ -176,7 +177,7 @@ export class EthereumProcessorOptions implements SubqlEthereumProcessorOptions {
   @IsString()
   abi?: string;
   @IsOptional()
-  @IsEthereumAddress()
+  @IsEthereumOrZilliqaAddress()
   address?: string;
 }
 
@@ -191,6 +192,8 @@ export class RuntimeDataSourceBase<M extends SubqlMapping<SubqlRuntimeHandler>>
   @Type(() => EthereumMapping)
   @ValidateNested()
   mapping: M;
+  @Type(() => FileReferenceImpl)
+  @ValidateNested({each: true})
   @IsOptional()
   assets?: Map<string, FileReference>;
   @IsOptional()

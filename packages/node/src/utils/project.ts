@@ -1,4 +1,4 @@
-// Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
+// Copyright 2020-2024 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
 import fs from 'fs';
@@ -65,51 +65,31 @@ export async function updateDatasourcesFlare(
   root: string,
 ): Promise<EthereumProjectDs[]> {
   // Cast to any to make types happy
-  const partialUpdate = await Promise.all(
-    _dataSources.map(async (dataSource) => {
-      if ((dataSource.kind as string) === 'flare/Runtime') {
-        dataSource.kind = EthereumDatasourceKind.Runtime;
-      }
-      dataSource.mapping.handlers = dataSource.mapping.handlers.map(
-        (handler) => {
-          switch (handler.kind as string) {
-            case 'flare/BlockHandler': {
-              handler.kind = EthereumHandlerKind.Block;
-              break;
-            }
-            case 'flare/TransactionHandler': {
-              handler.kind = EthereumHandlerKind.Call;
-              break;
-            }
-            case 'flare/LogHandler': {
-              handler.kind = EthereumHandlerKind.Event;
-              break;
-            }
-            default:
-          }
-          return handler;
-        },
-      );
-
-      if (dataSource.assets) {
-        for (const [, asset] of Object.entries(dataSource.assets)) {
-          if (reader instanceof LocalReader) {
-            asset.file = path.resolve(root, asset.file);
-          } else {
-            const res = await reader.getFile(asset.file);
-            const outputPath = path.resolve(
-              root,
-              asset.file.replace('ipfs://', ''),
-            );
-            await fs.promises.writeFile(outputPath, res as string);
-            asset.file = outputPath;
-          }
+  const partialUpdate = _dataSources.map((dataSource) => {
+    if ((dataSource.kind as string) === 'flare/Runtime') {
+      dataSource.kind = EthereumDatasourceKind.Runtime;
+    }
+    dataSource.mapping.handlers = dataSource.mapping.handlers.map((handler) => {
+      switch (handler.kind as string) {
+        case 'flare/BlockHandler': {
+          handler.kind = EthereumHandlerKind.Block;
+          break;
         }
+        case 'flare/TransactionHandler': {
+          handler.kind = EthereumHandlerKind.Call;
+          break;
+        }
+        case 'flare/LogHandler': {
+          handler.kind = EthereumHandlerKind.Event;
+          break;
+        }
+        default:
       }
+      return handler;
+    });
 
-      return dataSource;
-    }),
-  );
+    return dataSource;
+  });
 
   return updateDataSourcesV1_0_0(partialUpdate, reader, root, isCustomDs);
 }

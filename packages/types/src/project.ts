@@ -1,4 +1,4 @@
-// Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
+// Copyright 2020-2024 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
 import {
@@ -9,6 +9,7 @@ import {
   FileReference,
   Processor,
   ProjectManifestV1_0_0,
+  BaseDataSource,
 } from '@subql/types-core';
 import {
   EthereumBlock,
@@ -159,7 +160,7 @@ export interface SubqlMapping<T extends SubqlHandler = SubqlHandler> extends Fil
  * @interface
  * @template M - The mapping type for the datasource.
  */
-interface ISubqlDatasource<M extends SubqlMapping> {
+interface ISubqlDatasource<M extends SubqlMapping> extends BaseDataSource {
   /**
    * The kind of the datasource.
    * @type {string}

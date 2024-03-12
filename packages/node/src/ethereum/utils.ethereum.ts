@@ -1,4 +1,4 @@
-// Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
+// Copyright 2020-2024 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
 import { getAddress } from '@ethersproject/address';
@@ -134,10 +134,10 @@ export function formatTransaction(
   } as EthereumTransaction;
 }
 
-export function formatReceipt(
+export function formatReceipt<R extends EthereumReceipt = EthereumReceipt>(
   receipt: Record<string, any>,
   block: EthereumBlock,
-): EthereumReceipt {
+): R {
   return {
     ...receipt,
     from: handleAddress(receipt.from),
@@ -152,5 +152,5 @@ export function formatReceipt(
     toJSON(): string {
       return JSON.stringify(omit(this, ['toJSON']));
     },
-  } as unknown as EthereumReceipt;
+  } as unknown as R;
 }

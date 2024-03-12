@@ -1,6 +1,7 @@
-// Copyright 2020-2023 SubQuery Pte Ltd authors & contributors
+// Copyright 2020-2024 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
+import assert from 'assert';
 import fs from 'fs';
 import http from 'http';
 import https from 'https';
@@ -27,11 +28,14 @@ import {
 import CacheableLookup from 'cacheable-lookup';
 import { hexDataSlice, hexValue } from 'ethers/lib/utils';
 import { retryOnFailEth } from '../utils/project';
-import { CeloJsonRpcBatchProvider } from './ethers/celo/celo-json-rpc-batch-provider';
-import { CeloJsonRpcProvider } from './ethers/celo/celo-json-rpc-provider';
-import { CeloWsProvider } from './ethers/celo/celo-ws-provider';
+import {
+  CeloJsonRpcBatchProvider,
+  CeloJsonRpcProvider,
+  CeloWsProvider,
+} from './ethers/celo/celo-provider';
 import { JsonRpcBatchProvider } from './ethers/json-rpc-batch-provider';
 import { JsonRpcProvider } from './ethers/json-rpc-provider';
+import { OPFormatterMixin } from './ethers/op/op-provider';
 import { ConnectionInfo } from './ethers/web';
 import SafeEthProvider from './safe-api';
 import {
@@ -55,7 +59,7 @@ async function loadAssets(
   }
   const res: Record<string, string> = {};
 
-  for (const [name, { file }] of Object.entries(ds.assets)) {
+  for (const [name, { file }] of ds.assets.entries()) {
     try {
       res[name] = await fs.promises.readFile(file, { encoding: 'utf8' });
     } catch (e) {
@@ -99,7 +103,11 @@ export class EthereumApi implements ApiWrapper {
   private name: string;
 
   // Ethereum POS
-  private supportsFinalization = true;
+  private _supportsFinalization = true;
+
+  get supportsFinalization(): boolean {
+    return this._supportsFinalization;
+  }
 
   /**
    * @param {string} endpoint - The endpoint of the RPC provider
@@ -110,6 +118,7 @@ export class EthereumApi implements ApiWrapper {
     private endpoint: string,
     private blockConfirmations: number,
     private eventEmitter: EventEmitter2,
+    private unfinalizedBlocks = false,
   ) {
     const { hostname, protocol, searchParams } = new URL(endpoint);
 
@@ -130,10 +139,10 @@ export class EthereumApi implements ApiWrapper {
       searchParams.forEach((value, name, searchParams) => {
         (connection.headers as any)[name] = value;
       });
-      this.client = new JsonRpcBatchProvider(connection);
-      this.nonBatchClient = new JsonRpcProvider(connection);
+      this.client = new (OPFormatterMixin(JsonRpcBatchProvider))(connection);
+      this.nonBatchClient = new (OPFormatterMixin(JsonRpcProvider))(connection);
     } else if (protocolStr === 'ws' || protocolStr === 'wss') {
-      this.client = new WebSocketProvider(this.endpoint);
+      this.client = new (OPFormatterMixin(WebSocketProvider))(this.endpoint);
     } else {
       throw new Error(`Unsupported protocol: ${protocol}`);
     }
@@ -157,13 +166,13 @@ export class EthereumApi implements ApiWrapper {
     try {
       const [genesisBlock, supportsFinalization, supportsSafe] =
         await Promise.all([
-          this.client.getBlock('earliest'),
+          this.getGenesisBlock(network.chainId),
           this.getSupportsTag('finalized'),
           this.getSupportsTag('safe'),
         ]);
 
       this.genesisBlock = genesisBlock;
-      this.supportsFinalization = supportsFinalization && supportsSafe;
+      this._supportsFinalization = supportsFinalization && supportsSafe;
       this.chainId = network.chainId;
       this.name = network.name;
     } catch (e) {
@@ -205,6 +214,20 @@ export class EthereumApi implements ApiWrapper {
     });
   }
 
+  private async getGenesisBlock(chainId: number): Promise<Block> {
+    const tag = () => {
+      switch (chainId) {
+        // BEVM Canary
+        case 1501:
+          return 4157986;
+        default:
+          return 'earliest';
+      }
+    };
+
+    return this.client.getBlock(tag());
+  }
+
   async getFinalizedBlock(): Promise<Block> {
     const height = this.supportsFinalization
       ? 'finalized'
@@ -226,7 +249,11 @@ export class EthereumApi implements ApiWrapper {
   async getBestBlockHeight(): Promise<number> {
     // Cronos "safe" tag doesn't currently work as indended
     const tag =
-      this.supportsFinalization && this.chainId !== 25 ? 'safe' : 'latest';
+      !this.unfinalizedBlocks &&
+      this.supportsFinalization &&
+      this.chainId !== 25
+        ? 'safe'
+        : 'latest';
     return (await this.client.getBlock(tag)).number;
   }
 
@@ -284,6 +311,14 @@ export class EthereumApi implements ApiWrapper {
       const logsRaw = await this.client.getLogs({
         blockHash: block.block.hash,
       });
+
+      // Certain RPC may not accommodate for blockHash, and would return wrong logs
+      if (logsRaw.length) {
+        assert(
+          logsRaw.every((l) => l.blockHash === block.block.hash),
+          `Log BlockHash does not match block: ${blockNumber}`,
+        );
+      }
 
       block.block.logs = logsRaw.map((l) => formatLog(l, block.block));
       block.block.transactions = block.block.transactions.map((tx) => ({
@@ -403,7 +438,9 @@ export class EthereumApi implements ApiWrapper {
   ): Promise<EthereumTransaction<T> | EthereumTransaction> {
     try {
       if (!ds?.options?.abi) {
-        logger.warn('No ABI provided for datasource');
+        if (transaction.input !== '0x') {
+          logger.warn('No ABI provided for datasource');
+        }
         return transaction;
       }
       const assets = await loadAssets(ds);
