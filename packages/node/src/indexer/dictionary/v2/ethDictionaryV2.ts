@@ -245,73 +245,17 @@ export class EthDictionaryV2 extends DictionaryV2<
     return buildDictionaryV2QueryEntry(filteredDs);
   }
 
-  /**
-   *
-   * @param startBlock
-   * @param queryEndBlock this block number will limit the max query range, increase dictionary query speed
-   * @param batchSize
-   * @param conditions
-   */
+  // eslint-disable-next-line @typescript-eslint/require-await
   async getData(
     startBlock: number,
-    queryEndBlock: number,
-    limit = MIN_FETCH_LIMIT,
-  ): Promise<DictionaryResponse<IBlock<EthereumBlock>> | undefined> {
-    const queryDetails = this.queriesMap?.getDetails(startBlock);
-    const conditions = queryDetails?.value;
-    // queryEndBlock = this.metadata.end;
-
-    if (!conditions) {
-      return undefined;
-    }
-
-    const requestData = {
-      jsonrpc: '2.0',
-      method: BLOCKS_QUERY_METHOD,
-      id: 1,
-      params: [
-        {
-          fromBlock: utils.hexValue(startBlock),
-          toBlock: utils.hexValue(queryEndBlock),
-          limit: utils.hexValue(limit),
-          blockFilter: conditions,
-          fieldSelector: {
-            blockHeader: true,
-            logs: { transaction: true },
-            transactions: { log: true },
-          },
-        },
-      ],
-    };
-
-    try {
-      const response = await this.dictionaryApi.post<{
-        result?: RawDictionaryResponseData<RawEthBlock>;
-        error?: { code: number; message: string };
-      }>(this.dictionaryEndpoint, requestData, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      if (response.data.error) {
-        throw new Error(response.data.error.message);
-      }
-
-      const ethBlocks = this.convertResponseBlocks(response.data.result);
-      this.metadata.end = response.data.result.BlockRange[1];
-      return ethBlocks;
-    } catch (error) {
-      logger.error(
-        error,
-        `Dictionary query failed. request: ${JSON.stringify(
-          requestData,
-          null,
-          2,
-        )}`,
-      );
-      // Handle the error as needed
-      throw new Error(`dictionary get capability failed ${error}`);
-    }
+    endBlock: number,
+    limit: number = MIN_FETCH_LIMIT,
+  ): Promise<DictionaryResponse<IBlock<EthereumBlock> | number> | undefined> {
+    return super.getData(startBlock, endBlock, limit, {
+      blockHeader: true,
+      logs: { transaction: true },
+      transactions: { log: true },
+    });
   }
 
   convertResponseBlocks<RFB = RawEthBlock>(

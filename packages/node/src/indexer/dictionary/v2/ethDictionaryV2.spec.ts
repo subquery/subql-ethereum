@@ -1,7 +1,12 @@
 // Copyright 2020-2024 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
-import { NodeConfig, BlockHeightMap } from '@subql/node-core';
+import {
+  NodeConfig,
+  BlockHeightMap,
+  IBlock,
+  DictionaryResponse,
+} from '@subql/node-core';
 import {
   EthereumBlock,
   EthereumDatasourceKind,
@@ -83,11 +88,11 @@ describe('eth dictionary v2', () => {
 
   it('query response match with entries', async () => {
     //Polygon
-    const ethBlocks = await ethDictionaryV2.getData(
+    const ethBlocks = (await ethDictionaryV2.getData(
       3678215,
       (ethDictionaryV2 as any)._metadata.end,
       2,
-    );
+    )) as DictionaryResponse<IBlock<EthereumBlock>>;
 
     expect(ethBlocks.batchBlocks.map((b) => b.block.number)).toStrictEqual([
       3678215, 3678250,
@@ -111,11 +116,11 @@ describe('eth dictionary v2', () => {
 
   it('able to convert raw v2 Blocks into eth blocks when getData', async () => {
     //Polygon
-    const ethBlocks = await ethDictionaryV2.getData(
+    const ethBlocks = (await ethDictionaryV2.getData(
       3678215,
       (ethDictionaryV2 as any)._metadata.end,
       2,
-    );
+    )) as DictionaryResponse<IBlock<EthereumBlock>>;
 
     expect(ethBlocks.batchBlocks[0].block.number).toStrictEqual(3678215);
     expect(ethBlocks.lastBufferedHeight).toStrictEqual(3678250);

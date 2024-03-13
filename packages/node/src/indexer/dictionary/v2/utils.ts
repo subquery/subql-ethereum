@@ -92,6 +92,9 @@ export function rawBlockToEthBlock(block: RawEthBlock): IBlock<EthereumBlock> {
   try {
     const formatter = new Formatter();
 
+    // Add gasLimit to each transaction from the block header
+    block.transactions.map((tx) => (tx.gasLimit = block.header.gasLimit));
+
     const ethBlock = formatter.blockWithTransactions({
       ...block.header,
       transactions: block.transactions,

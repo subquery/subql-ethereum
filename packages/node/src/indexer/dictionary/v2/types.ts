@@ -47,6 +47,7 @@ export interface RawEthTransaction {
   hash: string;
   from: string;
   func: string;
+  gasLimit: bigint;
 }
 
 export interface RawEthLog {
