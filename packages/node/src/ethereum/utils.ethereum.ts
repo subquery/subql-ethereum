@@ -13,6 +13,7 @@ import {
   EthereumReceipt,
   EthereumResult,
   EthereumTransaction,
+  LightEthereumBlock,
 } from '@subql/types-ethereum';
 import { omit } from 'lodash';
 import { BlockContent } from '../indexer/types';
@@ -62,7 +63,9 @@ export function formatBlock(block: Record<string, any>): EthereumBlock {
   } as EthereumBlock;
 }
 
-export function formatBlockUtil(block: EthereumBlock): IBlock<EthereumBlock> {
+export function formatBlockUtil<
+  B extends EthereumBlock | LightEthereumBlock = EthereumBlock,
+>(block: B): IBlock<B> {
   return {
     block,
     getHeader: () => {

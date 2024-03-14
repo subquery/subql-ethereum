@@ -63,10 +63,6 @@ export class BlockDispatcherService
     );
   }
 
-  onApplicationShutdown(signal?: string) {
-    throw new Error('Method not implemented.');
-  }
-
   protected async indexBlock(
     block: IBlock<BlockContent>,
   ): Promise<ProcessBlockResponse> {
