@@ -68,13 +68,7 @@ export function formatBlockUtil<
 >(block: B): IBlock<B> {
   return {
     block,
-    getHeader: () => {
-      return {
-        blockHash: block.hash,
-        blockHeight: block.number,
-        parentHash: block.parentHash,
-      };
-    },
+    getHeader: () => ethereumBlockToHeader(block),
   };
 }
 
