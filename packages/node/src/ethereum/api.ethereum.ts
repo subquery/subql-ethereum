@@ -320,7 +320,7 @@ export class EthereumApi implements ApiWrapper {
       }
 
       block.logs = logsRaw.map((l) => formatLog(l, block));
-      block.block.transactions = block.transactions.map((tx) => ({
+      block.transactions = block.transactions.map((tx) => ({
         ...formatTransaction(tx, block),
         receipt: () =>
           this.getTransactionReceipt(tx.hash).then((r) =>
