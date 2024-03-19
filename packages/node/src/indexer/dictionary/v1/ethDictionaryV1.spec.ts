@@ -12,7 +12,6 @@ import {
   EthereumProjectDsTemplate,
   SubqueryProject,
 } from '../../../configure/SubqueryProject';
-import { FetchService } from '../../fetch.service';
 import {
   buildDictionaryV1QueryEntries,
   EthDictionaryV1,
@@ -406,19 +405,6 @@ describe('buildDictionaryV1QueryEntries', () => {
         HTTP_ENDPOINT,
         dataSources,
         mockTempDs,
-      );
-
-      const fetchService = new FetchService(
-        null,
-        null,
-        null,
-        project,
-        null,
-        null,
-        null,
-        null,
-        null,
-        null,
       );
 
       const queryEntry = buildDictionaryV1QueryEntries(dataSources);

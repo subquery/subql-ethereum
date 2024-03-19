@@ -144,7 +144,7 @@ describe('eth dictionary v2', () => {
   }, 5000000);
 });
 
-describe('Log filters', () => {
+describe('buildDictionaryV2QueryEntry', () => {
   it('Build filter for !null', () => {
     const ds: SubqlRuntimeDatasource = {
       kind: EthereumDatasourceKind.Runtime,
@@ -182,6 +182,71 @@ describe('Log filters', () => {
             '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
           ],
           topics3: [],
+        },
+      ],
+    });
+  });
+
+  it('should unique QueryEntry for duplicate dataSources', () => {
+    const ds: SubqlRuntimeDatasource = {
+      kind: EthereumDatasourceKind.Runtime,
+      assets: new Map(),
+      options: {
+        abi: 'erc20',
+        address: '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619',
+      },
+      startBlock: 1,
+      mapping: {
+        file: '',
+        handlers: [
+          {
+            handler: 'handleLog',
+            kind: EthereumHandlerKind.Event,
+            filter: {
+              topics: ['Transfer(address, address, uint256)'],
+            },
+          },
+          {
+            handler: 'handleLogSame',
+            kind: EthereumHandlerKind.Event,
+            filter: {
+              topics: ['Transfer(address, address, uint256)'],
+            },
+          },
+          {
+            handler: 'handleTx',
+            kind: EthereumHandlerKind.Call,
+            filter: {
+              function: 'setminimumStakingAmount(uint256 amount)',
+              from: 'mockAddress',
+            },
+          },
+          {
+            handler: 'handleTxSame',
+            kind: EthereumHandlerKind.Call,
+            filter: {
+              function: 'setminimumStakingAmount(uint256 amount)',
+              from: 'mockAddress',
+            },
+          },
+        ],
+      },
+    };
+    const result = buildDictionaryV2QueryEntry([ds]);
+
+    expect(result).toEqual({
+      logs: [
+        {
+          address: ['0x7ceb23fd6bc0add59e62ac25578270cff1b9f619'],
+          topics0: [
+            '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
+          ],
+        },
+      ],
+      transactions: [
+        {
+          from: ['mockaddress'],
+          function: ['0x7ef9ea98'],
         },
       ],
     });

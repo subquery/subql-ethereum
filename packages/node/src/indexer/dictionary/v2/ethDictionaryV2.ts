@@ -18,7 +18,7 @@ import {
   SubqlDatasource,
   SubqlEthereumProcessorOptions,
 } from '@subql/types-ethereum';
-import { utils } from 'ethers';
+import { isEqual, uniqBy } from 'lodash';
 import { SubqueryProject } from '../../../configure/SubqueryProject';
 import { eventToTopic, functionToSighash } from '../../../utils/string';
 import { yargsOptions } from '../../../yargs';
@@ -33,7 +33,6 @@ import {
 import { rawBlockToEthBlock } from './utils';
 
 const MIN_FETCH_LIMIT = 200;
-const BLOCKS_QUERY_METHOD = `subql_filterBlocks`;
 
 const logger = getLogger('eth-dictionary v2');
 
@@ -183,21 +182,19 @@ export function buildDictionaryV2QueryEntry(
 
   if (!dictionaryConditions.logs.length) {
     delete dictionaryConditions.logs;
+  } else {
+    dictionaryConditions.logs = uniqBy(dictionaryConditions.logs, isEqual);
   }
 
   if (!dictionaryConditions.transactions.length) {
     delete dictionaryConditions.transactions;
+  } else {
+    dictionaryConditions.transactions = uniqBy(
+      dictionaryConditions.transactions,
+      isEqual,
+    );
   }
-
-  //TODO, unique
   return dictionaryConditions;
-  // return uniqBy(
-  //   allDictionaryConditions,
-  //   (item) =>
-  //     `${item}|${JSON.stringify(
-  //       sortBy(item.conditions, (c) => c.field),
-  //     )}`,
-  // );
 }
 
 export class EthDictionaryV2 extends DictionaryV2<
