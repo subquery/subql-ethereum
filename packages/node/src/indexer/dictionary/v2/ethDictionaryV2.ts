@@ -262,21 +262,15 @@ export class EthDictionaryV2 extends DictionaryV2<
     data: RawDictionaryResponseData<RFB>,
   ): DictionaryResponse<IBlock<EthereumBlock>> | undefined {
     try {
-      const blocks: IBlock<EthereumBlock>[] = [];
-      for (const block of (data as any).blocks) {
-        blocks.push(rawBlockToEthBlock(block));
-      }
-      if (blocks.length !== 0) {
-        return {
-          batchBlocks: blocks,
-          lastBufferedHeight: blocks[blocks.length - 1].block.number,
-        };
-      } else {
-        return {
-          batchBlocks: [],
-          lastBufferedHeight: undefined, // TODO is this correct?
-        };
-      }
+      const blocks: IBlock<EthereumBlock>[] = (
+        (data.blocks as RawEthBlock[]) || []
+      ).map(rawBlockToEthBlock);
+      return {
+        batchBlocks: blocks,
+        lastBufferedHeight: blocks.length
+          ? blocks[blocks.length - 1].block.number
+          : undefined,
+      };
     } catch (e) {
       logger.error(
         e,

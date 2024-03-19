@@ -5,6 +5,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { NETWORK_FAMILY } from '@subql/common';
 import { NodeConfig, DictionaryService } from '@subql/node-core';
+import { IProjectNetworkConfig } from '@subql/types-core';
 import { EthereumBlock, SubqlDatasource } from '@subql/types-ethereum';
 import { SubqueryProject } from '../../configure/SubqueryProject';
 import { EthDictionaryV1 } from './v1';
@@ -22,19 +23,11 @@ export class EthDictionaryService extends DictionaryService<
     if (!this.project) {
       throw new Error(`Project in Dictionary service not initialized `);
     }
-    const registryDictionaries = await this.resolveDictionary(
-      NETWORK_FAMILY.substrate,
-      this.project.network.chainId,
-      this.nodeConfig.dictionaryRegistry,
-    );
 
-    const dictionaryEndpoints: string[] = (
-      !Array.isArray(this.project.network.dictionary)
-        ? !this.project.network.dictionary
-          ? []
-          : [this.project.network.dictionary]
-        : this.project.network.dictionary
-    ).concat(registryDictionaries);
+    const dictionaryEndpoints = await this.getDictionaryEndpoints(
+      NETWORK_FAMILY.substrate,
+      this.project.network,
+    );
 
     for (const endpoint of dictionaryEndpoints) {
       try {
@@ -56,10 +49,9 @@ export class EthDictionaryService extends DictionaryService<
       // future resolver should a URL, and fetched from registryDictionaries
       dictionaryV1Endpoints = dictionaryV1Endpoints.concat([undefined]);
     }
-    // v2 should be prioritised
-    this.init([
-      ...dictionariesV2,
-      ...(await Promise.all(
+
+    const dictionariesV1 = (
+      await Promise.allSettled(
         dictionaryV1Endpoints.map((endpoint) =>
           EthDictionaryV1.create(
             this.project,
@@ -68,10 +60,39 @@ export class EthDictionaryService extends DictionaryService<
             endpoint,
           ),
         ),
-      )),
-    ]);
+      )
+    )
+      .map((r) => {
+        if (r.status === 'fulfilled') {
+          return r.value;
+        }
+      })
+      .filter((value) => value !== undefined);
+
+    // v2 should be prioritised
+    this.init([...dictionariesV2, ...dictionariesV1]);
   }
 
+  // TODO, this is moved to node-core, import from there
+  protected async getDictionaryEndpoints(
+    networkFamily: NETWORK_FAMILY,
+    network: IProjectNetworkConfig,
+  ): Promise<string[]> {
+    const registryDictionaries = await this.resolveDictionary(
+      networkFamily,
+      network.chainId,
+      this.nodeConfig.dictionaryRegistry,
+    );
+
+    const dictionaryEndpoints: string[] = (
+      !Array.isArray(network.dictionary)
+        ? !network.dictionary
+          ? []
+          : [network.dictionary]
+        : network.dictionary
+    ).concat(registryDictionaries);
+    return dictionaryEndpoints;
+  }
   constructor(
     @Inject('ISubqueryProject') protected project: SubqueryProject,
     nodeConfig: NodeConfig,

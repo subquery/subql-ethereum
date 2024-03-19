@@ -11,12 +11,16 @@ import {
   EthereumBlock,
   EthereumDatasourceKind,
   EthereumHandlerKind,
+  SubqlRuntimeDatasource,
 } from '@subql/types-ethereum';
 import {
   EthereumProjectDs,
   SubqueryProject,
 } from '../../../configure/SubqueryProject';
-import { EthDictionaryV2 } from './ethDictionaryV2';
+import {
+  buildDictionaryV2QueryEntry,
+  EthDictionaryV2,
+} from './ethDictionaryV2';
 
 const HTTP_ENDPOINT = 'https://polygon.api.onfinality.io/public';
 const mockDs: EthereumProjectDs[] = [
@@ -138,4 +142,48 @@ describe('eth dictionary v2', () => {
     // https://polygonscan.com/tx/0xb1b5f7882fa8d62d3650948c08066e928b7b5c9d607d2fe8c7e6ce57caf06774#eventlog
     expect(ethBlocks.batchBlocks[1].block.logs[0].data).toBe(`0x`);
   }, 5000000);
+});
+
+describe('Log filters', () => {
+  it('Build filter for !null', () => {
+    const ds: SubqlRuntimeDatasource = {
+      kind: EthereumDatasourceKind.Runtime,
+      assets: new Map(),
+      options: {
+        abi: 'erc20',
+        address: '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619',
+      },
+      startBlock: 1,
+      mapping: {
+        file: '',
+        handlers: [
+          {
+            handler: 'handleLog',
+            kind: EthereumHandlerKind.Event,
+            filter: {
+              topics: [
+                'Transfer(address, address, uint256)',
+                undefined,
+                undefined,
+                '!null',
+              ],
+            },
+          },
+        ],
+      },
+    };
+    const result = buildDictionaryV2QueryEntry([ds]);
+
+    expect(result).toEqual({
+      logs: [
+        {
+          address: ['0x7ceb23fd6bc0add59e62ac25578270cff1b9f619'],
+          topics0: [
+            '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
+          ],
+          topics3: [],
+        },
+      ],
+    });
+  });
 });

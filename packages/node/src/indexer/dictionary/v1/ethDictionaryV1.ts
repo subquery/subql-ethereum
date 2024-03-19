@@ -134,7 +134,13 @@ function callFilterToQueryEntry(
     );
   }
 
-  if (filter.function) {
+  if (filter.function === null || filter.function === '0x') {
+    conditions.push({
+      field: 'func',
+      value: true,
+      matcher: 'isNull',
+    });
+  } else if (filter.function) {
     conditions.push({
       field: 'func',
       value: functionToSighash(filter.function),
@@ -169,7 +175,7 @@ export function buildDictionaryV1QueryEntries(
           if (
             filter.from !== undefined ||
             filter.to !== undefined ||
-            filter.function
+            filter.function !== undefined
           ) {
             queryEntries.push(callFilterToQueryEntry(filter, ds.options));
           } else {
