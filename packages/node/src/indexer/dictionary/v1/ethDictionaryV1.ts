@@ -36,7 +36,7 @@ export function appendDsOptions(
     const addresses = dsOptions.map((option) => option.address).filter(Boolean);
 
     if (addresses.length > queryAddressLimit) {
-      logger.warn(
+      logger.debug(
         `Addresses length: ${addresses.length} is exceeding limit: ${queryAddressLimit}. Consider increasing this value with the flag --query-address-limit  `,
       );
     }
