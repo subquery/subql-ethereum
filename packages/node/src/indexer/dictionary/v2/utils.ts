@@ -3,18 +3,13 @@
 
 import { Formatter } from '@ethersproject/providers';
 import { IBlock } from '@subql/node-core';
-import { DictionaryQueryCondition } from '@subql/types-core';
 import { EthereumBlock } from '@subql/types-ethereum';
 import {
   formatBlockUtil,
   formatLog,
   formatTransaction,
 } from '../../../ethereum/utils.ethereum';
-import {
-  EthDictionaryLogConditions,
-  EthDictionaryTxConditions,
-  RawEthBlock,
-} from './types';
+import { RawEthBlock } from './types';
 
 export function rawBlockToEthBlock(block: RawEthBlock): IBlock<EthereumBlock> {
   try {
@@ -42,7 +37,6 @@ export function rawBlockToEthBlock(block: RawEthBlock): IBlock<EthereumBlock> {
 
     return formatBlockUtil(ethBlock);
   } catch (e) {
-    console.log('rawBlockToEthBlock failed', e);
     throw new Error(
       `Convert raw block to Eth block failed at ${block.header.number},${e.message}`,
     );
