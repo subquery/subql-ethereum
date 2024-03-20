@@ -11,6 +11,7 @@ import {
   EthereumBlock,
   EthereumDatasourceKind,
   EthereumHandlerKind,
+  SubqlDatasource,
   SubqlRuntimeDatasource,
 } from '@subql/types-ethereum';
 import {
@@ -19,6 +20,7 @@ import {
 } from '../../../configure/SubqueryProject';
 import {
   buildDictionaryV2QueryEntry,
+  DEFAULT_DICTIONARY,
   EthDictionaryV2,
 } from './ethDictionaryV2';
 
@@ -52,28 +54,54 @@ const mockDs: EthereumProjectDs[] = [
   },
 ];
 
+// tx to is null
+const mockDs2: EthereumProjectDs[] = [
+  {
+    kind: EthereumDatasourceKind.Runtime,
+    assets: new Map(),
+    startBlock: 3678215,
+    mapping: {
+      file: './dist/index.js',
+      handlers: [
+        {
+          handler: 'handleTransaction',
+          kind: EthereumHandlerKind.Call,
+          filter: {
+            to: null,
+          },
+        },
+      ],
+    },
+  },
+];
+
 const nodeConfig = new NodeConfig({
   subquery: 'polygon-starter',
   subqueryName: 'polygon-starter',
   dictionaryTimeout: 10,
   networkEndpoint: [HTTP_ENDPOINT],
-  networkDictionary: ['http://localhost:3000/rpc'],
+  networkDictionary: [DEFAULT_DICTIONARY],
 });
 
-const m = new Map<number, any>();
-mockDs.forEach((ds, index, dataSources) => {
-  m.set(ds.startBlock, dataSources.slice(0, index + 1));
-});
-const dsMap = new BlockHeightMap(m);
+function makeBlockHeightMap(mockDs: SubqlDatasource[]): BlockHeightMap<any> {
+  const m = new Map<number, any>();
+  mockDs.forEach((ds, index, dataSources) => {
+    m.set(ds.startBlock, dataSources.slice(0, index + 1));
+  });
+  return new BlockHeightMap(m);
+}
 
 // enable this once dictionary v2 is online
 describe('eth dictionary v2', () => {
   let ethDictionaryV2: EthDictionaryV2;
   let ethBlock3678215: EthereumBlock;
   let ethBlock3678250: EthereumBlock;
+
+  const dsMap = makeBlockHeightMap(mockDs);
+
   beforeEach(async () => {
     ethDictionaryV2 = await EthDictionaryV2.create(
-      'http://localhost:3000/rpc',
+      DEFAULT_DICTIONARY,
       nodeConfig,
       undefined,
       { network: { chainId: '10' } } as SubqueryProject,
@@ -88,7 +116,7 @@ describe('eth dictionary v2', () => {
     const query = (ethDictionaryV2 as any).queriesMap.get(3678215);
     expect(query.logs.length).toBe(1);
     expect(query.transactions.length).toBe(1);
-  }, 5000000);
+  }, 50000);
 
   it('query response match with entries', async () => {
     //Polygon
@@ -116,7 +144,7 @@ describe('eth dictionary v2', () => {
     expect(ethBlock3678250.logs[0].topics).toContain(
       '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
     );
-  }, 5000000);
+  }, 50000);
 
   it('able to convert raw v2 Blocks into eth blocks when getData', async () => {
     //Polygon
@@ -141,8 +169,32 @@ describe('eth dictionary v2', () => {
     // relate logs
     // https://polygonscan.com/tx/0xb1b5f7882fa8d62d3650948c08066e928b7b5c9d607d2fe8c7e6ce57caf06774#eventlog
     expect(ethBlocks.batchBlocks[1].block.logs[0].data).toBe(`0x`);
-  }, 5000000);
+  }, 50000);
 });
+
+// TODO, check this
+it.skip('able to get transaction with field to is null', async () => {
+  const dsMap = makeBlockHeightMap(mockDs2);
+  const ethDictionaryV2 = await EthDictionaryV2.create(
+    DEFAULT_DICTIONARY,
+    nodeConfig,
+    undefined,
+    { network: { chainId: '10' } } as SubqueryProject,
+    '10',
+  );
+  ethDictionaryV2.updateQueriesMap(dsMap);
+
+  const { conditions, queryEndBlock } = (
+    ethDictionaryV2 as any
+  ).getQueryConditions(3678215, (ethDictionaryV2 as any)._metadata.end);
+
+  expect(conditions).toBe({ transactions: [{ to: null }] });
+  const ethBlocks = (await ethDictionaryV2.getData(
+    3678215,
+    (ethDictionaryV2 as any)._metadata.end,
+    2,
+  )) as DictionaryResponse<IBlock<EthereumBlock>>;
+}, 50000);
 
 describe('buildDictionaryV2QueryEntry', () => {
   it('Build filter for !null', () => {

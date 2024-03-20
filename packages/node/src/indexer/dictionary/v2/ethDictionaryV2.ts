@@ -19,7 +19,11 @@ import {
   SubqlEthereumProcessorOptions,
 } from '@subql/types-ethereum';
 import { isEqual, uniqBy } from 'lodash';
-import { SubqueryProject } from '../../../configure/SubqueryProject';
+import {
+  EthereumProjectDs,
+  EthereumProjectDsTemplate,
+  SubqueryProject,
+} from '../../../configure/SubqueryProject';
 import { eventToTopic, functionToSighash } from '../../../utils/string';
 import { yargsOptions } from '../../../yargs';
 import { ethFilterDs } from '../utils';
@@ -34,7 +38,9 @@ import { rawBlockToEthBlock } from './utils';
 
 const MIN_FETCH_LIMIT = 200;
 
-const logger = getLogger('eth-dictionary v2');
+const logger = getLogger('eth-dictionary-v2');
+
+export const DEFAULT_DICTIONARY = 'http://localhost:3000/rpc';
 
 function extractOptionAddresses(
   dsOptions: SubqlEthereumProcessorOptions | SubqlEthereumProcessorOptions[],
@@ -73,13 +79,13 @@ function callFilterToDictionaryCondition(
     fromArray.push(filter.from.toLowerCase());
   }
   const optionsAddresses = extractOptionAddresses(dsOptions);
-  if (!optionsAddresses) {
+  if (!optionsAddresses.length) {
     if (filter.to) {
       toArray.push(filter.to.toLowerCase());
     } else if (filter.to === null) {
       toArray.push(null); //TODO, is this correct?
     }
-  } else if (optionsAddresses && (filter.to || filter.to === null)) {
+  } else if (!!optionsAddresses.length && (filter.to || filter.to === null)) {
     logger.warn(
       `TransactionFilter 'to' conflict with 'address' in data source options`,
     );
@@ -150,7 +156,7 @@ export function buildDictionaryV2QueryEntry(
           if (
             filter.from !== undefined ||
             filter.to !== undefined ||
-            filter.function
+            filter.function !== undefined
           ) {
             dictionaryConditions.transactions.push(
               callFilterToDictionaryCondition(filter, ds.options),
@@ -236,7 +242,7 @@ export class EthDictionaryV2 extends DictionaryV2<
   }
 
   buildDictionaryQueryEntries(
-    dataSources: SubqlDatasource[],
+    dataSources: (EthereumProjectDs | EthereumProjectDsTemplate)[],
   ): EthDictionaryV2QueryEntry {
     const filteredDs = ethFilterDs(dataSources);
     return buildDictionaryV2QueryEntry(filteredDs);
@@ -269,10 +275,7 @@ export class EthDictionaryV2 extends DictionaryV2<
           : undefined,
       };
     } catch (e) {
-      logger.error(
-        e,
-        `Failed to handle block response ${JSON.stringify(data)}`,
-      );
+      logger.error(e, `Failed to handle block response}`);
       throw e;
     }
   }

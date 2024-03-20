@@ -3,16 +3,31 @@
 
 import { SubqlDatasource } from '@subql/types-ethereum';
 import { groupBy, partition } from 'lodash';
+import {
+  EthereumProjectDsTemplate,
+  EthereumProjectDs,
+} from '../../configure/SubqueryProject';
 
-export function ethFilterDs(dataSources: EthDsInterface[]): EthDsInterface[] {
+function isTemplateDs(
+  ds: EthereumProjectDs | EthereumProjectDsTemplate,
+): ds is EthereumProjectDsTemplate {
+  return !!(ds as EthereumProjectDsTemplate)?.name;
+}
+
+export function ethFilterDs(
+  dataSources: (EthereumProjectDs | EthereumProjectDsTemplate)[],
+): SubqlDatasource[] {
   const [normalDataSources, templateDataSources] = partition(
     dataSources,
-    (ds) => !ds.name,
+    (ds) => isTemplateDs(ds),
   );
 
   // Group templ
   const groupedDataSources = Object.values(
-    groupBy(templateDataSources, (ds) => ds.name),
+    groupBy(
+      templateDataSources as EthereumProjectDsTemplate[],
+      (ds) => ds.name,
+    ),
   ).map((grouped) => {
     if (grouped.length === 1) {
       return grouped[0];
@@ -29,5 +44,3 @@ export function ethFilterDs(dataSources: EthDsInterface[]): EthDsInterface[] {
 
   return [...normalDataSources, ...groupedDataSources];
 }
-
-export type EthDsInterface = SubqlDatasource & { name?: string };

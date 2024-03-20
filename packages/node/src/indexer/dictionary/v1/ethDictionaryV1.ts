@@ -17,10 +17,14 @@ import {
 import JSON5 from 'json5';
 import { sortBy, uniqBy } from 'lodash';
 import fetch from 'node-fetch';
-import { SubqueryProject } from '../../../configure/SubqueryProject';
+import {
+  EthereumProjectDs,
+  EthereumProjectDsTemplate,
+  SubqueryProject,
+} from '../../../configure/SubqueryProject';
 import { eventToTopic, functionToSighash } from '../../../utils/string';
 import { yargsOptions } from '../../../yargs';
-import { EthDsInterface, ethFilterDs } from '../utils';
+import { ethFilterDs } from '../utils';
 
 const CHAIN_ALIASES_URL =
   'https://raw.githubusercontent.com/subquery/templates/main/chainAliases.json5';
@@ -239,13 +243,15 @@ export class EthDictionaryV1 extends DictionaryV1<GroupedEthereumProjectDs> {
     const chainAliases = await this.getEvmChainId();
     const chainAlias = chainAliases[project.network.chainId];
 
-    return new EthDictionaryV1(
+    const dictionary = new EthDictionaryV1(
       project,
       nodeConfig,
       eventEmitter,
       dictionaryUrl,
       chainAlias,
     );
+    await dictionary.init();
+    return dictionary;
   }
 
   private static async getEvmChainId(): Promise<Record<string, string>> {
@@ -258,7 +264,7 @@ export class EthDictionaryV1 extends DictionaryV1<GroupedEthereumProjectDs> {
 
   buildDictionaryQueryEntries(
     // Add name to datasource as templates have this set
-    dataSources: EthDsInterface[],
+    dataSources: (EthereumProjectDs | EthereumProjectDsTemplate)[],
   ): DictionaryV1QueryEntry[] {
     const filteredDs = ethFilterDs(dataSources);
     return buildDictionaryV1QueryEntries(filteredDs);
