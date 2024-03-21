@@ -5,6 +5,7 @@ import { Formatter } from '@ethersproject/providers';
 import { IBlock } from '@subql/node-core';
 import { EthereumBlock } from '@subql/types-ethereum';
 import {
+  formatBlock,
   formatBlockUtil,
   formatLog,
   formatTransaction,
@@ -15,26 +16,19 @@ export function rawBlockToEthBlock(block: RawEthBlock): IBlock<EthereumBlock> {
   try {
     const formatter = new Formatter();
 
-    // Add gasLimit to each transaction from the block header
-    if (block.transactions !== null && !!block.transactions.length) {
-      block.transactions.map((tx) => (tx.gasLimit = block.header.gasLimit));
-    }
-
-    const ethBlock = formatter.blockWithTransactions({
+    const ethBlock = formatBlock({
       ...block.header,
-      transactions: block.transactions,
-    }) as unknown as EthereumBlock;
+      transactions: [],
+    });
 
     ethBlock.logs = Formatter.arrayOf(formatter.filterLog.bind(formatter))(
       block.logs ?? [],
     ).map((l) => formatLog(l, ethBlock));
 
-    ethBlock.transactions = Formatter.arrayOf(
-      formatter.transactionResponse.bind(formatter),
-    )(block.transactions ?? []).map((tx) => ({
+    ethBlock.transactions = block.transactions.map((tx) => ({
       ...formatTransaction(tx, ethBlock),
       logs: ethBlock.logs.filter((l) => l.transactionHash === tx.hash),
-      input: tx.data, // Why is ethers renaming this to data?
+      // TODO add method for receipts
     }));
 
     return formatBlockUtil(ethBlock);

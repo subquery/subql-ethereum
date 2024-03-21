@@ -40,8 +40,6 @@ const MIN_FETCH_LIMIT = 200;
 
 const logger = getLogger('eth-dictionary-v2');
 
-export const DEFAULT_DICTIONARY = 'http://localhost:3000/rpc';
-
 function extractOptionAddresses(
   dsOptions: SubqlEthereumProcessorOptions | SubqlEthereumProcessorOptions[],
 ): string[] {
