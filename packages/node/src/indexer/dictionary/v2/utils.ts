@@ -25,7 +25,7 @@ export function rawBlockToEthBlock(block: RawEthBlock): IBlock<EthereumBlock> {
       block.logs ?? [],
     ).map((l) => formatLog(l, ethBlock));
 
-    ethBlock.transactions = block.transactions.map((tx) => ({
+    ethBlock.transactions = (block.transactions ?? []).map((tx) => ({
       ...formatTransaction(tx, ethBlock),
       logs: ethBlock.logs.filter((l) => l.transactionHash === tx.hash),
       // TODO add method for receipts
