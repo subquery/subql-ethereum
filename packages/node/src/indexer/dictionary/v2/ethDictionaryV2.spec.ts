@@ -20,9 +20,10 @@ import {
 } from '../../../configure/SubqueryProject';
 import {
   buildDictionaryV2QueryEntry,
-  DEFAULT_DICTIONARY,
   EthDictionaryV2,
 } from './ethDictionaryV2';
+
+const DEFAULT_DICTIONARY = 'http://localhost:3000/rpc/eth-mainnet';
 
 const HTTP_ENDPOINT = 'https://polygon.api.onfinality.io/public';
 const mockDs: EthereumProjectDs[] = [
