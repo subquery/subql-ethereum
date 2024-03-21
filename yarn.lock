@@ -3104,25 +3104,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@subql/common@npm:3.4.2-0":
-  version: 3.4.2-0
-  resolution: "@subql/common@npm:3.4.2-0"
-  dependencies:
-    "@subql/types-core": 0.5.1-0
-    axios: ^0.28.0
-    class-transformer: ^0.5.1
-    class-validator: ^0.14.0
-    fs-extra: ^10.1.0
-    ipfs-http-client: 56
-    js-yaml: ^4.1.0
-    reflect-metadata: ^0.1.13
-    semver: ^7.5.2
-    update-notifier: 5.1.0
-  checksum: 7ca9c725de52c2b9be5740716db27739b5948c4bf9e9962896712f3890dae41e301e75c68277fb18082b11a3e949311581f640357e8f93ae149d07495a268015
-  languageName: node
-  linkType: hard
-
-"@subql/common@npm:^3.4.2-1":
+"@subql/common@npm:3.4.2-1, @subql/common@npm:^3.4.2-1":
   version: 3.4.2-1
   resolution: "@subql/common@npm:3.4.2-1"
   dependencies:
@@ -3140,18 +3122,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@subql/node-core@npm:^7.5.1-0":
-  version: 7.5.1-0
-  resolution: "@subql/node-core@npm:7.5.1-0"
+"@subql/node-core@npm:^7.5.1-2":
+  version: 7.5.1-2
+  resolution: "@subql/node-core@npm:7.5.1-2"
   dependencies:
     "@apollo/client": ^3.8.8
     "@nestjs/common": ^9.4.0
     "@nestjs/event-emitter": ^2.0.0
     "@nestjs/schedule": ^3.0.1
-    "@subql/common": 3.4.2-0
+    "@subql/common": 3.4.2-1
     "@subql/testing": 2.1.1-0
     "@subql/types": 3.3.2-0
-    "@subql/utils": 2.8.0
+    "@subql/utils": 2.8.1-0
     "@willsoto/nestjs-prometheus": ^5.4.0
     async-lock: ^1.4.0
     async-mutex: ^0.4.0
@@ -3167,7 +3149,7 @@ __metadata:
     toposort-class: ^1.0.1
     vm2: ^3.9.19
     yargs: ^16.2.0
-  checksum: 30ac18bbe65553d33de0e0c3c1cb95df8367d497015b33b33b1ac8dd4892a3da6017f298363a30fde4d20b3b657133e9b89f9cda4d881451a0f0399bc50d1753
+  checksum: 58083a0959a44220fef06a040378644891745ea7e1630fb2b898a2d94a3c62813984808593b0376b3467baba49057f248deaf03d06a5174a77162e28b87f09e2
   languageName: node
   linkType: hard
 
@@ -3185,8 +3167,8 @@ __metadata:
     "@nestjs/testing": ^9.4.0
     "@subql/common": ^3.4.2-1
     "@subql/common-ethereum": "workspace:*"
-    "@subql/node-core": ^7.5.1-0
-    "@subql/testing": ^2.1.0
+    "@subql/node-core": ^7.5.1-2
+    "@subql/testing": ^2.1.1-0
     "@subql/types-ethereum": "workspace:*"
     "@types/express": ^4.17.13
     "@types/jest": ^27.4.0
@@ -3216,21 +3198,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@subql/testing@npm:2.1.1-0":
+"@subql/testing@npm:2.1.1-0, @subql/testing@npm:^2.1.1-0":
   version: 2.1.1-0
   resolution: "@subql/testing@npm:2.1.1-0"
   dependencies:
     "@subql/types-core": ^0.4.1-0
   checksum: d27d1181f2afb1a394a80fc7d7e36bdd1e64981728d41214412cdeab930c45a7d3bd7cdc58d25d4653c3dcdaf2a456a4e7ae67e4f2ccb39f5494905d06cdecad
-  languageName: node
-  linkType: hard
-
-"@subql/testing@npm:^2.1.0":
-  version: 2.1.0
-  resolution: "@subql/testing@npm:2.1.0"
-  dependencies:
-    "@subql/types-core": ^0.1.2-0
-  checksum: 42885519277ec48d079accbc68ca600da64e1c960930d506dcd4a207188ad399ff42f81dfeb5d447f235f3bf7ef61ea55d332d47cb10e6d89c4fafda61fe8bac
   languageName: node
   linkType: hard
 
@@ -3240,15 +3213,6 @@ __metadata:
   dependencies:
     package-json-type: ^1.0.3
   checksum: f5e9a4e4a34f00216dfd1a75a7866f87e2540abdb3a9433e7ecff3944222218404321b0c6667fb32702aea92b5c9258b0b6554fb6250e6d7c7b1a58508f73489
-  languageName: node
-  linkType: hard
-
-"@subql/types-core@npm:^0.1.2-0":
-  version: 0.1.2-1
-  resolution: "@subql/types-core@npm:0.1.2-1"
-  dependencies:
-    package-json-type: ^1.0.3
-  checksum: 1c54fecfd7b99875528a87109a3cb8cfcb86a61221f7e715be49198381c6c97e481b60f351c8210df67d1074d3541cd6ee0aad17831f0896dcea63e9784bda64
   languageName: node
   linkType: hard
 
@@ -3281,9 +3245,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@subql/utils@npm:2.8.0":
-  version: 2.8.0
-  resolution: "@subql/utils@npm:2.8.0"
+"@subql/utils@npm:2.8.1-0":
+  version: 2.8.1-0
+  resolution: "@subql/utils@npm:2.8.1-0"
   dependencies:
     "@polkadot/util": ^12.5.1
     "@polkadot/util-crypto": ^12.5.1
@@ -3299,7 +3263,7 @@ __metadata:
     rotating-file-stream: ^3.0.2
     semver: ^7.5.2
     tar: ^6.1.11
-  checksum: fa311fd7095f9e1ccc22f78113cccf744296722b921c1b1b405e9121f492baadd996eb68f5e21ef947295b767ab7172e7318b2a44e8a7c7f2ff577209a30eb11
+  checksum: 51c84fb43ceaa16340be30ea6095998fa1a31b4df67588c36e41d786539821ad51bfbd32346c2d04e4493cba29d544d9f602b78c0df8af96d3d75fd566b98a19
   languageName: node
   linkType: hard
 
