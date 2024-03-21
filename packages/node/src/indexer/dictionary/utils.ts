@@ -19,7 +19,7 @@ export function ethFilterDs(
 ): SubqlDatasource[] {
   const [normalDataSources, templateDataSources] = partition(
     dataSources,
-    (ds) => isTemplateDs(ds),
+    (ds) => !isTemplateDs(ds),
   );
 
   // Group templ

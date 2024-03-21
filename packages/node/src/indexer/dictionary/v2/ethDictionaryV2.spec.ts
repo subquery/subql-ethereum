@@ -80,7 +80,7 @@ const nodeConfig = new NodeConfig({
   subqueryName: 'polygon-starter',
   dictionaryTimeout: 10,
   networkEndpoint: [HTTP_ENDPOINT],
-  networkDictionary: [DEFAULT_DICTIONARY],
+  networkDictionary: [`${DEFAULT_DICTIONARY}/polygon`],
 });
 
 function makeBlockHeightMap(mockDs: SubqlDatasource[]): BlockHeightMap<any> {
@@ -116,7 +116,7 @@ describe('eth dictionary v2', () => {
     const query = (ethDictionaryV2 as any).queriesMap.get(3678215);
     expect(query.logs.length).toBe(1);
     expect(query.transactions.length).toBe(1);
-  }, 50000);
+  }, 100000);
 
   it('query response match with entries', async () => {
     //Polygon
@@ -144,7 +144,7 @@ describe('eth dictionary v2', () => {
     expect(ethBlock3678250.logs[0].topics).toContain(
       '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
     );
-  }, 50000);
+  }, 100000);
 
   it('able to convert raw v2 Blocks into eth blocks when getData', async () => {
     //Polygon
@@ -169,7 +169,7 @@ describe('eth dictionary v2', () => {
     // relate logs
     // https://polygonscan.com/tx/0xb1b5f7882fa8d62d3650948c08066e928b7b5c9d607d2fe8c7e6ce57caf06774#eventlog
     expect(ethBlocks.batchBlocks[1].block.logs[0].data).toBe(`0x`);
-  }, 50000);
+  }, 500000);
 });
 
 // TODO, check this

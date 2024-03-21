@@ -77,6 +77,7 @@ function testSubqueryProject(
 
 describe('Eth Dictionary V1', () => {
   it('Can resovle chain aliases', async () => {
+    (EthDictionaryV1.prototype as any).init = jest.fn();
     const dictionary = await EthDictionaryV1.create(
       {
         network: { chainId: '336', dictionary: 'https://foo.bar' } as any,
@@ -88,6 +89,8 @@ describe('Eth Dictionary V1', () => {
     expect((dictionary as any).chainId).toBe(
       '0xf1cf9022c7ebb34b162d5b5e34e705a5a740b2d0ecc1009fb89023e62a488108',
     );
+
+    jest.clearAllMocks();
   });
 });
 
@@ -400,12 +403,6 @@ describe('buildDictionaryV1QueryEntries', () => {
       ];
 
       const dataSources = [ds, ...duplicateDataSources];
-
-      const project = testSubqueryProject(
-        HTTP_ENDPOINT,
-        dataSources,
-        mockTempDs,
-      );
 
       const queryEntry = buildDictionaryV1QueryEntries(dataSources);
 

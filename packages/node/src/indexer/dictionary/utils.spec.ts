@@ -83,9 +83,9 @@ describe('Dictionary utils', () => {
     const filteredDs = ethFilterDs(dataSources);
     // Runtime + ERC721 (groupedOptions) + ERC1155
     expect(filteredDs.length).toBe(3);
-    expect((filteredDs[1] as any).groupedOptions).toBe([
-      'address1',
-      'address2',
+    expect((filteredDs[1] as any).groupedOptions).toStrictEqual([
+      { address: 'address1' },
+      { address: 'address2' },
     ]);
   });
 });
