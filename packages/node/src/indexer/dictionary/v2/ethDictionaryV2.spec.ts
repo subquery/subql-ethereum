@@ -25,7 +25,7 @@ import {
   EthDictionaryV2,
 } from './ethDictionaryV2';
 
-const DEFAULT_DICTIONARY = 'http://34.89.148.137:8545';
+const DEFAULT_DICTIONARY = 'http://localhost:3000/rpc/eth-mainnet';
 
 const HTTP_ENDPOINT = 'https://polygon.api.onfinality.io/public';
 const mockDs: EthereumProjectDs[] = [
