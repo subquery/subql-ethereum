@@ -28,7 +28,7 @@ import {
 } from './ethDictionaryV2';
 
 const DEFAULT_DICTIONARY = 'http://localhost:3000/rpc/eth-mainnet'; // Takoyaki returning incorrect results so these will fail
-const HTTP_ENDPOINT = 'https://eth.api.onfinality.io/public';
+const HTTP_ENDPOINT = 'https://eth.llamarpc.com';
 const mockDs: EthereumProjectDs[] = [
   {
     kind: EthereumDatasourceKind.Runtime,
@@ -284,7 +284,7 @@ describe('eth dictionary v2', () => {
     const ethBlocks = (await ethDictionaryV2.getData(
       19476187,
       (ethDictionaryV2 as any)._metadata.end,
-      100,
+      2,
     )) as DictionaryResponse<IBlock<EthereumBlock>>;
 
     const { hash, logs } = ethBlocks.batchBlocks[0].block;
