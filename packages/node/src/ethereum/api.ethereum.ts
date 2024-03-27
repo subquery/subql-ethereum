@@ -318,7 +318,9 @@ export class EthereumApi implements ApiWrapper {
             throw new Error(
               `Log BlockHash does not match block: ${blockNumber}, blockHash ${
                 block.hash
-              }. Log got block ${handleNumber(
+              }. Log ${handleNumber(
+                l.logIndex,
+              ).toNumber()} got block ${handleNumber(
                 l.blockNumber,
               ).toNumber()} blockHash ${
                 l.blockHash

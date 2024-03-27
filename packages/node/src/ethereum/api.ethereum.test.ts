@@ -352,11 +352,12 @@ describe('Api.ethereum', () => {
         blockNumber: '0x1831a96',
         blockHash: mockIncorrectBlockHash,
         transactionHash: 'tx1',
+        logIndex: '0x0',
       },
     ]);
 
     await expect(ethApi.fetchBlock(mockBlockNumber)).rejects.toThrow(
-      `Log BlockHash does not match block: 72194336, blockHash mockBlockHash. Log got block 25369238 blockHash mockIncorrectBlockHash. Please check with rpc provider`,
+      `Log BlockHash does not match block: 72194336, blockHash mockBlockHash. Log 0 got block 25369238 blockHash mockIncorrectBlockHash. Please check with rpc provider`,
     );
   });
 
