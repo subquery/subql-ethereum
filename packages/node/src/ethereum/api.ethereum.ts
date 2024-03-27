@@ -25,7 +25,6 @@ import {
 } from '@subql/types-ethereum';
 import CacheableLookup from 'cacheable-lookup';
 import { hexDataSlice, hexValue } from 'ethers/lib/utils';
-import { lowerCase } from 'lodash';
 import { retryOnFailEth } from '../utils/project';
 import {
   CeloJsonRpcBatchProvider,
@@ -314,7 +313,7 @@ export class EthereumApi implements ApiWrapper {
       // Certain RPC may not accommodate for blockHash, and would return wrong logs
       if (logsRaw.length) {
         logsRaw.forEach((l) => {
-          if (lowerCase(l.blockHash) !== lowerCase(block.hash)) {
+          if (l.blockHash.toLowerCase() !== block.hash.toLowerCase()) {
             throw new Error(
               `Log BlockHash does not match block: ${blockNumber}, blockHash ${
                 block.hash
