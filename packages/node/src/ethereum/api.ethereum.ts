@@ -1,14 +1,12 @@
 // Copyright 2020-2024 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
-import assert from 'assert';
 import fs from 'fs';
 import http from 'http';
 import https from 'https';
 import { Interface } from '@ethersproject/abi';
 import {
   BlockTag,
-  Provider,
   Block,
   TransactionReceipt,
 } from '@ethersproject/abstract-provider';
@@ -27,6 +25,7 @@ import {
 } from '@subql/types-ethereum';
 import CacheableLookup from 'cacheable-lookup';
 import { hexDataSlice, hexValue } from 'ethers/lib/utils';
+import { lowerCase } from 'lodash';
 import { retryOnFailEth } from '../utils/project';
 import {
   CeloJsonRpcBatchProvider,
@@ -44,6 +43,7 @@ import {
   formatLog,
   formatReceipt,
   formatTransaction,
+  handleNumber,
 } from './utils.ethereum';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -193,7 +193,7 @@ export class EthereumApi implements ApiWrapper {
 
   private async getSupportsTag(tag: BlockTag): Promise<boolean> {
     try {
-      // We set the timeout here because theres a bug in ethers where it will never resolve
+      // We set the timeout here because there is a bug in ethers where it will never resolve
       // It was happening with arbitrum on a syncing node
       const result = await timeout(this.client.getBlock(tag), 2);
 
@@ -313,10 +313,19 @@ export class EthereumApi implements ApiWrapper {
 
       // Certain RPC may not accommodate for blockHash, and would return wrong logs
       if (logsRaw.length) {
-        assert(
-          logsRaw.every((l) => l.blockHash === block.hash),
-          `Log BlockHash does not match block: ${blockNumber}`,
-        );
+        logsRaw.forEach((l) => {
+          if (lowerCase(l.blockHash) !== lowerCase(block.hash)) {
+            throw new Error(
+              `Log BlockHash does not match block: ${blockNumber}, blockHash ${
+                block.hash
+              }. Log got block ${handleNumber(
+                l.blockNumber,
+              ).toNumber()} blockHash ${
+                l.blockHash
+              }. Please check with rpc provider`,
+            );
+          }
+        });
       }
 
       block.logs = logsRaw.map((l) => formatLog(l, block));
