@@ -27,7 +27,7 @@ import {
   EthDictionaryV2,
 } from './ethDictionaryV2';
 
-const DEFAULT_DICTIONARY = 'http://localhost:3000/rpc/eth-mainnet'; // Takoyaki returning incorrect results so these will fail
+const DEFAULT_DICTIONARY = 'https://ethereum.node.subquery.network/public'; // Takoyaki returning incorrect results so these will fail
 const HTTP_ENDPOINT = 'https://eth.llamarpc.com';
 const mockDs: EthereumProjectDs[] = [
   {
