@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [3.5.0] - 2024-04-03
 ### Changed
-- Bump version with @subql/types-core, also update api interface (#225)
+- version updated with @subql/types-core, also update api interface (#225)
 
 ## [3.4.0] - 2024-03-13
 ### Changed

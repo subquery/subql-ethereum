@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [3.5.0] - 2024-04-03
 ### Changed
-- version bump with `@subql/common`
+- version bump with `@subql/common` 3.5.0
 
 ## [3.4.1] - 2024-02-23
 ### Changed
