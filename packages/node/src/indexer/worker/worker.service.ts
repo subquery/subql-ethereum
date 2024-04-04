@@ -39,7 +39,7 @@ export class WorkerService extends BaseWorkerService<
     private apiService: ApiService<
       EthereumApi,
       SafeEthProvider,
-      IBlock<EthereumBlock>[] | IBlock<LightEthereumBlock>[]
+      IBlock<BlockContent>[]
     >,
     private indexerManager: IndexerManager,
     @Inject('IProjectService')
