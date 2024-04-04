@@ -7,12 +7,12 @@ import {
   NodeConfig,
   IProjectService,
   ProcessBlockResponse,
-  ApiService,
   BaseWorkerService,
   IProjectUpgradeService,
   IBlock,
 } from '@subql/node-core';
 import { EthereumProjectDs } from '../../configure/SubqueryProject';
+import { EthereumApiService } from '../../ethereum';
 import { IndexerManager } from '../indexer.manager';
 import { BlockContent } from '../types';
 
@@ -33,7 +33,7 @@ export class WorkerService extends BaseWorkerService<
   {}
 > {
   constructor(
-    private apiService: ApiService<any, any, IBlock<any>[]>,
+    private apiService: EthereumApiService,
     private indexerManager: IndexerManager,
     @Inject('IProjectService')
     projectService: IProjectService<EthereumProjectDs>,
@@ -49,7 +49,7 @@ export class WorkerService extends BaseWorkerService<
     extra: {},
   ): Promise<IBlock<BlockContent>> {
     const [block] = await this.apiService.fetchBlocks([heights]);
-    return block.block;
+    return block;
   }
 
   protected toBlockResponse(block: BlockContent): { parentHash: string } {

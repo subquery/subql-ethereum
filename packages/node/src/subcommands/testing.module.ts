@@ -5,7 +5,6 @@ import { Module } from '@nestjs/common';
 import { EventEmitter2, EventEmitterModule } from '@nestjs/event-emitter';
 import { ScheduleModule, SchedulerRegistry } from '@nestjs/schedule';
 import {
-  ApiService,
   ConnectionPoolService,
   ConnectionPoolStateManager,
   DbModule,
@@ -47,7 +46,7 @@ import { UnfinalizedBlocksService } from '../indexer/unfinalizedBlocks.service';
       useClass: ProjectService,
     },
     {
-      provide: ApiService,
+      provide: EthereumApiService,
       useFactory: async (
         project: SubqueryProject,
         connectionPoolService: ConnectionPoolService<EthereumApiConnection>,
@@ -74,7 +73,7 @@ import { UnfinalizedBlocksService } from '../indexer/unfinalizedBlocks.service';
     TestRunner,
     {
       provide: 'IApi',
-      useExisting: ApiService,
+      useExisting: EthereumApiService,
     },
     {
       provide: 'IIndexerManager',

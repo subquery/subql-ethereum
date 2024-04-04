@@ -11,7 +11,6 @@ import {
   IProjectService,
   BlockDispatcher,
   ProcessBlockResponse,
-  ApiService,
   IProjectUpgradeService,
   PoiSyncService,
   IBlock,
@@ -20,6 +19,7 @@ import {
   EthereumProjectDs,
   SubqueryProject,
 } from '../../configure/SubqueryProject';
+import { EthereumApiService } from '../../ethereum';
 import { DynamicDsService } from '../dynamic-ds.service';
 import { IndexerManager } from '../indexer.manager';
 import { BlockContent } from '../types';
@@ -33,7 +33,7 @@ export class BlockDispatcherService
   implements OnApplicationShutdown
 {
   constructor(
-    apiService: ApiService,
+    apiService: EthereumApiService,
     nodeConfig: NodeConfig,
     private indexerManager: IndexerManager,
     eventEmitter: EventEmitter2,

@@ -11,7 +11,6 @@ import {
   StoreService,
   NodeConfig,
   IProjectUpgradeService,
-  ApiService,
   profiler,
 } from '@subql/node-core';
 import { Sequelize } from '@subql/x-sequelize';
@@ -37,7 +36,7 @@ export class ProjectService extends BaseProjectService<
 
   constructor(
     dsProcessorService: DsProcessorService,
-    @Inject(ApiService) apiService: EthereumApiService,
+    @Inject(EthereumApiService) apiService: EthereumApiService,
     @Inject(isMainThread ? PoiService : 'Null') poiService: PoiService,
     @Inject(isMainThread ? PoiSyncService : 'Null')
     poiSyncService: PoiSyncService,

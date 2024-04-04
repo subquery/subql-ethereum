@@ -27,7 +27,7 @@ export class EthDictionaryService extends DictionaryService<
     @Inject('ISubqueryProject') protected project: SubqueryProject,
     nodeConfig: NodeConfig,
     eventEmitter: EventEmitter2,
-    @Inject(ApiService) private apiService: EthereumApiService,
+    @Inject(EthereumApiService) private apiService: EthereumApiService,
   ) {
     super(project.network.chainId, nodeConfig, eventEmitter);
   }

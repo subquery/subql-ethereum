@@ -6,15 +6,10 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { SchedulerRegistry } from '@nestjs/schedule';
 
 import { isCustomDs, EthereumHandlerKind } from '@subql/common-ethereum';
-import {
-  NodeConfig,
-  BaseFetchService,
-  ApiService,
-  getModulos,
-} from '@subql/node-core';
+import { NodeConfig, BaseFetchService, getModulos } from '@subql/node-core';
 import { EthereumBlock, SubqlDatasource } from '@subql/types-ethereum';
 import { SubqueryProject } from '../configure/SubqueryProject';
-import { EthereumApi } from '../ethereum';
+import { EthereumApi, EthereumApiService } from '../ethereum';
 import {
   calcInterval,
   ethereumBlockToHeader,
@@ -35,7 +30,7 @@ export class FetchService extends BaseFetchService<
   EthereumBlock
 > {
   constructor(
-    private apiService: ApiService,
+    private apiService: EthereumApiService,
     nodeConfig: NodeConfig,
     @Inject('IProjectService') projectService: ProjectService,
     @Inject('ISubqueryProject') project: SubqueryProject,

@@ -4,7 +4,6 @@
 import { Module } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import {
-  ApiService,
   ConnectionPoolService,
   WorkerDynamicDsService,
   WorkerConnectionPoolStateManager,
@@ -35,7 +34,7 @@ import { WorkerUnfinalizedBlocksService } from './worker/worker.unfinalizedBlock
     },
     ConnectionPoolService,
     {
-      provide: ApiService,
+      provide: EthereumApiService,
       useFactory: async (
         project: SubqueryProject,
         connectionPoolService: ConnectionPoolService<EthereumApiConnection>,

@@ -3,7 +3,6 @@
 
 import { hexZeroPad } from '@ethersproject/bytes';
 import {
-  ApiService,
   CacheMetadataModel,
   Header,
   NodeConfig,
@@ -13,6 +12,7 @@ import {
   METADATA_LAST_FINALIZED_PROCESSED_KEY,
 } from '@subql/node-core';
 import { EthereumNodeConfig } from '../configure/NodeConfig';
+import { EthereumApiService } from '../ethereum';
 import { UnfinalizedBlocksService } from './unfinalizedBlocks.service';
 
 // Adds 0 padding so we can convert to POI block
@@ -24,7 +24,7 @@ const makeHeader = (height: number, finalized?: boolean): Header => ({
   parentHash: hexify(`0xABC${height - 1}${finalized ? 'f' : ''}`),
 });
 
-const getMockApi = (): ApiService => {
+const getMockApi = (): EthereumApiService => {
   return {
     api: {
       getBlockByHeightOrHash: (hash: string | number) => {

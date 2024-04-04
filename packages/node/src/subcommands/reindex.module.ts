@@ -5,7 +5,6 @@ import { Module } from '@nestjs/common';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import {
-  ApiService,
   DbModule,
   ForceCleanService,
   StoreCacheService,
@@ -14,6 +13,7 @@ import {
   PoiService,
 } from '@subql/node-core';
 import { ConfigureModule } from '../configure/configure.module';
+import { EthereumApiService } from '../ethereum';
 import { DsProcessorService } from '../indexer/ds-processor.service';
 import { DynamicDsService } from '../indexer/dynamic-ds.service';
 import { UnfinalizedBlocksService } from '../indexer/unfinalizedBlocks.service';
@@ -36,7 +36,7 @@ import { UnfinalizedBlocksService } from '../indexer/unfinalizedBlocks.service';
     DsProcessorService,
     {
       // Used to work with DI for unfinalizedBlocksService but not used with reindex
-      provide: ApiService,
+      provide: EthereumApiService,
       useFactory: () => undefined,
     },
     SchedulerRegistry,

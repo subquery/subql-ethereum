@@ -3,7 +3,6 @@
 
 import { Injectable } from '@nestjs/common';
 import {
-  ApiService,
   BaseUnfinalizedBlocksService,
   Header,
   mainThreadOnly,
@@ -15,6 +14,7 @@ import {
 } from '@subql/node-core';
 import { last } from 'lodash';
 import { EthereumNodeConfig } from '../configure/NodeConfig';
+import { EthereumApiService } from '../ethereum';
 import { ethereumBlockToHeader } from '../ethereum/utils.ethereum';
 import { BlockContent } from './types';
 
@@ -26,7 +26,7 @@ export class UnfinalizedBlocksService extends BaseUnfinalizedBlocksService<Block
   private startupCheck = true;
 
   constructor(
-    private readonly apiService: ApiService,
+    private readonly apiService: EthereumApiService,
     nodeConfig: NodeConfig,
     storeCache: StoreCacheService,
   ) {

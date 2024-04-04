@@ -8,7 +8,6 @@ import {
   IndexingBenchmarkService,
   StoreService,
   PoiService,
-  ApiService,
   NodeConfig,
   ConnectionPoolService,
   ConnectionPoolStateManager,
@@ -41,7 +40,7 @@ import { UnfinalizedBlocksService } from './unfinalizedBlocks.service';
     StoreCacheService,
     EthereumApiService,
     {
-      provide: ApiService,
+      provide: EthereumApiService,
       useFactory: async (
         project: SubqueryProject,
         connectionPoolService: ConnectionPoolService<EthereumApiConnection>,
@@ -135,7 +134,7 @@ import { UnfinalizedBlocksService } from './unfinalizedBlocks.service';
         EventEmitter2,
         'IProjectService',
         'IProjectUpgradeService',
-        ApiService,
+        EthereumApiService,
         IndexerManager,
         SmartBatchService,
         InMemoryCacheService,
