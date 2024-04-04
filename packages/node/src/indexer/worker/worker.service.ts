@@ -55,7 +55,8 @@ export class WorkerService extends BaseWorkerService<
     heights: number,
     extra: {},
   ): Promise<IBlock<BlockContent>> {
-    return this.apiService.fetchBlocks([heights]);
+    const [block] = await this.apiService.fetchBlocks([heights]);
+    return block;
   }
 
   protected toBlockResponse(block: BlockContent): { parentHash: string } {
