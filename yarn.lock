@@ -3122,9 +3122,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@subql/node-core@npm:^9.0.0":
-  version: 9.0.0
-  resolution: "@subql/node-core@npm:9.0.0"
+"@subql/node-core@npm:dev":
+  version: 9.0.1-0
+  resolution: "@subql/node-core@npm:9.0.1-0"
   dependencies:
     "@apollo/client": ^3.8.8
     "@nestjs/common": ^9.4.0
@@ -3132,7 +3132,7 @@ __metadata:
     "@nestjs/schedule": ^3.0.1
     "@subql/common": 3.5.0
     "@subql/testing": 2.1.1-0
-    "@subql/types": 3.4.0
+    "@subql/types": 3.4.1-0
     "@subql/utils": 2.9.1
     "@willsoto/nestjs-prometheus": ^5.4.0
     async-lock: ^1.4.0
@@ -3149,7 +3149,7 @@ __metadata:
     toposort-class: ^1.0.1
     vm2: ^3.9.19
     yargs: ^16.2.0
-  checksum: 31132a0b0c3defabf9885e1d7a7290619993562957aae3c40137a40733035b97bc3d4b9fd2febce9e408aad1611eede3946a4aab1af6b0b002fa501c4595832e
+  checksum: dcd805788d3bdc8cf0fe79e833778d2121013d26133931ba9c2226cb1426fd1d822c0bc28f432f62037d26897d82e978201f0fc6ab5c02b26fca409f113da174
   languageName: node
   linkType: hard
 
@@ -3167,7 +3167,7 @@ __metadata:
     "@nestjs/testing": ^9.4.0
     "@subql/common": ^3.5.0
     "@subql/common-ethereum": "workspace:*"
-    "@subql/node-core": ^9.0.0
+    "@subql/node-core": dev
     "@subql/testing": ^2.1.1-0
     "@subql/types-ethereum": "workspace:*"
     "@types/express": ^4.17.13
@@ -3207,21 +3207,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@subql/types-core@npm:0.6.0, @subql/types-core@npm:^0.6.0":
-  version: 0.6.0
-  resolution: "@subql/types-core@npm:0.6.0"
+"@subql/types-core@npm:dev":
+  version: 0.6.1-0
+  resolution: "@subql/types-core@npm:0.6.1-0"
   dependencies:
     package-json-type: ^1.0.3
-  checksum: 0688f1973f830d1d2ab34864b00fc7efb105228b0328ac485c69950957da3a67a92d9477bc94945e57e3cccbf1b732bdea097c1a452a907e23704e9cbeff31fc
-  languageName: node
-  linkType: hard
-
-"@subql/types-core@npm:^0.4.1-0":
-  version: 0.4.1-0
-  resolution: "@subql/types-core@npm:0.4.1-0"
-  dependencies:
-    package-json-type: ^1.0.3
-  checksum: f7a51202b6e350e65f65a55136a2b48c8d6ae403850e96215995648656b3ef0779ef33ae526c7ffaa51b221b29255137e84ffd0abb5c1155095b1abfb15ef340
+  checksum: f08943f1164f13d3e8706e5a9b93bfa0b170cf47c583f8dbe2039b1b08d5407c7f9da6ffa00d32e1c65252682c1fdd39f962669957d88cd3c32d8d078e32d8e3
   languageName: node
   linkType: hard
 
@@ -3234,14 +3225,14 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@subql/types@npm:3.4.0":
-  version: 3.4.0
-  resolution: "@subql/types@npm:3.4.0"
+"@subql/types@npm:3.4.1-0":
+  version: 3.4.1-0
+  resolution: "@subql/types@npm:3.4.1-0"
   dependencies:
-    "@subql/types-core": 0.6.0
+    "@subql/types-core": 0.6.1-0
   peerDependencies:
     "@polkadot/api": ^10
-  checksum: a13e02ebdf35abc05104615f3884faf9f2d9037eece58ac05ba6cc4e07812ef40479645578327147ac82872e9466b5e2995a22076a7fdbc27fd6dd28f1cb669d
+  checksum: 98e3d91788c9c82894c00035d97c94a830c036bda1e125353c8f5063b5a1977b781df47a23672dccd1c1e6ef9dc627ccc2c348943c6d2dacb1af60fc1428a703
   languageName: node
   linkType: hard
 
