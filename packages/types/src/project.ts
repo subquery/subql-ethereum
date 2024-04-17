@@ -9,8 +9,8 @@ import {
   Processor,
   ProjectManifestV1_0_0,
   BaseDataSource,
-  SecondLayerHandlerProcessor_0_0_0 as BaseSecondLayerHandlerProcessor_0_0_0,
-  SecondLayerHandlerProcessor_1_0_0 as BaseSecondLayerHandlerProcessor_1_0_0,
+  SecondLayerHandlerProcessor_0_0_0,
+  SecondLayerHandlerProcessor_1_0_0,
   DsProcessor,
 } from '@subql/types-core';
 import {
@@ -249,7 +249,16 @@ export interface SubqlCustomDatasource<
   processor: Processor<O>;
 }
 
-export type SecondLayerHandlerProcessorArray<
+export type SecondLayerHandlerProcessor<
+  K extends EthereumHandlerKind,
+  F extends Record<string, unknown>, // EthereumRuntimeFilterMap?
+  E,
+  DS extends SubqlCustomDatasource = SubqlCustomDatasource
+> =
+  | SecondLayerHandlerProcessor_0_0_0<EthereumRuntimeHandlerInputMap, K, F, E, DS, ApiWrapper>
+  | SecondLayerHandlerProcessor_1_0_0<EthereumRuntimeHandlerInputMap, K, F, E, DS, ApiWrapper>;
+
+type SecondLayerHandlerProcessorArray<
   K extends string,
   F extends Record<string, unknown>,
   T,
@@ -268,27 +277,6 @@ export type SubqlDatasourceProcessor<
     SecondLayerHandlerProcessorArray<K, F, any, DS>
   >
 > = DsProcessor<DS, P, ApiWrapper>;
-
-export type SecondLayerHandlerProcessor_0_0_0<
-  K extends EthereumHandlerKind,
-  F extends Record<string, unknown>,
-  E,
-  DS extends SubqlCustomDatasource = SubqlCustomDatasource
-> = BaseSecondLayerHandlerProcessor_0_0_0<EthereumRuntimeHandlerInputMap, K, F, E, DS, ApiWrapper>;
-
-export type SecondLayerHandlerProcessor_1_0_0<
-  K extends EthereumHandlerKind,
-  F extends Record<string, unknown>,
-  E,
-  DS extends SubqlCustomDatasource = SubqlCustomDatasource
-> = BaseSecondLayerHandlerProcessor_1_0_0<EthereumRuntimeHandlerInputMap, K, F, E, DS, ApiWrapper>;
-
-export type SecondLayerHandlerProcessor<
-  K extends EthereumHandlerKind,
-  F extends Record<string, unknown>,
-  E,
-  DS extends SubqlCustomDatasource = SubqlCustomDatasource
-> = SecondLayerHandlerProcessor_0_0_0<K, F, E, DS> | SecondLayerHandlerProcessor_1_0_0<K, F, E, DS>;
 
 /**
  * Represents a Ethereum subquery network configuration, which is based on the CommonSubqueryNetworkConfig template.
