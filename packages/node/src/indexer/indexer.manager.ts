@@ -159,12 +159,6 @@ export class IndexerManager extends BaseIndexerManager<
   }
 }
 
-type ProcessorTypeMap = {
-  [EthereumHandlerKind.Block]: typeof isBlockHandlerProcessor;
-  [EthereumHandlerKind.Event]: typeof isEventHandlerProcessor;
-  [EthereumHandlerKind.Call]: typeof isCallHandlerProcessor;
-};
-
 const ProcessorTypeMap = {
   [EthereumHandlerKind.Block]: isBlockHandlerProcessor,
   [EthereumHandlerKind.Event]: isEventHandlerProcessor,

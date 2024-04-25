@@ -3207,12 +3207,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@subql/types-core@npm:dev":
-  version: 0.6.1-0
-  resolution: "@subql/types-core@npm:0.6.1-0"
+"@subql/types-core@npm:0.7.0, @subql/types-core@npm:^0.7.0":
+  version: 0.7.0
+  resolution: "@subql/types-core@npm:0.7.0"
   dependencies:
     package-json-type: ^1.0.3
-  checksum: f08943f1164f13d3e8706e5a9b93bfa0b170cf47c583f8dbe2039b1b08d5407c7f9da6ffa00d32e1c65252682c1fdd39f962669957d88cd3c32d8d078e32d8e3
+  checksum: ba8d140333d315e80c28b44f29f56511302d0179001048e55ef2bbdded51deb7ddd37d77eee3d6fff1c18f2b944f2cd9f4e39da39e9f4bd9216d4e1b4bbf6378
   languageName: node
   linkType: hard
 
