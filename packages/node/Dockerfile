@@ -30,10 +30,9 @@ RUN apk add --no-cache tini curl git &&  \
 # Install the app
 RUN npm i -g app.tgz
 
-# Clean up unused deps
-RUN rm /app.tgz && \
-    yarn cache clean && \
-    rm -rf /root/.npm /root/.cache
+# Create ./.monitor directory and set permissions
+RUN mkdir -p .monitor && \
+    chown 1000:1000 .monitor
 
 # Make the user not ROOT
 USER 1000
