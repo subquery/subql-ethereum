@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Fix import issue from node-core
 
 ## [4.4.1] - 2024-06-05
 ### Fixed
