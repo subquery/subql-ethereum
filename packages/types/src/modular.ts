@@ -6,11 +6,12 @@ import {Data} from 'ejs';
 import {SubqlRuntimeDatasource} from './project';
 
 export interface EthereumNetworkModule extends INetworkCommonModule {
-  generateAbis?(
+  generateAbis(
     datasources: SubqlRuntimeDatasource[],
     projectPath: string,
     prepareDirPath: (path: string, recreate: boolean) => Promise<void>,
+    upperFirst: (input?: string) => string,
     renderTemplate: (templatePath: string, outputPath: string, templateData: Data) => Promise<void>
   ): Promise<void>;
-  parseContractPath?(path: string): {name: string; rawName: string; path: string[]};
+  parseContractPath(path: string): {name: string; rawName: string; path: string[]};
 }
