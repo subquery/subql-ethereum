@@ -3,9 +3,10 @@
 
 import {INetworkCommonModule} from '@subql/types-core';
 import {Data} from 'ejs';
-import {SubqlRuntimeDatasource} from './project';
+import {SubqlCustomDatasource, SubqlDatasource, SubqlRuntimeDatasource} from './project';
 
-export interface EthereumNetworkModule extends INetworkCommonModule {
+export interface EthereumNetworkModule
+  extends INetworkCommonModule<SubqlDatasource, SubqlRuntimeDatasource, SubqlCustomDatasource> {
   generateAbis(
     datasources: SubqlRuntimeDatasource[],
     projectPath: string,
