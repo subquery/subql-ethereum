@@ -22,7 +22,7 @@ export interface EthereumTransactionFilter {
    * @example
    * to: '0x220866B1A2219f40e72f5c628B65D54268cA3A9D',
    **/
-  to?: string;
+  to?: string | null;
   /**
    * The function sighash or function signature of the call. This is the first 32bytes of the data field
    * @example
