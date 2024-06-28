@@ -277,9 +277,9 @@ describe('Codegen spec', () => {
       },
     };
 
-    await expect(generateAbis([ds], PROJECT_PATH, undefined, undefined, undefined)).rejects.toThrow(
-      /Asset: "erc20" not found in project/
-    );
+    await expect(
+      generateAbis([ds], PROJECT_PATH, undefined as any, undefined as any, undefined as any)
+    ).rejects.toThrow(/Asset: "erc20" not found in project/);
   });
 
   it('validate Abi.json Function Not Exist', async () => {
@@ -312,9 +312,9 @@ describe('Codegen spec', () => {
       },
     };
 
-    await expect(generateAbis([ds], PROJECT_PATH, undefined, undefined, undefined)).rejects.toThrow(
-      /Function: "approve222\(address a,uint256 b\)" not found in erc20 contract interface/
-    );
+    await expect(
+      generateAbis([ds], PROJECT_PATH, undefined as any, undefined as any, undefined as any)
+    ).rejects.toThrow(/Function: "approve222\(address a,uint256 b\)" not found in erc20 contract interface/);
   });
 
   it('validate Abi.json Topic Not Exist', async () => {
@@ -347,9 +347,9 @@ describe('Codegen spec', () => {
       },
     };
 
-    await expect(generateAbis([ds], PROJECT_PATH, undefined, undefined, undefined)).rejects.toThrow(
-      /Topic: "NotExist\(address a\)" not found in erc20 contract interface/
-    );
+    await expect(
+      generateAbis([ds], PROJECT_PATH, undefined as any, undefined as any, undefined as any)
+    ).rejects.toThrow(/Topic: "NotExist\(address a\)" not found in erc20 contract interface/);
   });
 
   it('doesnt validate if datasource has no abi option set', async () => {
@@ -383,7 +383,7 @@ describe('Codegen spec', () => {
         [ds],
         PROJECT_PATH,
         (p) => Promise.resolve(),
-        (v) => v,
+        (v) => v as any,
         () => Promise.resolve()
       )
     ).resolves.not.toThrow();
