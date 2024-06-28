@@ -258,7 +258,7 @@ export type SecondLayerHandlerProcessor<
   | SecondLayerHandlerProcessor_0_0_0<EthereumRuntimeHandlerInputMap, K, F, E, DS, ApiWrapper>
   | SecondLayerHandlerProcessor_1_0_0<EthereumRuntimeHandlerInputMap, K, F, E, DS, ApiWrapper>;
 
-type SecondLayerHandlerProcessorArray<
+export type SecondLayerHandlerProcessorArray<
   K extends string,
   F extends Record<string, unknown>,
   T,
