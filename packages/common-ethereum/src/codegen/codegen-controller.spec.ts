@@ -388,4 +388,38 @@ describe('Codegen spec', () => {
       )
     ).resolves.not.toThrow();
   });
+
+  it('abi option is exist, but assets option is not configured.', async () => {
+    const ds: SubqlRuntimeDatasource = {
+      kind: EthereumDatasourceKind.Runtime,
+      startBlock: 1,
+      options: {
+        abi: 'erc20',
+        address: '',
+      },
+      mapping: {
+        file: '',
+        handlers: [
+          {
+            handler: 'handleTransaction',
+            kind: EthereumHandlerKind.Event,
+            filter: {
+              topics: ['Transfer(address a,address b,uint256 c)'],
+            },
+          },
+          {
+            handler: 'handleTransaction',
+            kind: EthereumHandlerKind.Event,
+            filter: {
+              topics: ['Transfer(address a,address b,uint256 c)', 'NotExist(address a)'],
+            },
+          },
+        ],
+      },
+    };
+
+    await expect(
+      generateAbis([ds], PROJECT_PATH, undefined as any, undefined as any, undefined as any)
+    ).rejects.toThrow('Databases.Asset is undefined');
+  });
 });
