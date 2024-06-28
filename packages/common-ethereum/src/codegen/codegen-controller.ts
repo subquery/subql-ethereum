@@ -298,7 +298,7 @@ export async function generateAbis(
         );
       })
     );
-  } catch (e) {
+  } catch (e: any) {
     console.error(`! Unable to generate abi interface. ${e.message}`);
   }
 }
