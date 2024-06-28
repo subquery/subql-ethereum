@@ -122,7 +122,7 @@ export class UnfinalizedBlocksService extends BaseUnfinalizedBlocksService<Block
     try {
       const poiHeader = await this.findFinalizedUsingPOI(checkingHeader);
       return poiHeader.blockHeight;
-    } catch (e) {
+    } catch (e: any) {
       if (e.message === POI_NOT_ENABLED_ERROR_MESSAGE) {
         return Math.max(
           0,

@@ -46,7 +46,7 @@ async function initWorker(startHeight: number): Promise<void> {
     const workerService = app.get(WorkerService);
 
     initWorkerServices(app, workerService);
-  } catch (e) {
+  } catch (e: any) {
     console.log('Failed to start worker', e);
     logger.error(e, 'Failed to start worker');
     throw e;
