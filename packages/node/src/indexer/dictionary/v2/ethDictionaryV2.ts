@@ -285,7 +285,7 @@ export class EthDictionaryV2 extends DictionaryV2<
           ? blocks[blocks.length - 1].block.number
           : undefined,
       };
-    } catch (e) {
+    } catch (e: any) {
       logger.error(e, `Failed to handle block response}`);
       throw e;
     }
