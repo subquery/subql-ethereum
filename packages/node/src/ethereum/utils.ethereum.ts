@@ -135,7 +135,6 @@ export function formatTransaction(
 
 export function formatReceipt<R extends EthereumReceipt = EthereumReceipt>(
   receipt: Record<string, any>,
-  block: EthereumBlock,
 ): R {
   return {
     ...receipt,

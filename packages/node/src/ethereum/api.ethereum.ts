@@ -337,15 +337,13 @@ export class EthereumApi implements ApiWrapper {
       block.transactions = block.transactions.map((tx) => ({
         ...formatTransaction(tx, block),
         receipt: () =>
-          this.getTransactionReceipt(tx.hash).then((r) =>
-            formatReceipt(r, block),
-          ),
+          this.getTransactionReceipt(tx.hash).then((r) => formatReceipt(r)),
         logs: block.logs.filter((l) => l.transactionHash === tx.hash),
       }));
 
       this.eventEmitter.emit('fetchBlock');
       return formatBlockUtil(block);
-    } catch (e) {
+    } catch (e: any) {
       throw this.handleError(e);
     }
   }
@@ -412,7 +410,7 @@ export class EthereumApi implements ApiWrapper {
         }
 
         this.contractInterfaces[abiName] = new Interface(abiObj);
-      } catch (e) {
+      } catch (e: any) {
         logger.error(`Unable to parse ABI: ${e.message}`);
         throw new Error('ABI is invalid');
       }
@@ -437,7 +435,7 @@ export class EthereumApi implements ApiWrapper {
       log.args = iface?.parseLog(log).args as T;
 
       return log;
-    } catch (e) {
+    } catch (e: any) {
       logger.warn(`Failed to parse log data: ${e.message}`);
       return log;
     }
@@ -467,7 +465,7 @@ export class EthereumApi implements ApiWrapper {
 
       transaction.args = args;
       return transaction;
-    } catch (e) {
+    } catch (e: any) {
       logger.warn(`Failed to parse transaction data: ${e.message}`);
       return transaction;
     }
