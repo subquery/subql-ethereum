@@ -53,14 +53,9 @@ function validateAbi(datasources: SubqlRuntimeDatasource[], projectPath: string)
     const topicIssues: string[] = [];
     const funcIssues: string[] = [];
 
-    if (!datasource.assets) {
-      issues.push(`Databases.Asset is undefined`);
-      continue;
-    }
-
     let data = '';
     try {
-      const abi = datasource.assets.get(abiName);
+      const abi = datasource.assets?.get(abiName);
       if (!abi) {
         issues.push(`Asset: "${abiName}" not found in project`);
         continue;
