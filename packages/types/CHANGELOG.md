@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Fixed
+### Added
 - Add missing method `getAbiInterface` in type `EthereumNetworkModule` (#323)
 
 ## [3.8.0] - 2024-07-03
