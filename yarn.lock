@@ -3075,7 +3075,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@subql/common@npm:4.0.0, @subql/common@npm:^4.0.0":
+"@subql/common@npm:4.0.0":
   version: 4.0.0
   resolution: "@subql/common@npm:4.0.0"
   dependencies:
@@ -3155,7 +3155,6 @@ __metadata:
     "@nestjs/schedule": ^3.0.1
     "@nestjs/schematics": ^9.2.0
     "@nestjs/testing": ^9.4.0
-    "@subql/common": ^4.0.0
     "@subql/common-ethereum": "workspace:*"
     "@subql/node-core": ^10.10.0
     "@subql/testing": ^2.1.1
