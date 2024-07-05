@@ -94,7 +94,7 @@ export type EthereumTransaction<T extends EthereumResult = EthereumResult> = {
   hash: string;
   input: string;
   nonce: bigint;
-  to: string;
+  to?: string;
   transactionIndex: bigint;
   value: bigint;
   type: string;
