@@ -1,7 +1,7 @@
 /* eslint-disable */
 'use strict';
 
-import http from 'http';
+import http, { RequestOptions } from 'http';
 import https from 'https';
 import { gunzipSync } from 'zlib';
 import { parse } from 'url';
@@ -20,25 +20,26 @@ export { GetUrlResponse, Options };
 function getResponse(request: http.ClientRequest): Promise<GetUrlResponse> {
   return new Promise((resolve, reject) => {
     request.once('response', (resp: http.IncomingMessage) => {
+      if (!resp.statusCode) {
+        return reject(new Error('response statusCode is undefined'));
+      }
+
       const response: GetUrlResponse = {
         statusCode: resp.statusCode,
-        statusMessage: resp.statusMessage,
+        statusMessage: resp.statusMessage ?? '',
         headers: Object.keys(resp.headers).reduce((accum, name) => {
           let value = resp.headers[name];
           if (Array.isArray(value)) {
             value = value.join(', ');
           }
-          accum[name] = value;
+          if (value !== undefined) accum[name] = value;
           return accum;
         }, <{ [name: string]: string }>{}),
-        body: null,
+        body: new Uint8Array(0),
       };
       //resp.setEncoding("utf8");
 
       resp.on('data', (chunk: Uint8Array) => {
-        if (response.body == null) {
-          response.body = new Uint8Array(0);
-        }
         response.body = concat([response.body, chunk]);
       });
 
@@ -65,7 +66,7 @@ function getResponse(request: http.ClientRequest): Promise<GetUrlResponse> {
 }
 
 // The URL.parse uses null instead of the empty string
-function nonnull(value: string): string {
+function nonnull(value: string | null): string {
   if (value == null) {
     return '';
   }
@@ -85,22 +86,21 @@ export async function getUrl(
   //        to this request object
   const url = parse(href);
 
-  const request = {
+  const headers = options.allowGzip
+    ? { ...options.headers, 'accept-encoding': 'gzip' }
+    : { ...options.headers };
+  const request: RequestOptions = {
     protocol: nonnull(url.protocol),
     hostname: nonnull(url.hostname),
     port: nonnull(url.port),
     path: nonnull(url.pathname) + nonnull(url.search),
 
     method: options.method || 'GET',
-    headers: shallowCopy(options.headers || {}),
-    agent: null,
+    headers: shallowCopy(headers),
+    agent: undefined,
   };
 
-  if (options.allowGzip) {
-    request.headers['accept-encoding'] = 'gzip';
-  }
-
-  let req: http.ClientRequest = null;
+  let req: http.ClientRequest | undefined;
   switch (nonnull(url.protocol)) {
     case 'http:':
       if (options?.agents?.http) {
@@ -116,7 +116,7 @@ export async function getUrl(
       break;
     default:
       /* istanbul ignore next */
-      logger.throwError(
+      return logger.throwError(
         `unsupported protocol ${url.protocol}`,
         Logger.errors.UNSUPPORTED_OPERATION,
         {

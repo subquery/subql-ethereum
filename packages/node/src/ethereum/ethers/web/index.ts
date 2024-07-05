@@ -23,7 +23,7 @@ function staller(duration: number): Promise<void> {
   });
 }
 
-function bodyify(value: any, type: string): string {
+function bodyify(value: any, type: string | null): string | null {
   if (value == null) {
     return null;
   }
@@ -150,7 +150,7 @@ export function _fetchData<T = Uint8Array>(
 
   const headers: { [key: string]: Header } = {};
 
-  let url: string = null;
+  let url: string | null = null;
 
   // @TODO: Allow ConnectionInfo to override some of these values
   const options: Options = {
@@ -285,7 +285,7 @@ export function _fetchData<T = Uint8Array>(
   options.headers = flatHeaders;
 
   const runningTimeout = (function () {
-    let timer: NodeJS.Timer = null;
+    let timer: NodeJS.Timer | null = null;
     const promise: Promise<never> = new Promise(function (resolve, reject) {
       if (timeout) {
         timer = setTimeout(() => {
@@ -319,7 +319,7 @@ export function _fetchData<T = Uint8Array>(
 
   const runningFetch = (async function () {
     for (let attempt = 0; attempt < attemptLimit; attempt++) {
-      let response: GetUrlResponse = null;
+      let response: GetUrlResponse | null = null;
 
       try {
         response = await getUrl(url, options);
@@ -367,18 +367,20 @@ export function _fetchData<T = Uint8Array>(
         }
       } catch (error) {
         response = (<any>error).response;
-        if (response == null) {
-          runningTimeout.cancel();
-          logger.throwError('missing response', Logger.errors.SERVER_ERROR, {
+        if (response == null) runningTimeout.cancel();
+        throw logger.throwError(
+          'missing response',
+          Logger.errors.SERVER_ERROR,
+          {
             requestBody: bodyify(options.body, flatHeaders['content-type']),
             requestMethod: options.method,
             serverError: error,
             url: url,
-          });
-        }
+          },
+        );
       }
 
-      let body = response.body;
+      let body: Uint8Array | null = response.body;
 
       if (allow304 && response.statusCode === 304) {
         body = null;
@@ -387,7 +389,7 @@ export function _fetchData<T = Uint8Array>(
         (response.statusCode < 200 || response.statusCode >= 300)
       ) {
         runningTimeout.cancel();
-        logger.throwError('bad response', Logger.errors.SERVER_ERROR, {
+        throw logger.throwError('bad response', Logger.errors.SERVER_ERROR, {
           status: response.statusCode,
           headers: response.headers,
           body: bodyify(
@@ -405,7 +407,7 @@ export function _fetchData<T = Uint8Array>(
           const result = await processFunc(body, response);
           runningTimeout.cancel();
           return result;
-        } catch (error) {
+        } catch (error: any) {
           // Allow the processFunc to trigger a throttle
           if (error.throttleRetry && attempt < attemptLimit) {
             let tryAgain = true;
@@ -424,7 +426,7 @@ export function _fetchData<T = Uint8Array>(
           }
 
           runningTimeout.cancel();
-          logger.throwError(
+          throw logger.throwError(
             'processing response error',
             Logger.errors.SERVER_ERROR,
             {
@@ -486,7 +488,7 @@ export function fetchJson(
   // If we have json to send, we must
   // - add content-type of application/json (unless already overridden)
   // - convert the json to bytes
-  let body: Uint8Array = null;
+  let body: Uint8Array | undefined;
   if (json != null) {
     body = toUtf8Bytes(json);
 
@@ -532,7 +534,7 @@ export function poll<T>(
   }
 
   return new Promise(function (resolve, reject) {
-    let timer: NodeJS.Timer = null;
+    let timer: NodeJS.Timer | null = null;
     let done: boolean = false;
 
     // Returns true if cancel was successful. Unsuccessful cancel means we're already done.
@@ -555,7 +557,7 @@ export function poll<T>(
       }, options.timeout);
     }
 
-    const retryLimit = options.retryLimit;
+    const retryLimit = options.retryLimit ?? 0;
 
     let attempt = 0;
     function check() {
@@ -566,9 +568,9 @@ export function poll<T>(
             if (cancel()) {
               resolve(result);
             }
-          } else if (options.oncePoll) {
+          } else if (options?.oncePoll) {
             options.oncePoll.once('poll', check);
-          } else if (options.onceBlock) {
+          } else if (options?.onceBlock) {
             options.onceBlock.once('block', check);
 
             // Otherwise, exponential back-off (up to 10s) our next request

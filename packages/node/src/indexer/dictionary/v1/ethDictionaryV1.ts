@@ -37,7 +37,9 @@ export function appendDsOptions(
 ): void {
   const queryAddressLimit = yargsOptions.argv['query-address-limit'];
   if (Array.isArray(dsOptions)) {
-    const addresses = dsOptions.map((option) => option.address).filter(Boolean);
+    const addresses = dsOptions
+      .map((option) => option.address)
+      .filter((v): v is string => Boolean(v));
 
     if (addresses.length > queryAddressLimit) {
       logger.debug(
@@ -230,7 +232,7 @@ export class EthDictionaryV1 extends DictionaryV1<GroupedEthereumProjectDs> {
   static async create(
     project: SubqueryProject,
     nodeConfig: NodeConfig,
-    dictionaryUrl?: string,
+    dictionaryUrl: string,
   ): Promise<EthDictionaryV1> {
     /*Some dictionarys for EVM are built with other SDKs as they are chains with an EVM runtime
      * we maintain a list of aliases so we can map the evmChainId to the genesis hash of the other SDKs
