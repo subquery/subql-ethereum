@@ -96,7 +96,7 @@ export class EthereumApi implements ApiWrapper {
 
   // This is used within the sandbox when HTTP is used
   private nonBatchClient?: JsonRpcProvider;
-  private genesisBlock: Record<string, any>;
+  private _genesisBlock?: Record<string, any>;
   private contractInterfaces: Record<string, Interface> = {};
   private chainId: number;
   private name: string;
@@ -147,6 +147,13 @@ export class EthereumApi implements ApiWrapper {
     }
   }
 
+  private get genesisBlock(): Record<string, any> {
+    if (!this._genesisBlock) {
+      throw new Error('Genesis block is not available');
+    }
+    return this._genesisBlock;
+  }
+
   async init(): Promise<void> {
     this.injectClient();
 
@@ -170,7 +177,7 @@ export class EthereumApi implements ApiWrapper {
           this.getSupportsTag('safe'),
         ]);
 
-      this.genesisBlock = genesisBlock;
+      this._genesisBlock = genesisBlock;
       this._supportsFinalization = supportsFinalization && supportsSafe;
       this.chainId = network.chainId;
       this.name = network.name;
