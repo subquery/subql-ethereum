@@ -420,6 +420,6 @@ describe('Codegen spec', () => {
 
     await expect(
       generateAbis([ds], PROJECT_PATH, undefined as any, undefined as any, undefined as any)
-    ).rejects.toThrow('Databases.Asset is undefined');
+    ).rejects.toThrow('Asset: "erc20" not found in project');
   });
 });
