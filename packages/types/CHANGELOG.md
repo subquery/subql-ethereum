@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [3.10.0] - 2024-07-10
 ### Changed
-- Update `@subql/types-core` dependency
+- Update `@subql/types-core` dependency (#326)
 
 ### Fixed
 - Incorrect generic parameter type (#321)

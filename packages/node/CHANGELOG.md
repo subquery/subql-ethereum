@@ -8,8 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [4.8.0] - 2024-07-10
 ### Changed
-- Bump with `@subql/common-ethereum` and `@subql/types-ethereum`
-- Bump with `@subql/node-core`, fix admin api `dbSize` issue
+- Bump with `@subql/common-ethereum` and `@subql/types-ethereum` (#326)
+- Bump with `@subql/node-core`, fix admin api `dbSize` issue (#326)
 
 ## [4.7.0] - 2024-07-03
 ### Changed
