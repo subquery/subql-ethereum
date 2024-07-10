@@ -1,6 +1,7 @@
 // Copyright 2020-2024 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
+import assert from 'assert';
 import fs from 'fs';
 import http from 'http';
 import https from 'https';
@@ -98,8 +99,8 @@ export class EthereumApi implements ApiWrapper {
   private nonBatchClient?: JsonRpcProvider;
   private _genesisBlock?: Record<string, any>;
   private contractInterfaces: Record<string, Interface> = {};
-  private chainId: number;
-  private name: string;
+  private chainId?: number;
+  private name?: string;
 
   // Ethereum POS
   private _supportsFinalization = true;
@@ -183,6 +184,9 @@ export class EthereumApi implements ApiWrapper {
       this.name = network.name;
     } catch (e) {
       if ((e as Error).message.startsWith('Invalid response')) {
+        if (!this.nonBatchClient) {
+          throw new Error('No suitable client found');
+        }
         this.client = this.nonBatchClient;
 
         logger.warn(
@@ -213,9 +217,9 @@ export class EthereumApi implements ApiWrapper {
   private injectClient(): void {
     const orig = this.client.send.bind(this.client);
     Object.defineProperty(this.client, 'send', {
-      value: (...args) => {
+      value: (method: string, args: any[]) => {
         this.eventEmitter.emit('rpcCall');
-        return orig(...args);
+        return orig(method, args);
       },
     });
   }
@@ -268,10 +272,12 @@ export class EthereumApi implements ApiWrapper {
   }
 
   getRuntimeChain(): string {
+    assert(this.name, 'Api has not been initialised');
     return this.name;
   }
 
   getChainId(): number {
+    assert(this.chainId, 'Api has not been initialised');
     return this.chainId;
   }
 
@@ -391,13 +397,15 @@ export class EthereumApi implements ApiWrapper {
         ? this.client
         : this.nonBatchClient;
 
+    assert(client, 'Unable to find client to make SafeApi');
+
     return new SafeEthProvider(client, blockHeight);
   }
 
   private buildInterface(
     abiName: string,
     assets: Record<string, string>,
-  ): Interface | undefined {
+  ): Interface {
     if (!assets[abiName]) {
       throw new Error(`ABI named "${abiName}" not referenced in assets`);
     }

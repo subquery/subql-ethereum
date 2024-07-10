@@ -69,7 +69,7 @@ function extractOptionAddresses(
 
 function callFilterToDictionaryCondition(
   filter: EthereumTransactionFilter,
-  dsOptions: SubqlEthereumProcessorOptions,
+  dsOptions?: SubqlEthereumProcessorOptions,
 ): EthDictionaryTxConditions {
   const txConditions: EthDictionaryTxConditions = {};
   const toArray: (string | null)[] = [];
@@ -120,7 +120,7 @@ function callFilterToDictionaryCondition(
 
 function eventFilterToDictionaryCondition(
   filter: EthereumLogFilter,
-  dsOptions: SubqlEthereumProcessorOptions | SubqlEthereumProcessorOptions[],
+  dsOptions?: SubqlEthereumProcessorOptions | SubqlEthereumProcessorOptions[],
 ): EthDictionaryLogConditions {
   const logConditions: EthDictionaryLogConditions = {};
   logConditions.address = extractOptionAddresses(dsOptions);
@@ -281,11 +281,13 @@ export class EthDictionaryV2 extends DictionaryV2<
       const blocks: IBlock<EthereumBlock>[] = (
         (data.blocks as RawEthBlock[]) || []
       ).map((b) => rawBlockToEthBlock(b, this.api));
+
+      if (!blocks.length) {
+        return undefined;
+      }
       return {
         batchBlocks: blocks,
-        lastBufferedHeight: blocks.length
-          ? blocks[blocks.length - 1].block.number
-          : undefined,
+        lastBufferedHeight: blocks[blocks.length - 1].block.number,
       };
     } catch (e: any) {
       logger.error(e, `Failed to handle block response}`);

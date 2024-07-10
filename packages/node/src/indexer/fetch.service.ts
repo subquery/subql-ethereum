@@ -86,7 +86,9 @@ export class FetchService extends BaseFetchService<
   }
 
   protected async initBlockDispatcher(): Promise<void> {
-    await this.blockDispatcher.init(this.resetForNewDs.bind(this)); // TODO need update main repo to support this
+    await this.blockDispatcher.init((height) =>
+      Promise.resolve(this.resetForNewDs(height)),
+    );
   }
 
   protected async preLoopHook(): Promise<void> {
