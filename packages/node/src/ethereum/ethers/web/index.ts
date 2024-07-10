@@ -150,7 +150,7 @@ export function _fetchData<T = Uint8Array>(
 
   const headers: { [key: string]: Header } = {};
 
-  let url: string | null = null;
+  let url: string = null;
 
   // @TODO: Allow ConnectionInfo to override some of these values
   const options: Options = {
@@ -549,7 +549,7 @@ export function poll<T>(
       return true;
     };
 
-    if (options.timeout) {
+    if (options?.timeout) {
       timer = setTimeout(() => {
         if (cancel()) {
           reject(new Error('timeout'));
@@ -557,7 +557,7 @@ export function poll<T>(
       }, options.timeout);
     }
 
-    const retryLimit = options.retryLimit ?? 0;
+    const retryLimit = options?.retryLimit ?? 0;
 
     let attempt = 0;
     function check() {
@@ -584,13 +584,13 @@ export function poll<T>(
             }
 
             let timeout =
-              options.interval *
+              options!.interval! *
               parseInt(String(Math.random() * Math.pow(2, attempt)));
-            if (timeout < options.floor) {
-              timeout = options.floor;
+            if (timeout < options!.floor!) {
+              timeout = options!.floor!;
             }
-            if (timeout > options.ceiling) {
-              timeout = options.ceiling;
+            if (timeout > options!.ceiling!) {
+              timeout = options!.ceiling!;
             }
 
             setTimeout(check, timeout);
