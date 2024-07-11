@@ -11,6 +11,7 @@ import {
   BaseFetchService,
   ApiService,
   getModulos,
+  getLogger,
 } from '@subql/node-core';
 import { EthereumBlock, SubqlDatasource } from '@subql/types-ethereum';
 import { SubqueryProject } from '../configure/SubqueryProject';
@@ -28,12 +29,15 @@ const BLOCK_TIME_VARIANCE = 5000;
 
 const INTERVAL_PERCENT = 0.9;
 
+const logger = getLogger(`EthFetchService`);
+
 @Injectable()
 export class FetchService extends BaseFetchService<
   SubqlDatasource,
   IEthereumBlockDispatcher,
   EthereumBlock
 > {
+  private lastFinalizedHeight?: number;
   constructor(
     private apiService: ApiService,
     nodeConfig: NodeConfig,
@@ -65,9 +69,21 @@ export class FetchService extends BaseFetchService<
     const block = await this.api.getFinalizedBlock();
 
     const header = ethereumBlockToHeader(block);
-
-    this.unfinalizedBlocksService.registerFinalizedBlock(header);
-    return header.blockHeight;
+    const newFinalizedBlockHeight = header.blockHeight;
+    logger.debug(
+      `Rpc finalized height, ${newFinalizedBlockHeight} | current lastFinalizedHeight, ${this.lastFinalizedHeight}`,
+    );
+    // Rpc could return finalized height below last finalized height due to unmatched nodes
+    // See how this could happen in https://gist.github.com/jiqiang90/ea640b07d298bca7cbeed4aee50776de
+    // We want to ensure indexer not stall due to this
+    if (
+      this.lastFinalizedHeight === undefined ||
+      newFinalizedBlockHeight > this.lastFinalizedHeight
+    ) {
+      this.lastFinalizedHeight = newFinalizedBlockHeight;
+      this.unfinalizedBlocksService.registerFinalizedBlock(header);
+    }
+    return this.lastFinalizedHeight;
   }
 
   protected async getBestHeight(): Promise<number> {
