@@ -7,7 +7,6 @@ import {
   DictionaryQueryEntry as DictionaryV1QueryEntry,
 } from '@subql/types-core';
 import {
-  EthereumBlockFilter,
   EthereumHandlerKind,
   EthereumLogFilter,
   EthereumTransactionFilter,
@@ -32,7 +31,10 @@ const CHAIN_ALIASES_URL =
 const logger = getLogger('dictionary-v1');
 
 export function appendDsOptions(
-  dsOptions: SubqlEthereumProcessorOptions | SubqlEthereumProcessorOptions[],
+  dsOptions:
+    | SubqlEthereumProcessorOptions
+    | SubqlEthereumProcessorOptions[]
+    | undefined,
   conditions: DictionaryQueryCondition[],
 ): void {
   const queryAddressLimit = yargsOptions.argv['query-address-limit'];
@@ -67,7 +69,7 @@ export function appendDsOptions(
 
 function eventFilterToQueryEntry(
   filter: EthereumLogFilter,
-  dsOptions: SubqlEthereumProcessorOptions | SubqlEthereumProcessorOptions[],
+  dsOptions?: SubqlEthereumProcessorOptions | SubqlEthereumProcessorOptions[],
 ): DictionaryV1QueryEntry {
   const conditions: DictionaryQueryCondition[] = [];
   appendDsOptions(dsOptions, conditions);
@@ -102,7 +104,7 @@ function eventFilterToQueryEntry(
 
 function callFilterToQueryEntry(
   filter: EthereumTransactionFilter,
-  dsOptions: SubqlEthereumProcessorOptions | SubqlEthereumProcessorOptions[],
+  dsOptions?: SubqlEthereumProcessorOptions | SubqlEthereumProcessorOptions[],
 ): DictionaryV1QueryEntry {
   const conditions: DictionaryQueryCondition[] = [];
   appendDsOptions(dsOptions, conditions);

@@ -116,6 +116,9 @@ export class UnfinalizedBlocksService extends BaseUnfinalizedBlocksService<Block
       }
 
       // Get the new parent
+      if (!checkingHeader.parentHash) {
+        throw new Error('Unable to get parent hash for header');
+      }
       checkingHeader = await this.getHeaderForHash(checkingHeader.parentHash);
     }
 
