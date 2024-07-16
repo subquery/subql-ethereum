@@ -69,7 +69,7 @@ export class SubqueryProject implements ISubqueryProject {
     this.#dataSources = await insertBlockFiltersCronSchedules(
       this.dataSources,
       getTimestamp,
-      isRuntimeDs, // TODO need update main repo to support this
+      isRuntimeDs,
       EthereumHandlerKind.Block,
     );
   }
@@ -156,7 +156,7 @@ async function loadProjectFromManifestBase(
     projectManifest.templates,
     root,
     reader,
-    isCustomDs, // TODO need update main repo to support this
+    isCustomDs,
   );
   const runner = projectManifest.runner;
   assert(

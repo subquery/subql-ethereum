@@ -3075,7 +3075,24 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@subql/common@npm:4.0.1, @subql/common@npm:^4.0.1":
+"@subql/common@npm:4.1.0":
+  version: 4.1.0
+  resolution: "@subql/common@npm:4.1.0"
+  dependencies:
+    "@subql/types-core": 0.10.0
+    axios: ^0.28.0
+    class-transformer: ^0.5.1
+    class-validator: ^0.14.0
+    fs-extra: ^10.1.0
+    js-yaml: ^4.1.0
+    reflect-metadata: ^0.1.13
+    semver: ^7.5.2
+    update-notifier: 5.1.0
+  checksum: 8beac982f53ad99efb9a5725d73768f945a4fb52ff50222c3db047e4143013a9e716c0cb63d561dd8ae40fa2f0a8ceb472516d6e3fc2beb58ee888361a7798a7
+  languageName: node
+  linkType: hard
+
+"@subql/common@npm:^4.0.1":
   version: 4.0.1
   resolution: "@subql/common@npm:4.0.1"
   dependencies:
@@ -3093,15 +3110,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@subql/node-core@npm:^10.10.2":
-  version: 10.10.2
-  resolution: "@subql/node-core@npm:10.10.2"
+"@subql/node-core@npm:^11.0.0":
+  version: 11.0.0
+  resolution: "@subql/node-core@npm:11.0.0"
   dependencies:
     "@apollo/client": ^3.8.8
     "@nestjs/common": ^9.4.0
     "@nestjs/event-emitter": ^2.0.0
     "@nestjs/schedule": ^3.0.1
-    "@subql/common": 4.0.1
+    "@subql/common": 4.1.0
     "@subql/testing": 2.2.1
     "@subql/types": 3.9.0
     "@subql/utils": 2.12.1
@@ -3122,7 +3139,7 @@ __metadata:
     toposort-class: ^1.0.1
     vm2: ^3.9.19
     yargs: ^16.2.0
-  checksum: 632b712c315004f1af7cbf1bcd5f444e427278688f0d5e9453df56682cae6625ce4d51de4f23de47ccc3d74ad330a8f95cde3332850049445ca6a809118b6c84
+  checksum: b41ec97d614ceafc006e66cf5f6419fba027d5831cd56ed335d431d63b176f902ab1039db5764ba01d5cadbfba695cbd4c06f67e5b7b4f9941877ea482e8e066
   languageName: node
   linkType: hard
 
@@ -3138,7 +3155,7 @@ __metadata:
     "@nestjs/schematics": ^9.2.0
     "@nestjs/testing": ^9.4.0
     "@subql/common-ethereum": "workspace:*"
-    "@subql/node-core": ^10.10.2
+    "@subql/node-core": ^11.0.0
     "@subql/testing": ^2.2.1
     "@subql/types-ethereum": "workspace:*"
     "@types/express": ^4.17.13
@@ -3170,6 +3187,15 @@ __metadata:
   dependencies:
     "@subql/types-core": ^0.9.1
   checksum: 0e2529ec5e3c0b1360f51c3ad7d536b7d63efa9fdafa956c388c7547a23eeca0b9d1445b27010d9fa249b2541882c8009c8f2a4a49a00ef78d94e55c9675f392
+  languageName: node
+  linkType: hard
+
+"@subql/types-core@npm:0.10.0":
+  version: 0.10.0
+  resolution: "@subql/types-core@npm:0.10.0"
+  dependencies:
+    package-json-type: ^1.0.3
+  checksum: 952e25f69daa8b11a8949588c67df0e2d8f95660d8b963d00343c7e5e9788390dde05f76a890e7e366392fa6cf878f0c12be3b9f4fb270e967a7d722b3743fb3
   languageName: node
   linkType: hard
 

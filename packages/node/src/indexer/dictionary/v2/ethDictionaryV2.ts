@@ -148,7 +148,7 @@ function eventFilterToDictionaryCondition(
 function sanitiseDictionaryConditions(
   dictionaryConditions: EthDictionaryV2QueryEntry,
 ): EthDictionaryV2QueryEntry {
-  if (dictionaryConditions.logs?.length === 0) {
+  if (!dictionaryConditions.logs?.length) {
     delete dictionaryConditions.logs;
   } else {
     dictionaryConditions.logs = uniqBy(dictionaryConditions.logs, (log) =>
@@ -156,7 +156,7 @@ function sanitiseDictionaryConditions(
     );
   }
 
-  if (dictionaryConditions.transactions?.length === 0) {
+  if (!dictionaryConditions.transactions?.length) {
     delete dictionaryConditions.transactions;
   } else {
     dictionaryConditions.transactions = uniqBy(
@@ -194,7 +194,8 @@ export function buildDictionaryV2QueryEntry(
             filter.to !== undefined ||
             filter.function !== undefined
           ) {
-            dictionaryConditions.transactions?.push(
+            dictionaryConditions.transactions ??= [];
+            dictionaryConditions.transactions.push(
               callFilterToDictionaryCondition(filter, ds.options),
             );
           } else {
@@ -204,12 +205,13 @@ export function buildDictionaryV2QueryEntry(
         }
         case EthereumHandlerKind.Event: {
           const filter = handler.filter as EthereumLogFilter;
+          dictionaryConditions.logs ??= [];
           if (ds.groupedOptions) {
-            dictionaryConditions.logs?.push(
+            dictionaryConditions.logs.push(
               eventFilterToDictionaryCondition(filter, ds.groupedOptions),
             );
           } else if (ds.options?.address || filter.topics) {
-            dictionaryConditions.logs?.push(
+            dictionaryConditions.logs.push(
               eventFilterToDictionaryCondition(filter, ds.options),
             );
           } else {

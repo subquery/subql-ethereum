@@ -54,6 +54,7 @@ export class FetchService extends BaseFetchService<
       dictionaryService,
       eventEmitter,
       schedulerRegistry,
+      unfinalizedBlocksService,
     );
   }
 

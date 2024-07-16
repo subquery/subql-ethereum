@@ -117,7 +117,7 @@ function unpercent(value: string): Uint8Array {
 export function _fetchData<T = Uint8Array>(
   connection: string | ConnectionInfo,
   body?: Uint8Array,
-  processFunc?: (value: Uint8Array, response: FetchJsonResponse) => T,
+  processFunc?: (value: Uint8Array | null, response: FetchJsonResponse) => T,
 ): Promise<T> {
   // How many times to retry in the event of a throttle
   const attemptLimit =
@@ -150,7 +150,7 @@ export function _fetchData<T = Uint8Array>(
 
   const headers: { [key: string]: Header } = {};
 
-  let url: string | null = null;
+  let url: string;
 
   // @TODO: Allow ConnectionInfo to override some of these values
   const options: Options = {
@@ -225,6 +225,8 @@ export function _fetchData<T = Uint8Array>(
     if (connection.agents != null) {
       options.agents = connection.agents;
     }
+  } else {
+    throw new Error('invalid connection');
   }
 
   const reData = new RegExp('^data:([^;:]*)?(;base64)?,(.*)$', 'i');
@@ -465,7 +467,10 @@ export function fetchJson(
   json?: string,
   processFunc?: (value: any, response: FetchJsonResponse) => any,
 ): Promise<any> {
-  let processJsonFunc = (value: Uint8Array, response: FetchJsonResponse) => {
+  let processJsonFunc = (
+    value: Uint8Array | null,
+    response: FetchJsonResponse,
+  ) => {
     let result: any = null;
     if (value != null) {
       try {
