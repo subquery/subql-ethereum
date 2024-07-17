@@ -3190,7 +3190,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@subql/types-core@npm:0.10.0":
+"@subql/types-core@npm:0.10.0, @subql/types-core@npm:^0.10.0":
   version: 0.10.0
   resolution: "@subql/types-core@npm:0.10.0"
   dependencies:
@@ -3214,7 +3214,7 @@ __metadata:
   dependencies:
     "@ethersproject/abstract-provider": ^5.6.1
     "@ethersproject/providers": ^5.7.2
-    "@subql/types-core": ^0.9.1
+    "@subql/types-core": ^0.10.0
   languageName: unknown
   linkType: soft
 
