@@ -216,22 +216,3 @@ export class EthereumApiService extends ApiService<
     }
   }
 }
-
-class A {
-  name = '';
-  a() {
-    return 1;
-  }
-}
-class B {
-  name = 1;
-  a(): string {
-    return '1';
-  }
-}
-
-const aa = new A();
-
-const b: B = new B();
-
-aa.a.apply(b, []);

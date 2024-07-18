@@ -35,18 +35,20 @@ function getResponse(request: http.ClientRequest): Promise<GetUrlResponse> {
           if (value !== undefined) accum[name] = value;
           return accum;
         }, <{ [name: string]: string }>{}),
-        body: new Uint8Array(0),
+        body: null,
       };
       //resp.setEncoding("utf8");
 
       resp.on('data', (chunk: Uint8Array) => {
-        response.body = concat([response.body, chunk]);
+        response.body = concat([response.body ?? new Uint8Array(0), chunk]);
       });
 
       resp.on('end', () => {
         if (response.headers['content-encoding'] === 'gzip') {
           //const size = response.body.length;
-          response.body = arrayify(gunzipSync(response.body));
+          response.body = response.body
+            ? arrayify(gunzipSync(response.body))
+            : null;
           //console.log("Delta:", response.body.length - size, Buffer.from(response.body).toString());
         }
         resolve(response);
