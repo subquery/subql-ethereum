@@ -162,7 +162,7 @@ export class EthereumApi implements ApiWrapper {
   private applyBatchSize(batchSize?: number): void {
     if (batchSize === null || batchSize === undefined) return;
 
-    if (batchSize === 0 && !!this.nonBatchClient) {
+    if (batchSize <= 0 && !!this.nonBatchClient) {
       logger.info('Endpoint config batch size is 0, not using batch requests');
       this.client = this.nonBatchClient;
       return;
