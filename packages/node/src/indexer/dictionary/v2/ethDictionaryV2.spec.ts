@@ -313,6 +313,7 @@ describe('eth dictionary v2', () => {
 
     const res = await ethDictionaryV2.getData(18723210, 18733210, 100);
 
+    expect(res?.batchBlocks.length).toEqual(0);
     expect(res?.lastBufferedHeight).toEqual(18733210);
   });
 });
