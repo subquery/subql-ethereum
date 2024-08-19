@@ -24,5 +24,8 @@ COPY . .
 COPY benchmarking.sh /app/benchmarking.sh
 RUN chmod +x /app/benchmarking.sh
 
+
+ENV TZ=utc
+
 # Set the entrypoint to the script
 ENTRYPOINT ["/bin/bash", "/app/benchmarking.sh"]
