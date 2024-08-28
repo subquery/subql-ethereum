@@ -43,7 +43,6 @@ function applyAddresses(
     addresses.length > queryAddressLimit ||
     addresses.filter((v) => !v).length // DONT use find because 'undefined' and 'null' as falsey
   ) {
-    console.log('YOYO');
     return;
   }
 
@@ -202,7 +201,6 @@ export function buildDictionaryV1QueryEntries(
         ) {
           return [];
         }
-        console.log('XXXXX', handler.filter, addresses);
         queryEntries.push(eventFilterToQueryEntry(handler.filter, addresses));
         break;
       default:
