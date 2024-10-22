@@ -11,6 +11,7 @@ import {
   EthereumLogFilter,
   SubqlRuntimeDatasource,
 } from '@subql/types-ethereum';
+import _ from 'lodash';
 import { EthereumApi } from './api.ethereum';
 import {
   filterLogsProcessor,
@@ -366,6 +367,11 @@ describe('Api.ethereum', () => {
     const lightBlock = (await (ethApi as any).fetchLightBlock(16258633)).block;
     expect(isFullBlock(blockData)).toBeTruthy();
     expect(isFullBlock(lightBlock)).toBeFalsy();
+
+    // block with transactions, but no logs
+    const noLogBlockData = _.cloneDeep(blockData);
+    noLogBlockData.logs = [];
+    expect(isFullBlock(noLogBlockData)).toBeTruthy();
 
     // block without transaction
     const block10001 = (await (ethApi as any).fetchBlock(10001)).block;

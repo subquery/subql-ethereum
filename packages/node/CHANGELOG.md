@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Do not index data when fullBlock does not exist logs (#)
+
 ## [5.1.5] - 2024-10-22
 ### Changed
 - Bump `@subql/node-core` dependency (#347)
