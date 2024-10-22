@@ -16,7 +16,6 @@ import {
   StoreCacheService,
 } from '@subql/node-core';
 import { EthereumBlock, SubqlDatasource } from '@subql/types-ethereum';
-import { SubqueryProject } from '../configure/SubqueryProject';
 import { EthereumApi } from '../ethereum';
 import {
   calcInterval,
