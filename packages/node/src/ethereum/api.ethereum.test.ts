@@ -368,9 +368,8 @@ describe('Api.ethereum', () => {
     expect(isFullBlock(blockData)).toBeTruthy();
     expect(isFullBlock(lightBlock)).toBeFalsy();
 
-    // block with transactions, but no logs
-    const noLogBlockData = _.cloneDeep(blockData);
-    noLogBlockData.logs = [];
+    // block with transactions, but no logs 4913287
+    const noLogBlockData = (await (ethApi as any).fetchBlock(4913287)).block;
     expect(isFullBlock(noLogBlockData)).toBeTruthy();
 
     // block without transaction
