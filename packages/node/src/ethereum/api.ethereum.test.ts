@@ -11,7 +11,6 @@ import {
   EthereumLogFilter,
   SubqlRuntimeDatasource,
 } from '@subql/types-ethereum';
-import _ from 'lodash';
 import { EthereumApi } from './api.ethereum';
 import {
   filterLogsProcessor,
