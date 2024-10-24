@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
-- Do not index data when fullBlock does not exist logs (#350)
+- When there is no log data for fullBlock, it is determined as lightBlock. (#350)
 
 ## [5.1.6] - 2024-10-23
 ### Changed
