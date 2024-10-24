@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Do not index data when fullBlock does not exist logs (#350)
 
+## [5.1.6] - 2024-10-23
+### Changed
+- Bump `@subql/common` dependency
+
 ## [5.1.5] - 2024-10-22
 ### Changed
 - Bump `@subql/node-core` dependency (#347)
@@ -563,7 +567,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Init release
 
-[Unreleased]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/5.1.5...HEAD
+[Unreleased]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/5.1.6...HEAD
+[5.1.6]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/5.1.5...node-ethereum/5.1.6
 [5.1.5]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/5.1.4...node-ethereum/5.1.5
 [5.1.4]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/5.1.3...node-ethereum/5.1.4
 [5.1.3]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/5.1.2...node-ethereum/5.1.3
