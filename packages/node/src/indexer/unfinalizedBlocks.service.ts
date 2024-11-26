@@ -1,7 +1,7 @@
 // Copyright 2020-2024 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import {
   ApiService,
   BaseUnfinalizedBlocksService,
@@ -28,7 +28,7 @@ export class UnfinalizedBlocksService extends BaseUnfinalizedBlocksService<Block
   constructor(
     private readonly apiService: ApiService,
     nodeConfig: NodeConfig,
-    storeModelProvider: IStoreModelProvider,
+    @Inject('IStoreModelProvider') storeModelProvider: IStoreModelProvider,
   ) {
     super(new EthereumNodeConfig(nodeConfig), storeModelProvider);
   }
