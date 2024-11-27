@@ -5,7 +5,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { EthereumApi, EthereumApiService } from '../ethereum';
 import { ProjectService } from './project.service';
 
-const HTTP_ENDPOINT = 'https://ethereum.rpc.subquery.network/public';
+const HTTP_ENDPOINT = 'https://eth-pokt.nodies.app';
 
 const mockApiService = (): EthereumApiService => {
   const ethApi = new EthereumApi(HTTP_ENDPOINT, 20, new EventEmitter2());
