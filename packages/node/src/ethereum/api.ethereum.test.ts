@@ -312,7 +312,7 @@ describe('Api.ethereum', () => {
 
     // BSC
     ethApi = new EthereumApi(
-      'https://bsc-dataseed.binance.org',
+      'https://binance.llamarpc.com',
       BLOCK_CONFIRMATIONS,
       eventEmitter,
     );
