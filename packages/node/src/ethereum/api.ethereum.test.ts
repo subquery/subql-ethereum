@@ -19,7 +19,7 @@ import {
 } from './block.ethereum';
 
 // Add api key to work
-const HTTP_ENDPOINT = 'https://eth-pokt.nodies.app';
+const HTTP_ENDPOINT = 'https://ethereum.rpc.subquery.network/public';
 const BLOCK_CONFIRMATIONS = 20;
 const MOONBEAM_ENDPOINT = 'https://rpc.api.moonbeam.network';
 
