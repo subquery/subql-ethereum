@@ -47,7 +47,16 @@ const prepareApiService = async (
         provide: 'ISubqueryProject',
         useFactory: () => testSubqueryProject(endpoint),
       },
-      EthereumApiService,
+      {
+        provide: EthereumApiService,
+        useFactory: EthereumApiService.init,
+        inject: [
+          'ISubqueryProject',
+          ConnectionPoolService,
+          EventEmitterModule,
+          NodeConfig,
+        ],
+      },
     ],
     imports: [EventEmitterModule.forRoot()],
   }).compile();
@@ -55,7 +64,6 @@ const prepareApiService = async (
   const app = module.createNestApplication();
   await app.init();
   const apiService = app.get(EthereumApiService);
-  await apiService.init();
   return [apiService, app];
 };
 
