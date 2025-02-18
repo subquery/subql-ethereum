@@ -20,7 +20,9 @@ import {
   LightEthereumBlock,
   SubqlCustomDatasource,
   SubqlCustomHandler,
+  SubqlDatasource,
   SubqlMapping,
+  SubqlRuntimeDatasource,
 } from '@subql/types-ethereum';
 import { plainToClass } from 'class-transformer';
 import { validateSync } from 'class-validator';
@@ -41,8 +43,8 @@ const { version: packageVersion } = require('../package.json');
 export class BlockchainService
   implements
     IBlockchainService<
-      SubqlEthereumDataSource,
-      SubqlCustomDatasource,
+      SubqlDatasource,
+      SubqlCustomDatasource<string, SubqlMapping<SubqlCustomHandler>>,
       SubqueryProject,
       SafeEthProvider,
       LightEthereumBlock,
@@ -68,7 +70,7 @@ export class BlockchainService
     blockNum: number,
     context: { workers: IIndexerWorker[] },
   ): Promise<Header> {
-    return worker.fetchBlock(blockNum, context);
+    return worker.fetchBlock(blockNum, 0);
   }
 
   getBlockSize(block: IBlock<BlockContent>): number {
