@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0
 
 import { INestApplication } from '@nestjs/common';
-import { EventEmitterModule } from '@nestjs/event-emitter';
+import { EventEmitter2, EventEmitterModule } from '@nestjs/event-emitter';
 import { Test } from '@nestjs/testing';
 import {
   ConnectionPoolService,
@@ -53,7 +53,7 @@ const prepareApiService = async (
         inject: [
           'ISubqueryProject',
           ConnectionPoolService,
-          EventEmitterModule,
+          EventEmitter2,
           NodeConfig,
         ],
       },

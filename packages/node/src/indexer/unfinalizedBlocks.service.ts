@@ -28,9 +28,8 @@ export class UnfinalizedBlocksService extends BaseUnfinalizedBlocksService<Block
   private _blockchainService: BlockchainService;
 
   constructor(
-    protected readonly nodeConfig: NodeConfig,
-    @Inject('IStoreModelProvider')
-    protected readonly storeModelProvider: IStoreModelProvider,
+    nodeConfig: NodeConfig,
+    @Inject('IStoreModelProvider') storeModelProvider: IStoreModelProvider,
     @Inject('IBlockchainService') blockchainService: BlockchainService,
   ) {
     // blockchain service cast is due to unsolvable typescript generic error, it wokrs on the main sdk but not here
@@ -39,6 +38,8 @@ export class UnfinalizedBlocksService extends BaseUnfinalizedBlocksService<Block
       storeModelProvider,
       blockchainService as IBlockchainService,
     );
+
+    // TODO revert this with update to node-core
     this._blockchainService = blockchainService;
   }
 
