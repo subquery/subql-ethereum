@@ -24,9 +24,6 @@ export class UnfinalizedBlocksService extends BaseUnfinalizedBlocksService<Block
   private supportsFinalization?: boolean;
   private startupCheck = true;
 
-  // TODO update node core unfinalized blocks to be protected
-  private _blockchainService: BlockchainService;
-
   constructor(
     nodeConfig: NodeConfig,
     @Inject('IStoreModelProvider') storeModelProvider: IStoreModelProvider,
@@ -38,9 +35,6 @@ export class UnfinalizedBlocksService extends BaseUnfinalizedBlocksService<Block
       storeModelProvider,
       blockchainService as IBlockchainService,
     );
-
-    // TODO revert this with update to node-core
-    this._blockchainService = blockchainService;
   }
 
   /**
@@ -71,7 +65,7 @@ export class UnfinalizedBlocksService extends BaseUnfinalizedBlocksService<Block
       const lastUnfinalized = last(this.unfinalizedBlocks);
       if (lastUnfinalized) {
         const checkUnfinalized =
-          await this._blockchainService.getHeaderForHeight(
+          await this.blockchainService.getHeaderForHeight(
             lastUnfinalized.blockHeight,
           );
 
@@ -131,7 +125,7 @@ export class UnfinalizedBlocksService extends BaseUnfinalizedBlocksService<Block
       if (!checkingHeader.parentHash) {
         throw new Error('Unable to get parent hash for header');
       }
-      checkingHeader = await this._blockchainService.getHeaderForHash(
+      checkingHeader = await this.blockchainService.getHeaderForHash(
         checkingHeader.parentHash,
       );
     }

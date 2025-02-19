@@ -22,6 +22,7 @@ import {
   BlockDispatcher,
   DsProcessorService,
   FetchService,
+  DictionaryService,
 } from '@subql/node-core';
 import { BlockchainService } from '../blockchain.service';
 import { SubqueryProject } from '../configure/SubqueryProject';
@@ -118,14 +119,20 @@ import { UnfinalizedBlocksService } from './unfinalizedBlocks.service';
       ],
     },
     FetchService,
-    EthDictionaryService,
+    {
+      provide: DictionaryService,
+      useClass: EthDictionaryService,
+    },
     DsProcessorService,
     DynamicDsService,
     {
       useClass: ProjectService,
       provide: 'IProjectService',
     },
-    UnfinalizedBlocksService,
+    {
+      provide: 'IUnfinalizedBlocksService',
+      useClass: UnfinalizedBlocksService,
+    },
   ],
 })
 export class FetchModule {}

@@ -23,7 +23,6 @@ import { UnfinalizedBlocksService } from '../indexer/unfinalizedBlocks.service';
 @Module({
   imports: [TestingCoreModule],
   providers: [
-    // UnfinalizedBlocksService, // TODO privde correct instance
     {
       provide: 'IProjectService',
       useClass: ProjectService,

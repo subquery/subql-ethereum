@@ -5,6 +5,7 @@ import { Module } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import {
   ConnectionPoolService,
+  DsProcessorService,
   NodeConfig,
   ProjectService,
   WorkerCoreModule,
@@ -17,6 +18,7 @@ import { WorkerService } from './worker.service';
 @Module({
   imports: [WorkerCoreModule],
   providers: [
+    DsProcessorService,
     IndexerManager,
     {
       provide: 'APIService',
