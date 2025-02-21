@@ -22,6 +22,7 @@ const makeHeader = (height: number, finalized?: boolean): Header => ({
   blockHeight: height,
   blockHash: hexify(`0xABC${height}${finalized ? 'f' : ''}`),
   parentHash: hexify(`0xABC${height - 1}${finalized ? 'f' : ''}`),
+  timestamp: new Date((1740100000 + height) * 1000),
 });
 
 const getMockApi = (): ApiService => {
@@ -42,12 +43,14 @@ const getMockApi = (): ApiService => {
           number: num,
           hash: typeof hash === 'number' ? hexify(`0xABC${hash}f`) : hash,
           parentHash: hexify(`0xABC${num - 1}f`),
+          timestamp: 1740100000 + num,
         });
       },
       getFinalizedBlock: jest.fn(() => ({
         number: 110,
         hash: '0xABC110f',
         parentHash: '0xABC109f',
+        timestamp: 1740100000 + 110,
       })),
     },
   } as any;
@@ -164,6 +167,7 @@ describe('UnfinalizedBlockService', () => {
       blockHash: '0x00ABC99f',
       blockHeight: 99,
       parentHash: '0x00ABC98f',
+      timestamp: new Date((1740100000 + 99) * 1000),
     });
   });
 
@@ -188,6 +192,7 @@ describe('UnfinalizedBlockService', () => {
       blockHash: '0x00ABC99f',
       blockHeight: 99,
       parentHash: '0x00ABC98f',
+      timestamp: new Date((1740100000 + 99) * 1000),
     });
   });
 
