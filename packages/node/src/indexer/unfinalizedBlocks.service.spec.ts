@@ -47,14 +47,14 @@ const getMockApi = (): ApiService => {
           number: num,
           hash: typeof hash === 'number' ? hexify(`0xABC${hash}f`) : hash,
           parentHash: hexify(`0xABC${num - 1}f`),
-          timestamp: genBlockTimestamp(num),
+          timestamp: genBlockTimestamp(num) / 1000,
         });
       },
       getFinalizedBlock: jest.fn(() => ({
         number: 110,
         hash: '0xABC110f',
         parentHash: '0xABC109f',
-        timestamp: genBlockTimestamp(110),
+        timestamp: genBlockTimestamp(110) / 1000,
       })),
     },
   } as any;
@@ -196,7 +196,7 @@ describe('UnfinalizedBlockService', () => {
       blockHash: '0x00ABC99f',
       blockHeight: 99,
       parentHash: '0x00ABC98f',
-      timestamp: genBlockTimestamp(99),
+      timestamp: genBlockDate(99),
     });
   });
 
