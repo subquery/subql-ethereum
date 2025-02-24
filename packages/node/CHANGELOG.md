@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
-- Fix `Header` not found `timestamp` field
+- `timestamp` field missing on `Header`
 
 ### Changed
 - Update header year to 2025 (#362)

@@ -20,7 +20,7 @@ const hexify = (input: string) => hexZeroPad(input, 4);
 
 // Mock 1740100000 is the timestamp of the genesis block
 const genBlockTimestamp = (height: number) => (1740100000 + height) * 1000;
-const genBlockDate = (height: number) => new Date((1740100000 + height) * 1000);
+const genBlockDate = (height: number) => new Date(genBlockTimestamp(height));
 
 const makeHeader = (height: number, finalized?: boolean): Header => ({
   blockHeight: height,
