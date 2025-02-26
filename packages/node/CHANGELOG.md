@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [5.5.0] - 2025-02-25
+## [5.5.0] - 2025-02-26
 ### Fixed
 - `timestamp` field missing on `Header`
 
@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update nestjs dependencies (#363)
 - Update node core and implement blockchain service (#363)
 - Upgrade to Node.js LTS (#367)
+- Update @subql/node-core dependencies (#368)
 
 ## [5.4.0] - 2025-01-28
 ### Changed
