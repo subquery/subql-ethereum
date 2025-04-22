@@ -19,7 +19,7 @@
     "subql-node-ethereum": "./bin/run"
   },
   "dependencies": {
-    "@nestjs/common": "^11.0.8",
+    "@nestjs/common": "^11.0.16",
     "@nestjs/core": "^11.0.8",
     "@nestjs/event-emitter": "^2.0.0",
     "@nestjs/platform-express": "^11.0.8",
