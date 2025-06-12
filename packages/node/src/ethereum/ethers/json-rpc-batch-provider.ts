@@ -172,6 +172,7 @@ export class JsonRpcBatchProvider extends JsonRpcProvider {
               ),
             );
           } else if (payload.error) {
+            console.log('RRRRRR', inflightRequest.request);
             const error = new Error(payload.error.message);
             (<any>error).code = payload.error.code;
             (<any>error).data = payload.error.data;
