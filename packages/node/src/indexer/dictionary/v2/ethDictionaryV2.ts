@@ -223,7 +223,7 @@ export function buildDictionaryV2QueryEntry(
             eventFilterToDictionaryCondition(
               handler.filter,
               addresses,
-              availableFilters?.transactions,
+              availableFilters?.logs,
             ),
           );
         }
