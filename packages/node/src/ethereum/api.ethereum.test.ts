@@ -329,40 +329,21 @@ describe('Api.ethereum', () => {
     );
   });
 
-  it('Resolves the correct tags for finalization', async () => {
-    // Ethereum
-    expect((ethApi as any).supportsFinalization).toBeTruthy();
+  it.each([
+    // TODO all these networs now support finalization tags, need to find one that does not
+    [HTTP_ENDPOINT, true],
+    [MOONBEAM_ENDPOINT, true],
+    ['https://binance.llamarpc.com', true],
+    ['https://polygon-rpc.com', true],
+  ])(
+    'Resolve the correct finalization tags for %s',
+    async (endpoint, finalization) => {
+      ethApi = new EthereumApi(endpoint, BLOCK_CONFIRMATIONS, eventEmitter);
+      await ethApi.init();
 
-    // Moonbeam
-    ethApi = new EthereumApi(
-      MOONBEAM_ENDPOINT,
-      BLOCK_CONFIRMATIONS,
-      eventEmitter,
-    );
-    await ethApi.init();
-
-    expect((ethApi as any).supportsFinalization).toBeTruthy();
-
-    // BSC
-    ethApi = new EthereumApi(
-      'https://binance.llamarpc.com',
-      BLOCK_CONFIRMATIONS,
-      eventEmitter,
-    );
-    await ethApi.init();
-
-    expect((ethApi as any).supportsFinalized).toBeFalsy();
-
-    // Polygon
-    ethApi = new EthereumApi(
-      'https://polygon.llamarpc.com',
-      BLOCK_CONFIRMATIONS,
-      eventEmitter,
-    );
-    await ethApi.init();
-
-    expect((ethApi as any).supportsFinalized).toBeFalsy();
-  });
+      expect(ethApi.supportsFinalization).toEqual(finalization);
+    },
+  );
 
   it('Assert blockHash on logs and block', async () => {
     ethApi = new EthereumApi(
