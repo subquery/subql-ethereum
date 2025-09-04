@@ -1,6 +1,7 @@
 // Copyright 2020-2025 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
+import { Interface } from '@ethersproject/abi';
 import { NOT_NULL_FILTER } from '@subql/common-ethereum';
 import { filterBlockTimestamp } from '@subql/node-core';
 import {
@@ -92,6 +93,7 @@ export function filterLogsProcessor(
   log: EthereumLog | LightEthereumLog,
   filter: EthereumLogFilter,
   address?: string,
+  abiInterface?: Interface,
 ): boolean {
   if (address && !stringNormalizedEq(address, log.address)) {
     return false;
@@ -114,7 +116,7 @@ export function filterLogsProcessor(
         return true;
       }
 
-      if (!hexStringEq(eventToTopic(topic), log.topics[i])) {
+      if (!hexStringEq(eventToTopic(topic, abiInterface), log.topics[i])) {
         return false;
       }
     }

@@ -1,6 +1,7 @@
 // Copyright 2020-2025 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
+import { Interface } from '@ethersproject/abi';
 import { Inject, Injectable } from '@nestjs/common';
 import {
   isBlockHandlerProcessor,
@@ -188,13 +189,44 @@ const FilterTypeMap = {
     data: EthereumLog | LightEthereumLog,
     filter: EthereumLogFilter,
     ds: SubqlEthereumDataSource,
-  ) => filterLogsProcessor(data, filter, ds.options?.address),
+  ) =>
+    filterLogsProcessor(data, filter, ds.options?.address, getAbiInterface(ds)),
   [EthereumHandlerKind.Call]: (
     data: EthereumTransaction,
     filter: EthereumTransactionFilter,
     ds: SubqlEthereumDataSource,
   ) => filterTransactionsProcessor(data, filter, ds.options?.address),
 };
+
+// Helper function to get ABI interface from datasource
+function getAbiInterface(ds: SubqlEthereumDataSource): Interface | undefined {
+  try {
+    if (!ds?.options?.abi || !ds.assets) {
+      return undefined;
+    }
+
+    const abiAsset = ds.assets.get(ds.options.abi);
+    if (!abiAsset?.file) {
+      return undefined;
+    }
+
+    // Try to load ABI file synchronously for filtering
+    // This is a performance trade-off but necessary for custom type resolution
+    const fs = require('fs');
+    const abiContent = fs.readFileSync(abiAsset.file, 'utf8');
+    let abiObj = JSON.parse(abiContent);
+
+    // Handle both raw ABI arrays and artifacts
+    if (!Array.isArray(abiObj) && abiObj.abi) {
+      abiObj = abiObj.abi;
+    }
+
+    return new Interface(abiObj);
+  } catch (error) {
+    // Silently fail and use fallback behavior
+    return undefined;
+  }
+}
 
 const DataAbiParser = {
   [EthereumHandlerKind.Block]: () => (data: EthereumBlock) => data,

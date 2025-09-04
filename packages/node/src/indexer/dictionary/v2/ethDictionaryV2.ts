@@ -145,6 +145,9 @@ function eventFilterToDictionaryCondition(
       if (topic === NOT_NULL_FILTER) {
         logConditions[field] = []; // TODO, check if !null
       } else {
+        // Should we do this ?
+        // TODO: Pass ABI interface for custom type resolution
+        // Dictionary services don't currently have access to loaded ABI interfaces
         logConditions[field].push(eventToTopic(topic));
       }
     }
