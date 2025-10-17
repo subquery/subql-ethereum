@@ -1,6 +1,7 @@
 // Copyright 2020-2025 SubQuery Pte Ltd authors & contributors
 // SPDX-License-Identifier: GPL-3.0
 
+import { Interface } from '@ethersproject/abi';
 import {
   SubqlRuntimeHandler,
   SubqlCustomHandler,
@@ -9,12 +10,19 @@ import {
   SubqlEthereumHandlerKind,
   isCustomDs,
   isRuntimeDs,
+  SubqlEthereumDataSource,
+  EthereumLogFilter,
+  EthereumTransactionFilter,
 } from '@subql/common-ethereum';
 import { retryOnFail } from '@subql/node-core';
 import {
   EthereumProjectDs,
   SubqueryProject,
 } from '../configure/SubqueryProject';
+import {
+  extractCustomTypesFromAbi,
+  resolveCustomTypesInSignature,
+} from './string';
 
 export function isBaseHandler(
   handler: SubqlHandler,
@@ -72,4 +80,149 @@ export function isOnlyEventHandlers(project: SubqueryProject): boolean {
   );
 
   return !hasNonEventHandler && !hasNonEventTemplate;
+}
+
+/**
+ * Helper function to load ABI interface from a datasource
+ */
+function getAbiInterfaceFromDs(
+  ds: SubqlEthereumDataSource,
+): Interface | undefined {
+  try {
+    if (!ds?.options?.abi || !ds.assets) {
+      return undefined;
+    }
+
+    const abiAsset = ds.assets.get(ds.options.abi);
+    if (!abiAsset?.file) {
+      return undefined;
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const fs = require('fs');
+    const abiContent = fs.readFileSync(abiAsset.file, 'utf8');
+    let abiObj = JSON.parse(abiContent);
+
+    // Handle truffle artifacts format
+    if (abiObj?.abi) {
+      abiObj = abiObj.abi;
+    }
+
+    return new Interface(abiObj);
+  } catch (error) {
+    console.warn(
+      `Failed to load ABI interface for datasource: ${
+        error instanceof Error ? error.message : 'Unknown error'
+      }`,
+    );
+    return undefined;
+  }
+}
+
+/**
+ * Process event handler topic filters and resolve custom types
+ */
+function processEventHandlerFilters(
+  handler: SubqlHandler,
+  customTypes: Map<string, any>,
+): void {
+  if (handler.kind === 'ethereum/LogHandler') {
+    const logFilter = handler.filter as EthereumLogFilter | undefined;
+    if (logFilter?.topics && Array.isArray(logFilter.topics)) {
+      for (let i = 0; i < logFilter.topics.length; i++) {
+        const topic = logFilter.topics[i];
+
+        if (
+          typeof topic === 'string' &&
+          topic.trim() !== '' &&
+          !topic.startsWith('0x')
+        ) {
+          const resolved = resolveCustomTypesInSignature(topic, customTypes);
+          if (resolved !== topic) {
+            logFilter.topics[i] = resolved;
+            console.log(`Resolved topic filter: "${topic}" -> "${resolved}"`);
+          }
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Process transaction handler function filters and resolve custom types
+ */
+function processTransactionHandlerFilters(
+  handler: SubqlHandler,
+  customTypes: Map<string, any>,
+): void {
+  if (handler.kind === 'ethereum/TransactionHandler') {
+    const txFilter = handler.filter as EthereumTransactionFilter | undefined;
+    if (txFilter?.function) {
+      const funcSig = txFilter.function;
+      if (typeof funcSig === 'string' && !funcSig.startsWith('0x')) {
+        const resolved = resolveCustomTypesInSignature(funcSig, customTypes);
+        if (resolved !== funcSig) {
+          txFilter.function = resolved;
+          console.log(
+            `Resolved function filter: "${funcSig}" -> "${resolved}"`,
+          );
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Resolves custom types (enums, structs) in topic filters for all datasources at project load time.
+ * Mutates the datasource handlers' topic filters in-place.
+ *
+ * This ensures that:
+ * - Enums are replaced with uint8
+ * - Structs are replaced with tuple notation (type1,type2,...)
+ * - Dictionary services receive correct topic0 hashes
+ * - No runtime ABI resolution is needed
+ *
+ * @param dataSources - Array of datasources to process
+ */
+export function resolveTopicFiltersInProject(
+  dataSources: SubqlEthereumDataSource[],
+): void {
+  for (const ds of dataSources) {
+    // Skip if no ABI or assets
+    if (!ds?.options?.abi || !ds.assets) {
+      continue;
+    }
+
+    try {
+      // Load ABI interface
+      const abiInterface = getAbiInterfaceFromDs(ds);
+      if (!abiInterface) {
+        continue;
+      }
+
+      // Extract custom types once per datasource
+      const customTypes = extractCustomTypesFromAbi(abiInterface);
+      if (customTypes.size === 0) {
+        continue; // No custom types, no need to process
+      }
+
+      // Log discovered custom types
+      const customTypeNames = Array.from(customTypes.keys()).join(', ');
+      console.log(
+        `Found custom types in ABI '${ds.options.abi}': ${customTypeNames}`,
+      );
+
+      // Process each handler
+      for (const handler of ds.mapping.handlers) {
+        processEventHandlerFilters(handler, customTypes);
+        processTransactionHandlerFilters(handler, customTypes);
+      }
+    } catch (error) {
+      console.warn(
+        `Failed to resolve custom types for datasource: ${
+          error instanceof Error ? error.message : 'Unknown error'
+        }`,
+      );
+    }
+  }
 }

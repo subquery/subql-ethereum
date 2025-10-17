@@ -85,10 +85,6 @@ function eventFilterToQueryEntry(
           matcher: 'isNull',
         });
       } else {
-        // Should we do this ?
-        // TODO: Pass ABI interface for custom type resolution
-        // Dictionary services don't currently have access to loaded ABI interfaces
-        // This would require architectural changes to pass datasource context
         conditions.push({
           field,
           value: eventToTopic(topic),

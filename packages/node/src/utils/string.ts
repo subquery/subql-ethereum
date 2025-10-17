@@ -19,13 +19,13 @@ export function hexStringEq(a: string, b: string): boolean {
 const eventTopicsCache: Record<string, string> = {};
 const functionSighashCache: Record<string, string> = {};
 
-interface AbiCustomType {
+export interface AbiCustomType {
   name: string;
   type: 'enum' | 'struct';
   resolvedType: string;
 }
 
-function extractCustomTypesFromAbi(
+export function extractCustomTypesFromAbi(
   abiInterface: Interface,
 ): Map<string, AbiCustomType> {
   const customTypes = new Map<string, AbiCustomType>();
@@ -238,7 +238,7 @@ function isStandardSolidityType(type: string): boolean {
   return standardTypes.includes(baseType);
 }
 
-function resolveCustomTypesInSignature(
+export function resolveCustomTypesInSignature(
   signature: string,
   customTypes: Map<string, AbiCustomType>,
 ): string {
@@ -263,36 +263,14 @@ function escapeRegex(string: string): string {
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-export function eventToTopic(input: string, abiInterface?: Interface): string {
+export function eventToTopic(input: string): string {
   if (isHexString(input)) return input;
 
-  // Created a cache key that includes ABI-specific info if available
-  const cacheKey = abiInterface
-    ? `${input}:${Object.keys(abiInterface.events).length}`
-    : input;
-
-  if (!eventTopicsCache[cacheKey]) {
-    let processedSignature = input;
-
-    // Apply custom type resolution if ABI interface is available
-    if (abiInterface) {
-      const customTypes = extractCustomTypesFromAbi(abiInterface);
-      if (customTypes.size > 0) {
-        processedSignature = resolveCustomTypesInSignature(input, customTypes);
-      }
-    }
-
-    try {
-      eventTopicsCache[cacheKey] = id(
-        EventFragment.fromString(processedSignature).format(),
-      );
-    } catch (error) {
-      // Fallback to original behavior if custom type resolution fails
-      eventTopicsCache[cacheKey] = id(EventFragment.fromString(input).format());
-    }
+  if (!eventTopicsCache[input]) {
+    eventTopicsCache[input] = id(EventFragment.fromString(input).format());
   }
 
-  return eventTopicsCache[cacheKey];
+  return eventTopicsCache[input];
 }
 
 export function functionToSighash(input: string): string {
