@@ -56,18 +56,15 @@ export function extractCustomTypesFromAbi(
 }
 
 function extractCustomTypeFromInput(
-  input: any,
+  input: { type: string; internalType?: string; components?: any[] },
   customTypes: Map<string, AbiCustomType>,
 ): void {
   // Handle tuple types (structs)
   if (input.type === 'tuple' && input.internalType) {
     // Extract struct name from internal type (e.g., "struct MoreData" -> "MoreData", "contract.MoreData" -> "MoreData")
-    let structName = input.internalType;
-    if (structName.startsWith('struct ')) {
-      structName = structName.substring(7); // Remove "struct " prefix
-    } else {
-      structName = structName.split('.').pop() || structName; // Handle dotted names
-    }
+    const structName = input.internalType
+      .replace(/^struct\s+/, '') // Remove "struct " prefix
+      .replace(/^.*\./, ''); // Remove contract prefix if present (e.g., "contract.Name" -> "Name")
 
     if (!customTypes.has(structName) && input.components) {
       const tupleType = `(${input.components
@@ -84,12 +81,9 @@ function extractCustomTypeFromInput(
   // Handle enum types - look for custom internal types that aren't standard solidity types
   if (input.internalType && input.internalType !== input.type) {
     // Extract enum name from internal type (e.g., "enum DisputeType" -> "DisputeType", "contract.DisputeType" -> "DisputeType")
-    let enumName = input.internalType;
-    if (enumName.startsWith('enum ')) {
-      enumName = enumName.substring(5); // Remove "enum " prefix
-    } else {
-      enumName = enumName.split('.').pop() || enumName; // Handle dotted names
-    }
+    const enumName = input.internalType
+      .replace(/^enum\s+/, '') // Remove "enum " prefix
+      .replace(/^.*\./, ''); // Remove contract prefix if present (e.g., "contract.Name" -> "Name")
 
     // Check if it's likely an enum (uint8/uint256 type with custom internal type)
     if (
@@ -248,12 +242,10 @@ export function resolveCustomTypesInSignature(
   customTypes.forEach((customType, typeName) => {
     // Create regex to match the custom type name as a parameter type
     const regex = new RegExp(`\\b${escapeRegex(typeName)}\\b`, 'g');
-    if (regex.test(resolvedSignature)) {
-      resolvedSignature = resolvedSignature.replace(
-        new RegExp(`\\b${escapeRegex(typeName)}\\b`, 'g'),
-        customType.resolvedType,
-      );
-    }
+    resolvedSignature = resolvedSignature.replace(
+      regex,
+      customType.resolvedType,
+    );
   });
 
   return resolvedSignature;

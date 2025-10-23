@@ -66,7 +66,6 @@ function applyAddresses(
 function eventFilterToQueryEntry(
   filter?: EthereumLogFilter,
   addresses?: (string | undefined | null)[],
-  ds?: SubqlDatasource,
 ): DictionaryV1QueryEntry {
   const conditions: DictionaryQueryCondition[] = [];
   applyAddresses(conditions, addresses);

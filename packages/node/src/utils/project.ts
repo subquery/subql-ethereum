@@ -13,8 +13,9 @@ import {
   SubqlEthereumDataSource,
   EthereumLogFilter,
   EthereumTransactionFilter,
+  getAbiInterface,
 } from '@subql/common-ethereum';
-import { retryOnFail } from '@subql/node-core';
+import { getLogger, retryOnFail } from '@subql/node-core';
 import {
   EthereumProjectDs,
   SubqueryProject,
@@ -23,6 +24,8 @@ import {
   extractCustomTypesFromAbi,
   resolveCustomTypesInSignature,
 } from './string';
+
+const logger = getLogger('project');
 
 export function isBaseHandler(
   handler: SubqlHandler,
@@ -87,30 +90,16 @@ export function isOnlyEventHandlers(project: SubqueryProject): boolean {
  */
 function getAbiInterfaceFromDs(
   ds: SubqlEthereumDataSource,
+  projectPath: string,
 ): Interface | undefined {
   try {
-    if (!ds?.options?.abi || !ds.assets) {
+    if (!ds?.options?.abi || !projectPath) {
       return undefined;
     }
 
-    const abiAsset = ds.assets.get(ds.options.abi);
-    if (!abiAsset?.file) {
-      return undefined;
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const fs = require('fs');
-    const abiContent = fs.readFileSync(abiAsset.file, 'utf8');
-    let abiObj = JSON.parse(abiContent);
-
-    // Handle truffle artifacts format
-    if (abiObj?.abi) {
-      abiObj = abiObj.abi;
-    }
-
-    return new Interface(abiObj);
+    return getAbiInterface(projectPath, ds.options.abi);
   } catch (error) {
-    console.warn(
+    logger.warn(
       `Failed to load ABI interface for datasource: ${
         error instanceof Error ? error.message : 'Unknown error'
       }`,
@@ -126,24 +115,26 @@ function processEventHandlerFilters(
   handler: SubqlHandler,
   customTypes: Map<string, any>,
 ): void {
-  if (handler.kind === 'ethereum/LogHandler') {
-    const logFilter = handler.filter as EthereumLogFilter | undefined;
-    if (logFilter?.topics && Array.isArray(logFilter.topics)) {
-      for (let i = 0; i < logFilter.topics.length; i++) {
-        const topic = logFilter.topics[i];
+  if (handler.kind !== EthereumHandlerKind.Event) {
+    return;
+  }
 
-        if (
-          typeof topic === 'string' &&
-          topic.trim() !== '' &&
-          !topic.startsWith('0x')
-        ) {
-          const resolved = resolveCustomTypesInSignature(topic, customTypes);
-          if (resolved !== topic) {
-            logFilter.topics[i] = resolved;
-            console.log(`Resolved topic filter: "${topic}" -> "${resolved}"`);
-          }
-        }
-      }
+  const logFilter = handler.filter as EthereumLogFilter | undefined;
+  if (!logFilter?.topics) {
+    return;
+  }
+
+  // Only resolve custom types in the first topic (topic0), which is the event signature
+  const topic = logFilter.topics[0];
+  if (
+    typeof topic === 'string' &&
+    topic.trim() !== '' &&
+    !topic.startsWith('0x')
+  ) {
+    const resolved = resolveCustomTypesInSignature(topic, customTypes);
+    if (resolved !== topic) {
+      logFilter.topics[0] = resolved;
+      logger.info(`Resolved topic filter: "${topic}" -> "${resolved}"`);
     }
   }
 }
@@ -155,19 +146,21 @@ function processTransactionHandlerFilters(
   handler: SubqlHandler,
   customTypes: Map<string, any>,
 ): void {
-  if (handler.kind === 'ethereum/TransactionHandler') {
-    const txFilter = handler.filter as EthereumTransactionFilter | undefined;
-    if (txFilter?.function) {
-      const funcSig = txFilter.function;
-      if (typeof funcSig === 'string' && !funcSig.startsWith('0x')) {
-        const resolved = resolveCustomTypesInSignature(funcSig, customTypes);
-        if (resolved !== funcSig) {
-          txFilter.function = resolved;
-          console.log(
-            `Resolved function filter: "${funcSig}" -> "${resolved}"`,
-          );
-        }
-      }
+  if (handler.kind !== EthereumHandlerKind.Call) {
+    return;
+  }
+
+  const txFilter = handler.filter as EthereumTransactionFilter | undefined;
+  if (!txFilter?.function) {
+    return;
+  }
+
+  const funcSig = txFilter.function;
+  if (typeof funcSig === 'string' && !funcSig.startsWith('0x')) {
+    const resolved = resolveCustomTypesInSignature(funcSig, customTypes);
+    if (resolved !== funcSig) {
+      txFilter.function = resolved;
+      logger.info(`Resolved function filter: "${funcSig}" -> "${resolved}"`);
     }
   }
 }
@@ -179,23 +172,19 @@ function processTransactionHandlerFilters(
  * This ensures that:
  * - Enums are replaced with uint8
  * - Structs are replaced with tuple notation (type1,type2,...)
- * - Dictionary services receive correct topic0 hashes
  * - No runtime ABI resolution is needed
  *
- * @param dataSources - Array of datasources to process
+ * @param dataSources - Array of datasources to process (mutated in-place)
+ * @param projectPath - The project root path for loading ABI files
  */
 export function resolveTopicFiltersInProject(
   dataSources: SubqlEthereumDataSource[],
+  projectPath: string,
 ): void {
   for (const ds of dataSources) {
-    // Skip if no ABI or assets
-    if (!ds?.options?.abi || !ds.assets) {
-      continue;
-    }
-
     try {
       // Load ABI interface
-      const abiInterface = getAbiInterfaceFromDs(ds);
+      const abiInterface = getAbiInterfaceFromDs(ds, projectPath);
       if (!abiInterface) {
         continue;
       }
@@ -208,8 +197,8 @@ export function resolveTopicFiltersInProject(
 
       // Log discovered custom types
       const customTypeNames = Array.from(customTypes.keys()).join(', ');
-      console.log(
-        `Found custom types in ABI '${ds.options.abi}': ${customTypeNames}`,
+      logger.info(
+        `Found custom types in ABI '${ds.options?.abi}': ${customTypeNames}`,
       );
 
       // Process each handler
@@ -218,7 +207,7 @@ export function resolveTopicFiltersInProject(
         processTransactionHandlerFilters(handler, customTypes);
       }
     } catch (error) {
-      console.warn(
+      logger.warn(
         `Failed to resolve custom types for datasource: ${
           error instanceof Error ? error.message : 'Unknown error'
         }`,

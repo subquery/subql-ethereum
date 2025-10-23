@@ -58,12 +58,13 @@ export async function createSubQueryProject(
   });
 
   // Resolve custom types in topic filters at project load time
-  resolveTopicFiltersInProject(project.dataSources);
+  resolveTopicFiltersInProject(project.dataSources, root);
 
   // Also resolve in templates
   if (project.templates && project.templates.length > 0) {
     resolveTopicFiltersInProject(
       project.templates as SubqlEthereumDataSource[],
+      root,
     );
   }
 
