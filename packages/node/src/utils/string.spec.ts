@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0
 
 import { id } from '@ethersproject/hash';
+import * as hashModule from '@ethersproject/hash';
 import { eventToTopic, functionToSighash } from './string';
 
 describe('String utilities', () => {
@@ -33,10 +34,21 @@ describe('String utilities', () => {
     });
 
     it('should cache results', () => {
-      const signature = 'Transfer(address,address,uint256)';
+      // Use a unique signature to avoid cache pollution from other tests
+      const signature = 'UniqueTestEvent(bytes32,uint256,address)';
+      const idSpy = jest.spyOn(hashModule, 'id');
+
       const firstResult = eventToTopic(signature);
+      const callCountAfterFirst = idSpy.mock.calls.length;
+
       const secondResult = eventToTopic(signature);
+      const callCountAfterSecond = idSpy.mock.calls.length;
+
+      // Second call should not invoke id() again due to caching
+      expect(callCountAfterSecond).toBe(callCountAfterFirst);
       expect(firstResult).toBe(secondResult);
+
+      idSpy.mockRestore();
     });
   });
 
@@ -53,10 +65,21 @@ describe('String utilities', () => {
     });
 
     it('should cache results', () => {
-      const signature = 'balanceOf(address)';
+      // Use a unique signature to avoid cache pollution from other tests
+      const signature = 'uniqueTestFunction(bytes32,uint256)';
+      const idSpy = jest.spyOn(hashModule, 'id');
+
       const firstResult = functionToSighash(signature);
+      const callCountAfterFirst = idSpy.mock.calls.length;
+
       const secondResult = functionToSighash(signature);
+      const callCountAfterSecond = idSpy.mock.calls.length;
+
+      // Second call should not invoke id() again due to caching
+      expect(callCountAfterSecond).toBe(callCountAfterFirst);
       expect(firstResult).toBe(secondResult);
+
+      idSpy.mockRestore();
     });
   });
 });
