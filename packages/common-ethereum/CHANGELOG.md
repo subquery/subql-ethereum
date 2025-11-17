@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
-- Support for  `indexed` option in event topic0 filters (#400)
+- Support for `indexed` option in event topic0 filters (#400)
 
 ## [4.9.3] - 2025-07-30
 ### Changed
