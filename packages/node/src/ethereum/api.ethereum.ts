@@ -324,7 +324,12 @@ export class EthereumApi implements ApiWrapper {
 
     const block = formatBlock(rawBlock);
 
-    block.stateRoot = this.client.formatter.hash(block.stateRoot);
+    try {
+      block.stateRoot = this.client.formatter.hash(block.stateRoot);
+    } catch (error) {
+      // Use zero hash if formatting fails
+      block.stateRoot = '0x0000000000000000000000000000000000000000000000000000000000000000';
+    }
 
     return block;
   }
