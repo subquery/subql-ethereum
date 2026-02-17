@@ -326,9 +326,17 @@ export class EthereumApi implements ApiWrapper {
 
     try {
       block.stateRoot = this.client.formatter.hash(block.stateRoot);
-    } catch (error) {
-      // Use zero hash if formatting fails
-      block.stateRoot = '0x0000000000000000000000000000000000000000000000000000000000000000';
+    } catch (e) {
+      // Tron sometimes returns '0x' as stateRoot, which fails the formatter
+      // We only want to apply this fix for Tron networks
+      // Mainnet: 728126428, Shasta: 2494104990, Nile: 3448148188
+      const tronChainIds = [728126428, 2494104990, 3448148188];
+      if (this.chainId && tronChainIds.includes(this.chainId)) {
+        block.stateRoot =
+          '0x0000000000000000000000000000000000000000000000000000000000000000';
+      } else {
+        throw e;
+      }
     }
 
     return block;
