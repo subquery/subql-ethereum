@@ -4,6 +4,12 @@ import { deepCopy } from '@ethersproject/properties';
 import { JsonRpcProvider as BaseJsonRpcProvider } from '@ethersproject/providers';
 import { Networkish } from '@ethersproject/networks';
 import { ConnectionInfo, fetchJson } from './web';
+import {
+  TRON_TRANSACTION_METHODS,
+  TRON_BLOCK_NUMBER_METHODS,
+  cleanParamsForTron,
+  replaceBlockNumberForTron,
+} from './tron-utils';
 
 function getResult(payload: {
   error?: { code?: number; data?: any; message?: string };
@@ -26,9 +32,23 @@ export class JsonRpcProvider extends BaseJsonRpcProvider {
   }
 
   send(method: string, params: Array<any>): Promise<any> {
+    // Clean params for Tron chains
+    const chainId = this.network ? this.network.chainId : 0;
+    let cleanedParams = params;
+
+    // Remove type and accessList from transaction objects
+    if (TRON_TRANSACTION_METHODS.includes(method)) {
+      cleanedParams = cleanParamsForTron(cleanedParams, chainId);
+    }
+
+    // Replace block number with 'latest' for Tron chains
+    if (TRON_BLOCK_NUMBER_METHODS[method] !== undefined) {
+      cleanedParams = replaceBlockNumberForTron(method, cleanedParams, chainId);
+    }
+
     const request = {
       method: method,
-      params: params,
+      params: cleanedParams,
       id: this._nextId++,
       jsonrpc: '2.0',
     };

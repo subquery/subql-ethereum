@@ -36,6 +36,7 @@ import {
 import { JsonRpcBatchProvider } from './ethers/json-rpc-batch-provider';
 import { JsonRpcProvider } from './ethers/json-rpc-provider';
 import { OPFormatterMixin } from './ethers/op/op-provider';
+import { TRON_CHAIN_IDS } from './ethers/tron-utils';
 import { ConnectionInfo } from './ethers/web';
 import SafeEthProvider from './safe-api';
 import {
@@ -327,17 +328,16 @@ export class EthereumApi implements ApiWrapper {
     // Tron sometimes returns '0x' as stateRoot, which fails the formatter
     // We only want to apply this fix for Tron networks
     // Mainnet: 728126428, Shasta: 2494104990, Nile: 3448148188
-    const tronChainIds = [728126428, 2494104990, 3448148188];
     if (
       this.chainId &&
-      tronChainIds.includes(this.chainId) &&
+      TRON_CHAIN_IDS.includes(this.chainId) &&
       block.stateRoot === '0x'
     ) {
       block.stateRoot =
         '0x0000000000000000000000000000000000000000000000000000000000000000';
+    } else {
+      block.stateRoot = this.client.formatter.hash(block.stateRoot);
     }
-
-    block.stateRoot = this.client.formatter.hash(block.stateRoot);
 
     return block;
   }
