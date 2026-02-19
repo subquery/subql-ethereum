@@ -184,10 +184,16 @@ export class EthereumApi implements ApiWrapper {
     //celo
     if (network.chainId === 42220) {
       if (this.client instanceof WebSocketProvider) {
-        this.client = new CeloWsProvider(this.client.connection.url);
+        this.client = new CeloWsProvider(this.client.connection.url, network);
       } else {
-        this.client = new CeloJsonRpcBatchProvider(this.client.connection);
-        this.nonBatchClient = new CeloJsonRpcProvider(this.client.connection);
+        this.client = new CeloJsonRpcBatchProvider(
+          this.client.connection,
+          network,
+        );
+        this.nonBatchClient = new CeloJsonRpcProvider(
+          this.client.connection,
+          network,
+        );
         this.applyBatchSize(this.config?.batchSize);
       }
     }
@@ -195,10 +201,16 @@ export class EthereumApi implements ApiWrapper {
     //tron
     if (TRON_CHAIN_IDS.includes(network.chainId)) {
       if (this.client instanceof WebSocketProvider) {
-        this.client = new TronWsProvider(this.client.connection.url);
+        this.client = new TronWsProvider(this.client.connection.url, network);
       } else {
-        this.client = new TronJsonRpcBatchProvider(this.client.connection);
-        this.nonBatchClient = new TronJsonRpcProvider(this.client.connection);
+        this.client = new TronJsonRpcBatchProvider(
+          this.client.connection,
+          network,
+        );
+        this.nonBatchClient = new TronJsonRpcProvider(
+          this.client.connection,
+          network,
+        );
         this.applyBatchSize(this.config?.batchSize);
       }
     }
