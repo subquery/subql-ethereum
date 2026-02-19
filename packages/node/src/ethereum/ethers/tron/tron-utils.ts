@@ -100,3 +100,27 @@ export function replaceBlockNumberForTron(
   cleaned[blockNumberIndex] = 'latest';
   return cleaned;
 }
+
+/**
+ * Apply all Tron-specific parameter transformations for the given method.
+ * This combines both transaction object cleaning and block number replacement.
+ *
+ * NOTE: eth_call intentionally appears in both TRON_TRANSACTION_METHODS and
+ * TRON_BLOCK_NUMBER_METHODS, so both cleanParamsForTron and
+ * replaceBlockNumberForTron are applied in sequence. This dual-pass behavior
+ * is intentional and not a duplication bug.
+ */
+export function applyTronParamTransforms(
+  method: string,
+  params: Array<any>,
+  chainId: number,
+): Array<any> {
+  let result = params;
+  if (TRON_TRANSACTION_METHODS.includes(method)) {
+    result = cleanParamsForTron(result, chainId);
+  }
+  if (TRON_BLOCK_NUMBER_METHODS[method] !== undefined) {
+    result = replaceBlockNumberForTron(method, result, chainId);
+  }
+  return result;
+}

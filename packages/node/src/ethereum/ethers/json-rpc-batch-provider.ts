@@ -5,12 +5,6 @@ import { JsonRpcProvider } from '@ethersproject/providers';
 import { Networkish } from '@ethersproject/networks';
 import { ConnectionInfo, fetchJson } from './web';
 import { getLogger } from '@subql/node-core';
-import {
-  TRON_TRANSACTION_METHODS,
-  TRON_BLOCK_NUMBER_METHODS,
-  cleanParamsForTron,
-  replaceBlockNumberForTron,
-} from './tron-utils';
 
 const logger = getLogger('JsonRpcBatchProvider');
 
@@ -55,23 +49,9 @@ export class JsonRpcBatchProvider extends JsonRpcProvider {
       return Promise.resolve(this._chainIdCache);
     }
 
-    // Clean params for Tron chains
-    const chainId = this.network ? this.network.chainId : 0;
-    let cleanedParams = params;
-
-    // Remove type and accessList from transaction objects
-    if (TRON_TRANSACTION_METHODS.includes(method)) {
-      cleanedParams = cleanParamsForTron(cleanedParams, chainId);
-    }
-
-    // Replace block number with 'latest' for Tron chains
-    if (TRON_BLOCK_NUMBER_METHODS[method] !== undefined) {
-      cleanedParams = replaceBlockNumberForTron(method, cleanedParams, chainId);
-    }
-
     const request = {
       method: method,
-      params: cleanedParams,
+      params: params,
       id: this._nextId++,
       jsonrpc: '2.0',
     };
