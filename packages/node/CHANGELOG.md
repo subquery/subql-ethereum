@@ -6,7 +6,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [6.3.1] - 2025-11-20
+## [6.3.3] - 2026-02-23
+### Fixed
+- Handle fork rollback crash when parent block lookup fails by falling back to height-based check
+- Handle genesis block edge case when searching for fork point
+### Changed
+- Update `@subql/node-core` to 19.1.0 with breaking change to worker `toBlockResponse`
+
+## [6.3.2] - 2025-12-09
+### Fixed
+- Handle genesis block fetch failure for Polkadot Hub chains (#412)
+
+## [6.3.1] - 2026-02-22
 ### Changed
 - Update `@subql/node-core` with POI fixes for arrays (#403)
 
