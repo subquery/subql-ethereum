@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.4.0] - 2026-03-20
+### Changed
+- Update `@subql/node-core` to 19.2.0 (#416)
+- Refactor block height retrieval with blockchain service (#417)
+- Refine Tron support for invalid state roots handling (#409, #418)
+
 ## [6.3.3] - 2026-02-23
 ### Fixed
 - Handle fork rollback crash when parent block lookup fails by falling back to height-based check
@@ -670,7 +676,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Init release
 
-[Unreleased]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/6.3.1...HEAD
+[Unreleased]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/6.4.0...HEAD
+[6.4.0]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/6.3.3...node-ethereum/6.4.0
+[6.3.3]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/6.3.1...node-ethereum/6.3.3
 [6.3.1]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/6.3.0...node-ethereum/6.3.1
 [6.3.0]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/6.2.1...node-ethereum/6.3.0
 [6.2.1]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/6.2.0...node-ethereum/6.2.1
