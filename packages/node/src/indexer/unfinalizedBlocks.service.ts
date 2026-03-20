@@ -45,13 +45,15 @@ export class UnfinalizedBlocksService extends BaseUnfinalizedBlocksService<Block
   ): Promise<Header | undefined> {
     return super.init(reindex);
   }
+
   /**
-   * Checks if a fork has happened, this doesn't find the start of the fork just where it was detected
-   * @returns (Header | undefined) - The header may be the forked header but will most likely be the main header. Either way it should be used just for the block height
+   * Checks if a fork has happened during startup by verifying the last unfinalized block hash.
+   * Runtime fork detection is handled by node-core's registerUnfinalizedBlock which validates parentHash chain.
+   * @returns (Header | undefined) - The header if fork is detected at startup
    * */
   @profiler()
   protected async hasForked(): Promise<Header | undefined> {
-    // Startup check helps speed up finding a fork by checking the hash of the last unfinalized block
+    // Startup check verifies the last unfinalized block hash against the chain
     if (this.startupCheck) {
       this.startupCheck = false;
       const lastUnfinalized = last(this.unfinalizedBlocks);
