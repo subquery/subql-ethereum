@@ -414,3 +414,17 @@ describe('Api.ethereum', () => {
     expect(tx.maxFeePerBlobGas).toEqual(1000000000n);
   });
 });
+
+describe('Api.ethereum supportsSafe semantics', () => {
+  it('returns supportsSafe=false for Cronos even when safe tag probe succeeded', () => {
+    const cronosApi = new EthereumApi(
+      HTTP_ENDPOINT,
+      BLOCK_CONFIRMATIONS,
+      new EventEmitter2(),
+    ) as any;
+    cronosApi._supportsSafe = true;
+    cronosApi.chainId = 25;
+
+    expect(cronosApi.supportsSafe).toBe(false);
+  });
+});

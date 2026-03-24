@@ -113,7 +113,8 @@ export class EthereumApi implements ApiWrapper {
   }
 
   get supportsSafe(): boolean {
-    return this._supportsSafe;
+    // Cronos (chainId 25) "safe" tag is hard-blocked due to unreliable behavior.
+    return this._supportsSafe && this.chainId !== 25;
   }
 
   /**
@@ -293,11 +294,8 @@ export class EthereumApi implements ApiWrapper {
   }
 
   async getBestBlockHeight(): Promise<number> {
-    // Cronos "safe" tag doesn't currently work as indended
     const tag =
-      !this.unfinalizedBlocks && this.supportsSafe && this.chainId !== 25
-        ? 'safe'
-        : 'latest';
+      !this.unfinalizedBlocks && this.supportsSafe ? 'safe' : 'latest';
     return (await this.client.getBlock(tag)).number;
   }
 
