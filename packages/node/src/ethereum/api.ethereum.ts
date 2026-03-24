@@ -104,11 +104,17 @@ export class EthereumApi implements ApiWrapper {
   private chainId?: number;
   private name?: string;
 
-  // Ethereum POS
+  // Ethereum POS tag support
   private _supportsFinalization = true;
+  private _supportsSafe = true;
 
   get supportsFinalization(): boolean {
     return this._supportsFinalization;
+  }
+
+  get supportsSafe(): boolean {
+    // Cronos (chainId 25) "safe" tag is hard-blocked due to unreliable behavior.
+    return this._supportsSafe && this.chainId !== 25;
   }
 
   /**
@@ -195,7 +201,8 @@ export class EthereumApi implements ApiWrapper {
         ]);
 
       this._genesisHash = genesisHash;
-      this._supportsFinalization = supportsFinalization && supportsSafe;
+      this._supportsFinalization = supportsFinalization;
+      this._supportsSafe = supportsSafe;
       this.chainId = network.chainId;
       this.name = network.name;
     } catch (e) {
@@ -287,13 +294,8 @@ export class EthereumApi implements ApiWrapper {
   }
 
   async getBestBlockHeight(): Promise<number> {
-    // Cronos "safe" tag doesn't currently work as indended
     const tag =
-      !this.unfinalizedBlocks &&
-      this.supportsFinalization &&
-      this.chainId !== 25
-        ? 'safe'
-        : 'latest';
+      !this.unfinalizedBlocks && this.supportsSafe ? 'safe' : 'latest';
     return (await this.client.getBlock(tag)).number;
   }
 
