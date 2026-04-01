@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [6.5.0] - 2026-04-01
+### Changed
+- Update `@subql/node-core` to 19.3.1
+- Optionally disable multichain rewind lock (#3028)
+### Fixed
+- SQL injection in dynamic datasource appending via unescaped json serialization (#3031)
+
 ## [6.4.0] - 2026-03-20
 ### Changed
 - Update `@subql/node-core` to 19.2.0 (#416)
@@ -676,7 +683,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Init release
 
-[Unreleased]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/6.4.0...HEAD
+[Unreleased]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/6.5.0...HEAD
+[6.5.0]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/6.4.0...node-ethereum/6.5.0
 [6.4.0]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/6.3.3...node-ethereum/6.4.0
 [6.3.3]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/6.3.1...node-ethereum/6.3.3
 [6.3.1]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/6.3.0...node-ethereum/6.3.1
