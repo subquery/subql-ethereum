@@ -1467,14 +1467,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nestjs/core@npm:^11.0.7":
-  version: 11.1.0
-  resolution: "@nestjs/core@npm:11.1.0"
+"@nestjs/core@npm:^11.1.18":
+  version: 11.1.18
+  resolution: "@nestjs/core@npm:11.1.18"
   dependencies:
     "@nuxt/opencollective": "npm:0.4.1"
     fast-safe-stringify: "npm:2.1.1"
     iterare: "npm:1.2.1"
-    path-to-regexp: "npm:8.2.0"
+    path-to-regexp: "npm:8.4.2"
     tslib: "npm:2.8.1"
     uid: "npm:2.0.2"
   peerDependencies:
@@ -1491,7 +1491,7 @@ __metadata:
       optional: true
     "@nestjs/websockets":
       optional: true
-  checksum: 10/9acff81e0a1a399158b42a41fc0fab563cfbecf76e1ce4fb4de759ebb81cbe40c255db5bb00fd862af45cda6497981e78d78a50e44c0d6ec89c9d7b6d1be87a6
+  checksum: 10/522775660e9111df51294d82ac1ab63ea6b7ebc1edbb45a79c6471cdf33205bd1bb4f6058d284c5ab7b480e25c4da71763a89595112cb6d958786f6f76c87a1e
   languageName: node
   linkType: hard
 
@@ -2064,9 +2064,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@subql/node-core@npm:^19.2.0":
-  version: 19.2.0
-  resolution: "@subql/node-core@npm:19.2.0"
+"@subql/node-core@npm:^19.3.1":
+  version: 19.3.1
+  resolution: "@subql/node-core@npm:19.3.1"
   dependencies:
     "@apollo/client": "npm:^3.14.0"
     "@nestjs/common": "npm:^11.0.16"
@@ -2093,7 +2093,7 @@ __metadata:
     toposort-class: "npm:^1.0.1"
     vm2: "npm:3.9.19"
     yargs: "npm:^16.2.0"
-  checksum: 10/1c99314fd12a2f878e98e605108e6fd3ab83e6f969e490a0170eb616cb3d4fb52efe9a6b6d4dcbb24a18c71d240a08e89722cb861c0131284f1bd89fcf679cf3
+  checksum: 10/4d79c0507267a73afc0eb64fcb3087ff234eb94eeafb536bfa3ed604bd51987eb4eb4d1621a05c02c2a9af50e0be9e37ec7c536a0c18d7a8b86d36cc45a07699
   languageName: node
   linkType: hard
 
@@ -2102,7 +2102,7 @@ __metadata:
   resolution: "@subql/node-ethereum@workspace:packages/node"
   dependencies:
     "@nestjs/common": "npm:^11.0.16"
-    "@nestjs/core": "npm:^11.0.7"
+    "@nestjs/core": "npm:^11.1.18"
     "@nestjs/event-emitter": "npm:^3.0.0"
     "@nestjs/platform-express": "npm:^11.0.7"
     "@nestjs/schedule": "npm:^5.0.1"
@@ -2110,7 +2110,7 @@ __metadata:
     "@nestjs/testing": "npm:^11.0.8"
     "@subql/common": "npm:^5.8.2"
     "@subql/common-ethereum": "workspace:*"
-    "@subql/node-core": "npm:^19.2.0"
+    "@subql/node-core": "npm:^19.3.1"
     "@subql/testing": "npm:^2.2.1"
     "@subql/types-ethereum": "workspace:*"
     "@types/express": "npm:^4.17.13"
@@ -9441,6 +9441,13 @@ __metadata:
   version: 8.2.0
   resolution: "path-to-regexp@npm:8.2.0"
   checksum: 10/23378276a172b8ba5f5fb824475d1818ca5ccee7bbdb4674701616470f23a14e536c1db11da9c9e6d82b82c556a817bbf4eee6e41b9ed20090ef9427cbb38e13
+  languageName: node
+  linkType: hard
+
+"path-to-regexp@npm:8.4.2":
+  version: 8.4.2
+  resolution: "path-to-regexp@npm:8.4.2"
+  checksum: 10/70fd2cbce0b962cbcf4d312af07818bfce2bae11c09cf3bd86be99c0e30168238a1a7b02b18b452e73f075897df04597d30d63e56da7be41eecfc37998693389
   languageName: node
   linkType: hard
 
