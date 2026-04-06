@@ -2037,7 +2037,7 @@ __metadata:
     "@zilliqa-js/crypto": "npm:^3.5.0"
     ejs: "npm:3.1.10"
     js-yaml: "npm:^4.1.1"
-    lodash: "npm:4.17.23"
+    lodash: "npm:4.18.1"
     pino: "npm:^6.13.3"
     reflect-metadata: "npm:^0.1.13"
     typechain: "npm:^8.3.1"
@@ -2064,9 +2064,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@subql/node-core@npm:^19.2.0":
-  version: 19.2.0
-  resolution: "@subql/node-core@npm:19.2.0"
+"@subql/node-core@npm:^19.3.1":
+  version: 19.3.1
+  resolution: "@subql/node-core@npm:19.3.1"
   dependencies:
     "@apollo/client": "npm:^3.14.0"
     "@nestjs/common": "npm:^11.0.16"
@@ -2093,7 +2093,7 @@ __metadata:
     toposort-class: "npm:^1.0.1"
     vm2: "npm:3.9.19"
     yargs: "npm:^16.2.0"
-  checksum: 10/1c99314fd12a2f878e98e605108e6fd3ab83e6f969e490a0170eb616cb3d4fb52efe9a6b6d4dcbb24a18c71d240a08e89722cb861c0131284f1bd89fcf679cf3
+  checksum: 10/4d79c0507267a73afc0eb64fcb3087ff234eb94eeafb536bfa3ed604bd51987eb4eb4d1621a05c02c2a9af50e0be9e37ec7c536a0c18d7a8b86d36cc45a07699
   languageName: node
   linkType: hard
 
@@ -2110,7 +2110,7 @@ __metadata:
     "@nestjs/testing": "npm:^11.0.8"
     "@subql/common": "npm:^5.8.2"
     "@subql/common-ethereum": "workspace:*"
-    "@subql/node-core": "npm:^19.2.0"
+    "@subql/node-core": "npm:^19.3.1"
     "@subql/testing": "npm:^2.2.1"
     "@subql/types-ethereum": "workspace:*"
     "@types/express": "npm:^4.17.13"
@@ -2124,7 +2124,7 @@ __metadata:
     ethers: "npm:^5.7.0"
     eventemitter2: "npm:^6.4.5"
     json5: "npm:^2.2.3"
-    lodash: "npm:^4.17.23"
+    lodash: "npm:^4.18.1"
     nodemon: "npm:^2.0.15"
     reflect-metadata: "npm:^0.1.13"
     rimraf: "npm:^3.0.2"
@@ -8203,10 +8203,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lodash@npm:4.17.23, lodash@npm:^4.17.23":
-  version: 4.17.23
-  resolution: "lodash@npm:4.17.23"
-  checksum: 10/82504c88250f58da7a5a4289f57a4f759c44946c005dd232821c7688b5fcfbf4a6268f6a6cdde4b792c91edd2f3b5398c1d2a0998274432cff76def48735e233
+"lodash@npm:4.18.1, lodash@npm:^4.18.1":
+  version: 4.18.1
+  resolution: "lodash@npm:4.18.1"
+  checksum: 10/306fea53dfd39dad1f03d45ba654a2405aebd35797b673077f401edb7df2543623dc44b9effbb98f69b32152295fff725a4cec99c684098947430600c6af0c3f
   languageName: node
   linkType: hard
 
