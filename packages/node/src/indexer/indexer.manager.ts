@@ -125,6 +125,18 @@ export class IndexerManager extends BaseIndexerManager<
           await this.indexEvent(log, dataSources, getVM);
         }
       }
+
+      // Handle Cosmos/Sei-injected synthetic logs whose parent tx is not visible in
+      // eth_getBlockByNumber (type 0xffffffff shell receipts, excluded from eth_ namespace).
+      // Their logs are still returned by eth_getLogs via the block-level bloom filter.
+      const txHashes = new Set(
+        block.transactions.map((tx) => tx.hash.toLowerCase()),
+      );
+      for (const log of block.logs ?? []) {
+        if (!txHashes.has(log.transactionHash.toLowerCase())) {
+          await this.indexEvent(log, dataSources, getVM);
+        }
+      }
     } else {
       for (const log of block.logs ?? []) {
         await this.indexEvent(log, dataSources, getVM);
