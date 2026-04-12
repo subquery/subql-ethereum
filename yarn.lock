@@ -2064,9 +2064,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@subql/node-core@npm:^19.2.0":
-  version: 19.2.0
-  resolution: "@subql/node-core@npm:19.2.0"
+"@subql/node-core@npm:^19.3.1":
+  version: 19.3.1
+  resolution: "@subql/node-core@npm:19.3.1"
   dependencies:
     "@apollo/client": "npm:^3.14.0"
     "@nestjs/common": "npm:^11.0.16"
@@ -2093,7 +2093,7 @@ __metadata:
     toposort-class: "npm:^1.0.1"
     vm2: "npm:3.9.19"
     yargs: "npm:^16.2.0"
-  checksum: 10/1c99314fd12a2f878e98e605108e6fd3ab83e6f969e490a0170eb616cb3d4fb52efe9a6b6d4dcbb24a18c71d240a08e89722cb861c0131284f1bd89fcf679cf3
+  checksum: 10/4d79c0507267a73afc0eb64fcb3087ff234eb94eeafb536bfa3ed604bd51987eb4eb4d1621a05c02c2a9af50e0be9e37ec7c536a0c18d7a8b86d36cc45a07699
   languageName: node
   linkType: hard
 
@@ -2110,7 +2110,7 @@ __metadata:
     "@nestjs/testing": "npm:^11.0.8"
     "@subql/common": "npm:^5.8.2"
     "@subql/common-ethereum": "workspace:*"
-    "@subql/node-core": "npm:^19.2.0"
+    "@subql/node-core": "npm:^19.3.1"
     "@subql/testing": "npm:^2.2.1"
     "@subql/types-ethereum": "workspace:*"
     "@types/express": "npm:^4.17.13"
@@ -3507,13 +3507,13 @@ __metadata:
   linkType: hard
 
 "axios@npm:^1.13.1":
-  version: 1.13.5
-  resolution: "axios@npm:1.13.5"
+  version: 1.15.0
+  resolution: "axios@npm:1.15.0"
   dependencies:
     follow-redirects: "npm:^1.15.11"
     form-data: "npm:^4.0.5"
-    proxy-from-env: "npm:^1.1.0"
-  checksum: 10/db726d09902565ef9a0632893530028310e2ec2b95b727114eca1b101450b00014133dfc3871cffc87983fb922bca7e4874d7e2826d1550a377a157cdf3f05b6
+    proxy-from-env: "npm:^2.1.0"
+  checksum: 10/d39a2c0ebc7ff4739401b282e726cc2673377949d6c46d60eb619458f8d7a2f7eadbcada7097f4dbc7d5c59abb4d3bf6fac33d474412bc3415d3f5aa7ed45530
   languageName: node
   linkType: hard
 
@@ -9842,10 +9842,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"proxy-from-env@npm:^1.1.0":
-  version: 1.1.0
-  resolution: "proxy-from-env@npm:1.1.0"
-  checksum: 10/f0bb4a87cfd18f77bc2fba23ae49c3b378fb35143af16cc478171c623eebe181678f09439707ad80081d340d1593cd54a33a0113f3ccb3f4bc9451488780ee23
+"proxy-from-env@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "proxy-from-env@npm:2.1.0"
+  checksum: 10/fbbaf4dab2a6231dc9e394903a5f66f20475e36b734335790b46feb9da07c37d6b32e2c02e3e2ea4d4b23774c53d8562e5b7cc73282cb43f4a597b7eacaee2ee
   languageName: node
   linkType: hard
 
