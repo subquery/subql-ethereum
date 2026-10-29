@@ -105,6 +105,12 @@ export class UnfinalizedBlocksService extends BaseUnfinalizedBlocksService<Block
 
     // Work backwards through the blocks until we find a matching hash
     for (const header of bestVerifiableBlocks.reverse()) {
+      // Walk back to the block above this one. The cached blocks can have a gap below the forked header,
+      // e.g. when node-core stops a backfill at a fork, so the walk can't step once per cached block
+      while (checkingHeader.blockHeight > header.blockHeight + 1) {
+        checkingHeader = await this.getParentHeader(checkingHeader);
+      }
+
       if (
         header.blockHash === checkingHeader.blockHash ||
         header.blockHash === checkingHeader.parentHash
@@ -113,23 +119,7 @@ export class UnfinalizedBlocksService extends BaseUnfinalizedBlocksService<Block
       }
 
       // Get the new parent
-      if (!checkingHeader.parentHash) {
-        throw new Error('Unable to get parent hash for header');
-      }
-      const parentHeight = checkingHeader.blockHeight - 1;
-      try {
-        checkingHeader = await this.blockchainService.getHeaderForHash(
-          checkingHeader.parentHash,
-        );
-      } catch {
-        // Parent block not found on chain (orphaned), fall back to height-based check
-        logger.warn(
-          `Failed to get block by hash, falling back to height-based check at height ${parentHeight}`,
-        );
-        checkingHeader = await this.blockchainService.getHeaderForHeight(
-          parentHeight,
-        );
-      }
+      checkingHeader = await this.getParentHeader(checkingHeader);
     }
 
     try {
@@ -148,6 +138,22 @@ export class UnfinalizedBlocksService extends BaseUnfinalizedBlocksService<Block
       // TODO rewind back 1000+ blocks
       logger.info('Failed to use POI to rewind block');
       throw e;
+    }
+  }
+
+  private async getParentHeader(header: Header): Promise<Header> {
+    if (!header.parentHash) {
+      throw new Error('Unable to get parent hash for header');
+    }
+    const parentHeight = header.blockHeight - 1;
+    try {
+      return await this.blockchainService.getHeaderForHash(header.parentHash);
+    } catch {
+      // Parent block not found on chain (orphaned), fall back to height-based check
+      logger.warn(
+        `Failed to get block by hash, falling back to height-based check at height ${parentHeight}`,
+      );
+      return this.blockchainService.getHeaderForHeight(parentHeight);
     }
   }
 }

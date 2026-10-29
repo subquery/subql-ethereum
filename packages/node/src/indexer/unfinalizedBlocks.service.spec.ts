@@ -47,7 +47,8 @@ const getMockApi = (): EthereumApiService => {
         return Promise.resolve({
           number: num,
           hash: typeof hash === 'number' ? hexify(`0xABC${hash}f`) : hash,
-          parentHash: hexify(`0xABC${num - 1}f`),
+          // The genesis block's parent hash is all zeros
+          parentHash: num === 0 ? hexify('0x00') : hexify(`0xABC${num - 1}f`),
           timestamp: genBlockTimestamp(num) / 1000,
         });
       },
@@ -57,6 +58,7 @@ const getMockApi = (): EthereumApiService => {
         parentHash: '0xABC109f',
         timestamp: genBlockTimestamp(110) / 1000,
       })),
+      getBestBlockHeight: jest.fn(() => 120),
     },
   } as any;
 };
@@ -123,6 +125,43 @@ describe('UnfinalizedBlockService', () => {
     );
 
     expect(rewind?.blockHeight).toEqual(103);
+  });
+
+  // node-core stops a backfill at a fork, so the blocks between the last cached block and the forked header are missing
+  it('handles a block fork with a gap below the forked header', async () => {
+    await unfinalizedBlocks.init(jest.fn());
+
+    (unfinalizedBlocks as any)._unfinalizedBlocks = [
+      makeHeader(106, true),
+      makeHeader(107, true),
+      makeHeader(108, true),
+      makeHeader(109, true), // Last block before the fork
+      makeHeader(110),
+    ];
+
+    const rewind = await (
+      unfinalizedBlocks as any
+    ).getLastCorrectFinalizedBlock(makeHeader(115, true));
+
+    expect(rewind?.blockHeight).toEqual(109);
+  });
+
+  it('handles a block fork over several cached blocks with a gap below the forked header', async () => {
+    await unfinalizedBlocks.init(jest.fn());
+
+    (unfinalizedBlocks as any)._unfinalizedBlocks = [
+      makeHeader(106, true),
+      makeHeader(107, true), // Last block before the fork
+      makeHeader(108),
+      makeHeader(109),
+      makeHeader(110),
+    ];
+
+    const rewind = await (
+      unfinalizedBlocks as any
+    ).getLastCorrectFinalizedBlock(makeHeader(115, true));
+
+    expect(rewind?.blockHeight).toEqual(107);
   });
 
   it('uses POI blocks if there are not enough cached unfinalized blocks', async () => {
@@ -228,7 +267,12 @@ describe('UnfinalizedBlockService', () => {
 
     await unfinalizedBlocks.init(rewind);
 
-    // It should fall back to poi in this case
-    expect(rewind).toHaveBeenCalledWith({ blockHeight: 0 });
+    // Without POI it rewinds blockForkReindex blocks back from the forked block, but not before genesis
+    expect(rewind).toHaveBeenCalledWith({
+      blockHash: '0x000ABC0f',
+      blockHeight: 0,
+      parentHash: '0x00000000',
+      timestamp: genBlockDate(0),
+    });
   });
 });
