@@ -131,9 +131,27 @@ jobs:
           package-path: packages/node
           repo-token: ${{ steps.app-token.outputs.token }}
 
+  # Fails before anything is published if the release app can't get a token, so a prerelease is never
+  # published without its version bump being pushed to main. The token is revoked when this job ends.
+  check-release-app:
+    name: Check Release App
+    needs: pre-ci
+    if: >
+      !startsWith(needs.pre-ci.outputs.commit-message, '[SKIP CI]')
+      && !startsWith(needs.pre-ci.outputs.commit-message, '[release]')
+      && github.repository == 'subquery/subql-ethereum'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create release app token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.RELEASE_APP_CLIENT_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+          permission-contents: write
+
   prerelease:
     name: Prerelease Publish
-    needs: [pre-ci, setup]
+    needs: [pre-ci, setup, check-release-app]
     if: >
       !startsWith(needs.pre-ci.outputs.commit-message, '[SKIP CI]')
       && !startsWith(needs.pre-ci.outputs.commit-message, '[release]')
@@ -177,18 +195,8 @@ jobs:
         with:
           package-path: packages/node
 
-      # Created after install, build and publish, so their third-party code never sees a write token
-      - name: Create release app token
-        id: app-token
-        uses: actions/create-github-app-token@v3
-        with:
-          client-id: ${{ vars.RELEASE_APP_CLIENT_ID }}
-          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
-          permission-contents: write
-
       - name: Commit changes
-        env:
-          TOKEN: ${{ steps.app-token.outputs.token }}
+        id: commit
         run: |
           git add .
           if git diff --cached --quiet; then
@@ -197,4 +205,20 @@ jobs:
           fi
           git -c user.name="github-actions" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
             commit -m "[SKIP CI] Prerelease"
-          git push "https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:${GITHUB_REF_NAME}"
+          echo "committed=true" >> "$GITHUB_OUTPUT"
+
+      # Created after install, build, publish and commit (its pre-commit hook runs lint-staged), so their third-party code never sees a write token
+      - name: Create release app token
+        if: steps.commit.outputs.committed == 'true'
+        id: app-token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.RELEASE_APP_CLIENT_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+          permission-contents: write
+
+      - name: Push changes
+        if: steps.commit.outputs.committed == 'true'
+        env:
+          TOKEN: ${{ steps.app-token.outputs.token }}
+        run: git push "https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:${GITHUB_REF_NAME}"
