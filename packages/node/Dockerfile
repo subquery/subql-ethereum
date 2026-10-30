@@ -1,5 +1,5 @@
 # ---- Build Stage ----
-FROM node:lts-alpine AS builder
+FROM node:26-alpine AS builder
 
 WORKDIR /app
 RUN apk add --no-cache python3 make g++ jq bash
@@ -11,7 +11,7 @@ COPY ./scripts/build.sh ./scripts/build.sh
 RUN ./scripts/build.sh packages/node
 
 # ---- Production Stage ----
-FROM node:lts-alpine
+FROM node:26-alpine
 
 ENV NODE_ENV=production
 RUN apk add --no-cache tini python3 make g++
