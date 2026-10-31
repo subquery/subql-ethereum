@@ -54,7 +54,8 @@ async function fetchDictionaryBlock(): Promise<RawEthBlock> {
   return (await res.json()).result.blocks[0];
 }
 
-describe('rawBlockToEthBlock', () => {
+// ethereum.node.subquery.network no longer resolves
+describe.skip('rawBlockToEthBlock', () => {
   const api = new EthereumApi(RPC_URL, 1, new EventEmitter2());
   let raw: RawEthBlock;
   let rpcBlock: IBlock<EthereumBlock>;

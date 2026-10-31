@@ -38,7 +38,8 @@ describe('OPRPCProviders', () => {
     expect(receipt.l1GasUsed).toEqual(BigNumber.from('0x098c'));
   });
 
-  it('should work with a network that isnt OP based', async () => {
+  // eth.llamarpc.com is unreachable
+  it.skip('should work with a network that isnt OP based', async () => {
     const provider = new OPJsonRpcProvider('https://eth.llamarpc.com');
 
     const receipt = formatReceipt<EthereumReceipt & OPReceiptFields>(
