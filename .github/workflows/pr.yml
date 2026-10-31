@@ -59,6 +59,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           skip-step: install
+          package-manager: yarn
           working-directory: ${{ matrix.path }}
           test-script: yarn test-jest
           annotations: none

@@ -384,8 +384,14 @@ describe('Codegen spec', () => {
     };
 
     await expect(
-      generateAbis([ds], PROJECT_PATH, undefined as any, undefined as any, undefined as any)
-    ).resolves.toBeDefined();
+      generateAbis(
+        [ds],
+        PROJECT_PATH,
+        (p) => Promise.resolve(),
+        (v) => v as any,
+        () => Promise.resolve()
+      )
+    ).resolves.not.toThrow();
   });
 
   it('validates abi with !null filter', async () => {
