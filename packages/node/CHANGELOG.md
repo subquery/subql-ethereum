@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [6.6.0] - 2026-10-31
 ### Changed
 - Update `@subql/node-core` to 19.4.0
 - The docker image uses `node:26-alpine` instead of `node:lts-alpine` (#438)
@@ -688,7 +690,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Init release
 
-[Unreleased]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/6.5.0...HEAD
+[Unreleased]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/6.6.0...HEAD
+[6.6.0]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/6.5.0...node-ethereum/6.6.0
 [6.5.0]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/6.4.0...node-ethereum/6.5.0
 [6.4.0]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/6.3.3...node-ethereum/6.4.0
 [6.3.3]: https://github.com/subquery/subql-ethereum/compare/node-ethereum/6.3.1...node-ethereum/6.3.3

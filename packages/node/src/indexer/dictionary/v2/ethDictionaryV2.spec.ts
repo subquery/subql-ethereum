@@ -120,7 +120,7 @@ function makeBlockHeightMap(mockDs: SubqlDatasource[]): BlockHeightMap<any> {
 }
 
 // enable this once dictionary v2 is online
-describe('eth dictionary v2', () => {
+describe.skip('eth dictionary v2', () => {
   let ethDictionaryV2: EthDictionaryV2;
   let ethApi: EthereumApi;
 
